@@ -13,10 +13,12 @@ df = dcast(Cars93, Manufacturer ~ Type, fun.aggregate = mean, value.var = "Price
 df
 
 
-#문제4. for문을 사용해서 1~10까지의 누적합 구하기.
+#문제4. for문을 사용해서 1~20 까지의 짝수의 합 구하기.
 x = 0
-for(i in 1:10){
-  x = x + i
+for(i in 1:20){
+  if((i %% 2) == 0){
+    x = x + i
+  }
 }
 x
 
