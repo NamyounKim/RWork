@@ -1,0 +1,18 @@
+{
+    "contents" : "require(dplyr)\nrequire(stringi)\nrequire(ggplot2)\nrequire(psych)\n\ntrain <- read.csv(\"./train.csv\")\ntest <- read.csv(\"./test.csv\")\n\nhead(train)\n\ntrain_r <- train %>% group_by(SibSp,Survived) %>% summarise(count=n()) %>% mutate(ratio=count/sum(count))\ntrain_Parch <- train %>% group_by(Parch,Survived) %>% summarise(count=n()) %>% mutate(ratio=count/sum(count))\ntrain_Pclass <- train %>% group_by(Pclass,SibSp,Survived) %>% summarise(count=n()) %>% mutate(ratio=count/sum(count))\ntrain_r\ntrain_r[train_r$Survived==1,]\ntrain_p[train_p$Survived==1,]\n\nggplot(train[train$Parch!='0',], aes(x=factor(Pclass), fill=factor(Parch)))+geom_bar()\n\nggplot(train, aes(x=factor(), y=Age))+ geom_boxplot()\n\nggplot(train, aes(Age, fill=factor(Survived)))+ geom_histogram(alpha=.5, position=\"identity\")\n\nggplot(train_Parch, aes(x=factor(Parch), y=ratio, fill=factor(Survived)))+geom_bar(stat = \"identity\")\nggplot(train_Pclass, aes(x=factor(SibSp), y=count, fill=factor(Pclass)))+geom_bar(stat = \"identity\")\n\n#버블차트\np<-ggplot(train_r, aes(x=SibSp, y=factor(Survived), size=count, colour=ratio))\np + geom_point() + scale_size_area(max_size = 25) + scale_colour_gradient(low=\"white\", high=\"red\")+ theme(axis.text=element_text(size=12))\n\nsummary(train$Survived)\n\n\n#여자와 어린아이가 많이 살았다\n#1st Class 사람들이 많이 살았다\n#부모/자식이 없이 탑승한 사람들이 상당히 많다. 하지만 생존 비율로 보면 1~3명 정도의 부모/자식이 있는 사람이 많이 생존함\n#형제자매/남편 또는 부인 없이 탑승한 사람들이 상당히 많다. 하지만 `1~2명 정도의 형제자매/남편 or 부인이 있는 사람이 많이 생존함\n\n\nlibrary(ca)\ntt <- table(train$Sex, train$Survived)\nmytable <- with(train, table(train$Pclass, train$Parch)) # create a 2 way table\nprop.table(mytable, 1) # row percentages\nprop.table(mytable, 2) # column percentages\n\nfit <- ca(mytable)\nprint(fit) # basic results \nsummary(fit) # extended results \nplot(fit) # symmetric map\nplot(fit, mass = TRUE, contrib = \"absolute\", map =\"rowgreen\", arrows = c(FALSE, TRUE)) # asymmetric map\nsummary(train)\n\nggplot(train[train$Parch!='0',], aes(x=factor(Pclass), fill=factor(Parch)))+geom_bar()\n#등급이 낮은 사람들의 자녀수가 많다.\n\n\n\n\n\n\n###################################\nseed <- 1000\ntrain2 <- subset(train , select= -c(Ticket,Name,Cabin))\ntest2 <- subset(test, select = -c(Ticket,Name,Cabin))\ntrain2$Survived <- factor(train2$Survived)\nf=rpart(Survived~.,data=train2, control=rpart.control(cp=0.01))\nfancyRpartPlot(f)\nplotcp(f)\n\n\npred <- predict(f, test2)\n\n\nregistered=rpart(registered~hour,data=train, control=rpart.control(minbucket = 900 ,cp=0.0075))\nfancyRpartPlot(registered)\nplotcp(registered)\n\nmean(train[train$humidity < 13, \"registered\"])\n\n\n\n\n\n\n\n\n",
+    "created" : 1458888709405.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "432863474",
+    "id" : "2F608044",
+    "lastKnownWriteTime" : 1459398778,
+    "path" : "D:/GitHub/RWork/Titanic/titanic.R",
+    "project_path" : "titanic.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "type" : "r_source"
+}

@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "#KoNLP 설치\ninstall.packages(\"KoNLP\")\nlibrary(KoNLP)\nlibrary(stringi)\n\n#KoNLP를 불러올때 에러가 난다면 JAVA의 경로를 다시 세팅\n#Sys.setenv(JAVA_HOME=\"C:/Program Files/Java/jre1.8.0_101\")\n\n\n#문석 대상 텍스트\nsentence = \"류현진(30·LA다저스)이 복귀전에서 5회를 버티지 못했다. 하지만 충분히 박수를 받을만한 경기였다.\"\n\n#명사만 추출\nextractNoun(sentence)\n\n#세종사전 사용하기\nuseSejongDic()\n\n#POS 태깅 정보 추출\ntermPos = SimplePos22(sentence)\n\n#POS 태깅 정보를 활용한 명사, 동사 추출\ntxt = NULL\n\nfor(i in 1: length(termPos)){\n  step1 = stri_split_fixed(termPos[i],\"+\")\n  step2 = unlist(step1)\n  for(j in 1:length(step2)){\n    if(grepl(\"/NC\",step2[j])){\n      temp = unlist(stri_split_fixed(step2[j],\"/\"))\n      temp = temp[1]\n      txt = paste(txt, temp, sep = \" uu\")\n    }else if(grepl(\"/PV\",step2[j])){\n      temp = unlist(stri_split_fixed(step2[j],\"/\"))\n      temp = temp[1]\n      txt = paste(txt, temp, collapse = \" \")\n    }\n  }\n}\n\n\n#txtDf = read.csv(\"./HomeApplication_cafe.csv\", stringsAsFactors = FALSE, header = TRUE, encoding = \"bytes\")\n#txt = sapply(sentence, function(x) {paste(extractNoun(x), collapse=\" \")}) \n\n",
+    "created" : 1497766328604.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2991234031",
+    "id" : "9582C4E6",
+    "lastKnownWriteTime" : 1491828511,
+    "last_content_update" : 1491828511,
+    "path" : "~/GitHub/RWork/FastCampus/konlp_test.R",
+    "project_path" : "konlp_test.R",
+    "properties" : {
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

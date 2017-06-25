@@ -1,0 +1,18 @@
+{
+    "contents" : "install.packages(\"ca\")\nlibrary(ca)\nlibrary(reshape)\n\ntest <- read.csv(\"./test_correspond2.csv\")\ntt <- cast(test, media_type_name ~ Product)\ntt[is.na(tt)] <- 0\ntt2 <- as.matrix(tt)\n\nmytable <- with(train, table(train$Pclass, train$Parch)) # create a 2 way table\nprop.table(tt2, 1) # row percentages\nprop.table(mytable, 2) # column percentages\n\nfit <- ca(tt2)\nprint(fit) # basic results \nsummary(fit) # extended results \nplot(fit) # symmetric map\nplot(fit, mass = TRUE, contrib = \"absolute\", map =\"rowgreen\", arrows = c(FALSE, TRUE)) # asymmetric map\nsummary(train)\n",
+    "created" : 1459154309183.000,
+    "dirty" : true,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "2438837515",
+    "id" : "AFF0E344",
+    "lastKnownWriteTime" : 7011605692497750387,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "type" : "r_source"
+}

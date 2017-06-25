@@ -1,0 +1,9 @@
+{
+    "path" : "~/GitHub/TextMining/Alibaba_Dashboard",
+    "sortOrder" : [
+        {
+            "ascending" : true,
+            "columnIndex" : 2
+        }
+    ]
+}

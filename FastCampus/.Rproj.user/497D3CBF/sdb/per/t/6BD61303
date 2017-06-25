@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "#======================================\n# word2vec로 연관 키워드 추출하기\n#======================================\ninstall.packages(\"tsne\")\ninstall.packages(\"devtools\")\nlibrary(devtools)   #Rtools는 Windows에 깔때 별도로 깔아야 한다.\ninstall_github(\"bmschmidt/wordVectors\")\nlibrary(wordVectors)\nlibrary(tsne)\nlibrary(readr)\n\n#형태소 분석기 실행하기\nsystem(\"tctStart\")\ntargetData = read_csv(\"/Users/kimnamyoun/TextConvert4TM/output/out_HomeApplication_cafe.csv\")\ntargetData = read_csv(\"c:/TextConvert4TM_v1.0/output/out_HomeApplication_cafe.csv\")\n\n#word2vec Train용 TXT파일 만들기\nwrite.table(targetData$parsedContent,file = \"./trainTxt.txt\", row.names = FALSE, col.names = FALSE, quote = F)\n\n#모델 Training\nmodel = train_word2vec(\"./trainTxt.txt\", output_file = \"w2vModel.bin\", \n                       threads=3, vectors=100, force = T)\n\n#word2vector 확인하기\nread.vectors(\"./w2vModel.bin\")\n\n#연관 키워드 추출하기\nnearest_to(model,model[[\"냉장고\"]], 20)\n\n#2가지 이상 키워드에 대한 연관 키워드 추출하기\nnearest_to(model,model[[c(\"냉장고\",\"양문\")]], 20)\n\n#단어간 연산하기\nsubVec = model[rownames(model)==\"냉장고\",] - model[rownames(model) == \"디오스\",] + model[rownames(model) == \"트롬\",]\nnearest_to(model, subVec, 20)\n\n#전체 단어 관계 시각화\nlibrary(extrafont) \npar(family=\"AppleGothic\") \n\nplot(model)\n\n######### 전처리 하기 ############\n#영어 소문자로 바꾸기\ntargetData$parsedContent = tolower(targetData$parsedContent)\n\n\n\n\n#Cosine 유사도 (= 1 - Cosine거리)\ncosineSimilarity(model[[\"냉장고\"]], model[[\"그룹\"]])\n\n#Euclidean Distance\ndist(model[(row.names(model)==\"냉장고\" | row.names(model)==\"그룹\"),])\n\n",
+    "created" : 1497766345143.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1219648158",
+    "id" : "6BD61303",
+    "lastKnownWriteTime" : 1497757313,
+    "last_content_update" : 1497757313,
+    "path" : "~/GitHub/RWork/FastCampus/word2vec.R",
+    "project_path" : "word2vec.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

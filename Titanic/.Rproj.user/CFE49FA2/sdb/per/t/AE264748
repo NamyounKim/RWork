@@ -1,0 +1,17 @@
+{
+    "contents" : "library(ggplot2)\nlibrary(psych)\n\n#Box plot\nggplot(train, aes(x=factor(hour), y=registered, fill=factor(year))) + geom_boxplot(outlier.colour = \"RED\") + stat_summary(fun.y=mean,geom = \"point\", size=2) + theme(axis.text=element_text(size=12), legend.position=\"bottom\") \nggplot(train[train$year=='2012',], aes(x=factor(hour), y=count, fill=factor(workingday))) + geom_boxplot() + theme(axis.text=element_text(size=12))\nggplot(train, aes(x=factor(weather), y=count)) + geom_boxplot() + theme(axis.text=element_text(size=12))\n\n\n#Scatter Plot\n#p<-ggplot(train, aes(x=season, y=weather, size=rentCount, colour=temp))\n#p + geom_point() + scale_size_area(max_size = 25) + scale_colour_gradient(low=\"lightblue\", high=\"red\")+ theme(axis.text=element_text(size=12))\n\npairs.panels(subset(train, select = c(count,diffTemp)))\npairs.panels(subset(train, diffTemp <=0 ,select = c(count,casual,registered,temp,atemp,diffTemp)))\n\n#Bar Plot\nggplot(temp, aes(x=factor(hour), y=rentCount, fill=category))+ geom_bar(stat = \"identity\", width = 0.8, position = \"dodge\") + theme(axis.text=element_text(size=12)) + scale_fill_brewer(palette=\"Set2\")\n\n\n#Data row check\ntrain_m <- train %>% group_by(hour) %>% summarise(rentCount = mean(count)) %>% mutate(category = \"real\")\nresult_m <- resultTemp %>% group_by(hour) %>% summarise(rentCount = mean(count)) %>% mutate(category =\"pred\")\ntemp <- rbind(as.data.frame(train_m), as.data.frame(result_m))\ntrain_m\n\n\n\ntest <- aov(count ~ season, data=train)\nsummary(test)\ntestDf<- fitted(test)\ntestDf <- as.data.frame(testDf)\ntestDf$resid <- resid(test)\nggplot(testDf, aes(x=testDf, y=resid)) + geom_point()\nggplot(testDf, aes(sample = resid)) + stat_qq()\n",
+    "created" : 1458888908714.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2305470306",
+    "id" : "AE264748",
+    "lastKnownWriteTime" : 1458793982,
+    "path" : "D:/GitHub/RWork/tests/bike_chart.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "type" : "r_source"
+}

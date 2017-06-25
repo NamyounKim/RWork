@@ -1,0 +1,18 @@
+{
+    "contents" : "\nwine_red <- read.csv(file = \"./1_wine/winequality-red.csv\" , sep=\";\")\nwine_white <- read.csv(file=\"./1_wine/winequality-white.csv\", sep=\";\")\n\nhead(wine_red)\nwine_red$quality <- factor(wine_red$quality)\n\n\nfit <- princomp(wine_red[,-12], cor=TRUE)\nsummary(fit) # print variance accounted for \nloadings(fit) # pc loadings \nplot(fit,type=\"lines\") # scree plot \nfit$scores # the principal components\nbiplot(fit)\n\nlibrary(psych)\nfit <- principal(wine_red[,-12], nfactors=5, rotate=\"varimax\")\nfit # print results\n\n\n#Exploratory Factor Analysis\nfit2 <- factanal(wine_red[,-12], 3, rotation=\"varimax\")\nprint(fit2, digits=2, cutoff=.3, sort=TRUE)\nprint(fit2$loadings, cutoff=.3, sort=TRUE)\n# plot factor 1 by factor 2 \nload <- fit2$loadings[,1:2] \nplot(load,type=\"n\") # set up plot \ntext(load,labels=names(wine_red[,-12]),cex=.7) # add variable names\n\n\n\n#Using fa() from package psych with rotation\ncorMat <- cor(wine_red[,-12])\nfaPC  <- fa(r=corMat, nfactors=4, rotate=\"varimax\")\nfactor.plot(faPC, cut=0.5)\nfa.diagram(faPC)\n#Determine number of factors\nfa.parallel(wine_red[,-12])\nvss(wine_red[,-12], rotate=\"varimax\") \n",
+    "created" : 1459499804890.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "548590171",
+    "id" : "E2B23D52",
+    "lastKnownWriteTime" : 1459502209,
+    "path" : "D:/GitHub/RWork/tests/wine.R",
+    "project_path" : "wine.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "type" : "r_source"
+}

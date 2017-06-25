@@ -1,0 +1,18 @@
+{
+    "contents" : "rm(list=ls())\ngc()\n\n#package check & install & load\nlibraryList <- c(\"dplyr\",\"stringi\",\"caret\",\"reshape\",\"randomForest\",\"lubridate\",\"ggplot2\",\"psych\",\"doParallel\")\n\nfor(lib in libraryList){\n  package.checking <- find.package(lib,quiet=TRUE)\n  if(length(package.checking) == 0){\n    install.packages(lib)\n  }\n}\nrequire(dplyr)\nrequire(stringi)\nrequire(caret)\nrequire(reshape)\nrequire(lubridate)\nrequire(randomForest)\nrequire(e1071)\nrequire(ggplot2)\nrequire(psych)\nrequire(doParallel)\n\ntrain <- read.csv(\"./train.csv\")\n#train_s <- subset(train, select = c(ID,TARGET))\ntrain_s <- train[,!(colnames(train) %in% c(\"ID\",\"TARGET\"))]\n\nggplot(train, aes(x=factor(TARGET))) + geom_bar()\n\nggplot(train, aes(x=factor(TARGET), y=saldo_var30)) + geom_boxplot()\nggplot(train[(train$var3>0 & train$var3<50),], aes(x=factor(TARGET), y=var3)) + geom_boxplot()\n\ncvtrain <- trainControl(method=\"cv\", number=5)\ngrid <- data.frame(mtry=c(19,40,80,100,200))\n\nrf <- train(x=train_s, y=train$TARGET, method=\"parRF\",\n            trControl=cvtrain,\n            tuneGrid=grid,\n            ntree=200,\n            metric=\"Accuracy\",\n            importance=TRUE\n            #preProc=c(\"center\", \"scale\")\n)\n\n\n",
+    "created" : 1458625230906.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2505479190",
+    "id" : "A8CCBEEA",
+    "lastKnownWriteTime" : 1458721846,
+    "path" : "D:/GitHub/RWork/Santander Customer Satisfaction/main.R",
+    "project_path" : "main.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "type" : "r_source"
+}

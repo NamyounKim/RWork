@@ -1,0 +1,13 @@
+CREATE TABLE `t_tp_result_rank_namyun` (
+  `crawl_data_id` varchar(20) DEFAULT NULL COMMENT '문서아이디',
+  `role` varchar(10) DEFAULT NULL COMMENT '품사정보',
+  `keyword` varchar(50) DEFAULT NULL COMMENT '키워드',
+  `crawled_date` date DEFAULT NULL COMMENT '크롤링일자',
+  `ranking` int(8) DEFAULT NULL COMMENT '빈도수',
+  `user` varchar(20) DEFAULT NULL COMMENT '사용자',
+  `added_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'insert 시간',
+  KEY `npk_t_tm_result_rank_idx01` (`keyword`),
+  KEY `npk_t_tm_result_rank_idx02` (`crawl_data_id`),
+  KEY `npk_t_tm_result_rank_idx03` (`crawled_date`,`keyword`),
+  KEY `npk_t_tm_result_rank_idx04` (`added_date`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

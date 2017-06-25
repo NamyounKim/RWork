@@ -1,0 +1,18 @@
+문제1. 단어 20개만 ggplot을 이용하여 그래프 그려보기
+
+
+문제2. 상위 20개 단어의 상관관계 그래프 그려보기
+dtm_df20 = dtm_df[,colSums(dtm_df)>50]
+corrplot(cor(dtm_df20))
+
+
+문제3. stopword를 csv파일로 작성하고 R로 읽어와서 적용해보기
+
+
+문제4. Word2vec에서 동의어 처리하기
+#동의어 처리
+for (i in 1:length(targetData$parsedContent))
+{
+  targetData$parsedContent[i] = gsub("lg", "엘지", targetData$parsedContent[i])
+  targetData$parsedContent[i] = gsub("samsung", "삼성", targetData$parsedContent[i])
+}

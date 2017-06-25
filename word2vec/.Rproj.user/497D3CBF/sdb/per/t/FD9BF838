@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "install.packages(\"devtools\")\n#Rtools는 Windows에 깔때 별도로 깔아야 한다.\ninstall.packages(\"KoNLP\")\ninstall_github(\"mukul13/rword2vec\")\nlibrary(devtools)\nlibrary(rword2vec)\nls(\"package:rword2vec\")\n\nlibrary(KoNLP)\nrequire(doParallel)\nregisterDoParallel()\n\n#----------------------------------------\nmodel=word2vec(train_file = \"./이명박취임연설문.txt\",output_file = \"./vec.bin\", binary=1)\n\ndistance(file_name = \"./vec.bin\", search_word = \"대한\",num = 10)\n\nana=word_analogy(file_name = \"vec2.bin\",search_words = \"노무현 많은 때문에\",num = 20)\n\n\nbin_to_txt(\"./vec.bin\",\"./vector.txt\")\n\n\nvocab_count(file_name=\"./이명박취임연설문.txt\",vocab_file=\"./vocab.txt\",min_count = 20)\nd=read.table(\"./vocab.txt\")\n#-----------------------------------------------------------------------------------\n\nvocTxt = readChar(\"./out.txt\", file.info(\"./out.txt\")$size, useBytes = TRUE)\n\nuseSejongDic()\nvocNoun = extractNoun(vocTxt)\n\nvocNoun2 = NULL\nfor(i in 1:length(vocNoun)){\n  vocNoun2 = paste(vocNoun2, vocNoun[i])\n}\nwriteChar(vocNoun2, \"./vocNoun.txt\")\n\nmodel2=word2vec(train_file = \"./out.txt\",output_file = \"./vecNoun.bin\",binary=2)\ndistance(file_name = \"./vecNoun.bin\", search_word = \"일자리\",num = 15)\nword_analogy(file_name = \"./vecNoun.bin\", search_words = \"젊은이 취업 젊은이\",num = 10)\n\n#vocab_count(file_name=\"./vecNoun.bin\", vocab_file=\"./vocNounVocab.txt\", min_count = 0)\n\nbin_to_txt(\"./vecNoun.bin\",\"./vectorNoun.txt\")\nvectorNoun = read.table(\"./vectorNoun.txt\",skip=1, fill = TRUE)\n\n#PCA\nfit = princomp(vectorNoun[,2:101], cor=TRUE)\n\n\n#----------------------------------------------------------------------\nplot(vectorNoun[,4:5])\ntext(vectorNoun[,4],vectorNoun[,5], vectorNoun[,1], cex= 0.7)\n\n\ninstall.packages(\"Rtsne\")\nlibrary(Rtsne)\nrtsne_out <- Rtsne(as.matrix(vectorNoun[1:209,2:101]))\njpeg(\"d:\\\\barneshutplot.jpg\", width=2400, height=1800)\nplot(rtsne_out$Y, t='n', main=\"BarnesHutSNE\")\ntext(rtsne_out$Y, labels=vectorNoun[,1], family=\"AppleGothic\")\nas.matrix(vectorNoun)\n",
+    "created" : 1481286750324.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4196070425",
+    "id" : "FD9BF838",
+    "lastKnownWriteTime" : 1481462296,
+    "last_content_update" : 1481462296556,
+    "path" : "~/GitHub/RWork/word2vec/word2vec_test.R",
+    "project_path" : "word2vec_test.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

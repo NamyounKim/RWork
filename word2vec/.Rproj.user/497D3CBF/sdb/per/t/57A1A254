@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "parsedData =read.csv(\"/Users/kimnamyoun/develop/workspace/TextConvert4TM/output/out_그랜저HG_동호회카페_9.csv\", \n                     stringsAsFactors = FALSE, header = FALSE, encoding = \"UTF-8\")\n\ncolnames(parsedData) = c(\"id\",\"pContent\")\n\nView(parsedData)\n\ninstall.packages(\"tm\")\nlibrary(tm)\n\n#Corpus 생성\ncorp<-Corpus(DataframeSource(parsedData))\n\n#특수문자 제거\ncorp <- tm_map(corp, removePunctuation)\n\n#숫자 삭제\ncorp <- tm_map(corp, removeNumbers)\n\n#소문자로 변경\ncorp <- tm_map(corp, tolower)\n\n#특정 단어 삭제\ncorp <- tm_map(corp, removeWords, c(\"블로그\", \"품질\"))\n\n#동의어 처리\nfor (j in seq(corp))\n{\n  corp[[j]] <- gsub(\"nike\", \"나이키\", corp[[j]])\n  corp[[j]] <- gsub(\"현대자동차\", \"현대차\", corp[[j]])\n  corp[[j]] <- gsub(\"엘쥐전자\", \"엘지전자\", corp[[j]])\n  corp[[j]] <- gsub(\"칼퇴\", \"칼퇴근\", corp[[j]])\n}\n\n#텍스트문서 형식으로 변환\ncorp <- tm_map(corp, PlainTextDocument)\n\n\n#Document Term Matrix 생성\ndtm<-DocumentTermMatrix(corp, control=list(removeNumbers=TRUE, wordLengths=c(2,Inf)))\n\n#Term Document Matirx 생성\ntdm<-TermDocumentMatrix(corp, control=list(removeNumbers=TRUE, wordLengths=c(2,Inf)))\n\n#Sparse Terms 삭제\ndtm <- removeSparseTerms(dtm, as.numeric(0.98))\n\n#Remove low tf-idf col and row\nterm_tfidf <- tapply(dtm$v/row_sums(dtm)[dtm$i], dtm$j, mean) * log2(nDocs(dtm)/col_sums(dtm > 0))\nnew_dtm <-dtm[,term_tfidf >= 0.1]\nnew_dtm <-new_dtm[row_sums(new_dtm)>0,]\n\n#단어 발생 빈도 구하기\nfreq = colSums(as.matrix(dtm))\n\n#단어 개수 구하기\nlength(freq)\n\n#내림차순으로 단어 10개, sorting 하기\nfreq[tail(order(freq), 10)]\n\n#오름차순으로 단어 10개 sorting 하기\nfreq[head(order(freq),10)]\n\n#특정 빈도 사이값을 갖는 단어 구하기 (20보다 크고 341보다 작은 단어)\nfindFreqTerms(dtm, lowfreq = 20, highfreq = 341)\n\n#단어 빈도 시각화\nwordDf = data.frame(word=names(freq), freq=freq)\nlibrary(ggplot2)\nfont_import()\nloadfonts(device=\"postscript\")\nggplot(wordDf, aes(x=word, y=freq)) + geom_bar(stat = \"identity\")\n\n#단어 10개만 바차트로 보여주기\nggplot(head(wordDf,10), aes(x=word, y=freq)) + geom_bar(stat = \"identity\") + theme(axis.text.x = element_text(family=\"AppleGothic\"))\n\n#상위 50개 단어만 바차트로 보여주기\nggplot(head(arrange(wordDf,-freq),25), aes(x=reorder(word,-freq), y=freq)) + geom_bar(stat = \"identity\") + theme(axis.text.x = element_text(family=\"AppleGothic\"))\n\n\n",
+    "created" : 1482644015464.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "431469015",
+    "id" : "57A1A254",
+    "lastKnownWriteTime" : 1482762152,
+    "last_content_update" : 1482762152359,
+    "path" : "~/GitHub/RWork/word2vec/강의용Script.R",
+    "project_path" : "강의용Script.R",
+    "properties" : {
+        "tempName" : "Untitled2"
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

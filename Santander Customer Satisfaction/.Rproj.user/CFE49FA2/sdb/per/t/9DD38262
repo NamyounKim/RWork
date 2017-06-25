@@ -1,0 +1,17 @@
+{
+    "contents" : "rm(list=ls())\ngc()\n\n#package check & install & load\nlibraryList <- c(\"dplyr\",\"stringi\",\"caret\",\"reshape\",\"randomForest\",\"lubridate\",\"ggplot2\",\"psych\",\"doParallel\")\n\nfor(lib in libraryList){\n  package.checking <- find.package(lib,quiet=TRUE)\n  if(length(package.checking) == 0){\n    install.packages(lib)\n  }\n}\nrequire(dplyr)\nrequire(stringi)\nrequire(caret)\nrequire(reshape)\nrequire(lubridate)\nrequire(randomForest)\nrequire(e1071)\nrequire(ggplot2)\nrequire(psych)\nrequire(doParallel)\n\nsource(file = \"./function.R\")\nregisterDoParallel()\n\n#Load Data\ntrain <- read.csv(file=\"./2_bike/train.csv\")\ntest <- read.csv(file=\"./2_bike/test.csv\")\n\n#Data preprocessing\ntrain <- trainDataProcessing(train)\ntest <- testDataProcessing(test)\n\n#remove outlier\ntrain<- subset(train, diffTemp <=5)\n\nresult <- NULL\nrmse_sum <- NULL\nrsquared_sum <- NULL\n\nrsIndex <- 1\ncvtrain <- trainControl(method=\"cv\", number=5)\ngrid <- data.frame(mtry=c(3,4,5,6,7,8,9,10,11))\n\nfor(index_i in unique(train$hourRange)){\n    train_s <- train[(train$hourRange == index_i),]\n    test_s <- test[(test$hourRange == index_i),]\n    \n    rf <- train(x=selectVariable(train_s), y=train_s$logCount, method=\"parRF\",\n                trControl=cvtrain,\n                tuneGrid=grid,\n                ntree=200,\n                metric=\"RMSE\",\n                importance=TRUE\n                #preProc=c(\"center\", \"scale\")\n    )\n    \n    output <- predict(rf, selectVariable(test_s))\n    \n    #test_s$count <- output\n    test_s$count <- exp(output)\n    result <- rbind(result, test_s)\n    rmse_sum[rsIndex] <- rf$results[2][match(rf$bestTune$mtry, grid$mtry),]\n    rsquared_sum[rsIndex] <- rf$results[3][match(rf$bestTune$mtry, grid$mtry),]\n    print(paste(index_i))\n    print(varImp(rf))\n    print(rmse_sum[rsIndex])\n    rsIndex <- rsIndex+1\n}\n\nwrite.csv(subset(result, select = c(datetime,count)), file=\"./predicted_test.csv\", row.names = FALSE, fileEncoding=\"UTF-8\")\n\n\n\n",
+    "created" : 1458625771321.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1564634238",
+    "id" : "9DD38262",
+    "lastKnownWriteTime" : 1457684295,
+    "path" : "D:/GitHub/RWork/tests/bike_one.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "type" : "r_source"
+}

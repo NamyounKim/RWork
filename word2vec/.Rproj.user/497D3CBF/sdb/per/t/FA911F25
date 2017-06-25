@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "getwd()\nsetwd(\"/Users/kimnamyoun/GitHub/TextMining/\")\nlocaleToCharset()\n\ntm <- read.csv(\"/Users/kimnamyoun/GitHub/out_resume.csv\", encoding = \"EUC-KR\")\nhead(tm)\nsource(\"./ML_functions.R\")\ntmKeyword <- fn_tm_keys(tm)\ncorp<-Corpus(DataframeSource(tmKeyword))\ndtm<-DocumentTermMatrix(corp, control=list(removeNumbers=TRUE, wordLengths=c(2,Inf)))\ndtm <- removeSparseTerms(dtm, as.numeric(0.999))\n\n\nrequire(wordcloud)\nlibrary(RColorBrewer)\nlibrary(extrafont)\nfont_import()\nloadfonts(device=\"postscript\")\ndisplay.brewer.all()\npal <- brewer.pal(9, \"BuGn\")\nwordcloud(tm$keyword,tm$count,colors=pal,family=\"AppleGothic\")\n\nlibrary(dplyr)\nlibrary(wordcloud)\n\ntm <- read.csv(\"/home/ruser/TextPrism/RSource/out_resume.csv\", encoding = \"UTF-8\")\nhead(tm)\n#Pre Processing\ntm$keyword <- replace(tm$keyword, (tm$keyword %in% \"역활\"), \"마케팅\")\ntm$keyword <- replace(tm$keyword, (tm$keyword %in% \"lg\"), \"LG전자\")\ntm$keyword <- replace(tm$keyword, (tm$keyword %in% \"엘지\"), \"LG전자\")\ntm$keyword <- replace(tm$keyword, (tm$keyword %in% \"전자\"), \"LG전자\")\ntm$keyword <- replace(tm$keyword, (tm$keyword %in% \"다양\"), \"마케팅\")\ntm$keyword <- replace(tm$keyword, (tm$keyword %in% \"존슨\"), \"머신러닝\")\ntm$keyword <- replace(tm$keyword, (tm$keyword %in% \"2010\"), \"머신러닝\")\ntm$keyword <- replace(tm$keyword, (tm$keyword %in% \"도출\"), \"머신러닝\")\n\n\n\n\n\ntm2 <- tm %>% group_by(keyword) %>% summarise(freq=sum(count))\ntm3 <- tm2[order(-tm2$freq),]\nhead(tm3,30)\nstopword <- c(\"2013\",\"12\",\"sm\",\"01\",\"03\",\"04\",\"05\",\"07\",\"02\",\"2009\",\"20\",\"09\",\"16\",\"10\",\"21\",\"11\",\"06\",\"26\",\"08\")\ntm4<- tm3[!(tm3$keyword %in% stopword),]\nhead(tm4)\n\n\npal<-brewer.pal(9,\"Set2\")\nwordcloud(tm4$keyword, tm4$freq, min.freq =2, colors = pal, rot.per = 0.25, random.order = F, scale = c(5,1))\n\n\n",
+    "created" : 1481431568906.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1658707293",
+    "id" : "FA911F25",
+    "lastKnownWriteTime" : 1482762155,
+    "last_content_update" : 1482762155243,
+    "path" : "~/GitHub/TextMining/wordCloud.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

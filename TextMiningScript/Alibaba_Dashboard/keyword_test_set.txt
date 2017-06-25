@@ -1,0 +1,14 @@
+﻿week_num	product_type	sentiment	keyword	role	numKeyword	numDocs	competitor
+2015/38	Bolun	pos	洗衣机	N	52	1	galanz
+2015/33	Bolun	pos	洗衣机	N	28	1	galanz
+2015/33	Bolun	pos	品牌	NZ	20	1	galanz
+2015/38	Bolun	pos	洗衣	V	16	1	galanz
+2015/38	Bolun	pos	京东	NB	15	1	galanz
+2015/38	Bolun	pos	自动	A	13	1	galanz
+2015/38	Bolun	pos	功能	N	13	1	galanz
+2015/38	Bolun	pos	洗涤	V	13	1	galanz
+2015/38	Bolun	pos	衣物	NZ	12	1	galanz
+2015/38	Bolun	pos	智能	N	11	1	galanz
+2015/38	Bolun	pos	价格	NZ	10	1	galanz
+2015/38	Bolun	pos	内筒	NZ	10	1	galanz
+2015/38	Bolun	pos	海尔	NB	9	1	galanz

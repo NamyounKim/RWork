@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "rm(list=ls())\ngc()\n\nrequire(gdata)\nrequire(stringi)\nrequire(ggplot2)\nrequire(dplyr)\nrequire(reshape)\n\n### Font Setting ###\nlibrary(extrafont)\nfont_import()\nfonts()\nloadfonts(device = \"postscript\")\n\n#Load Expenditure Data\nexpenditure = read.xls(\"./raw_data.xlsx\", sheet=1, header=TRUE, perl = \"D:/Strawberry/perl/bin/perl5.22.2.exe\")\nexpenditure = read.csv(\"./expenditure.csv\")\nhead(expenditure)\nexpenditure = as.data.frame(expenditure)\n\n#Load Income Data\nincome = read.xls(\"./raw_data.xlsx\", sheet=2, header=TRUE)\nincome = read.csv(\"./income.csv\")\nhead(income)\nincome = as.data.frame(income)\n\n#Data Processing - Expenditure\nexpenditure$useDate = stri_paste(substr(expenditure$date,1,4),\"-\",substr(expenditure$date,6,7),\"-\",substr(expenditure$date,9,10))\nexpenditure$yearMonth = stri_paste(substr(expenditure$date,1,4),\"-\",substr(expenditure$date,6,7))\nexpenditure$totalExpend = expenditure$cash + expenditure$credit\nexpenditure$category1 = stri_split_fixed(expenditure$category,\">\",simplify = TRUE)[,1]\nexpenditure$category2 = stri_split_fixed(expenditure$category,\">\",simplify = TRUE)[,2]\n\nsubExpend = subset(expenditure, !(category1 %in% c('저축/보험','카드대금')))\n\n\n#Data Processing - Income\nincome$incomeDate = stri_paste(substr(income$date,1,4),\"-\",substr(income$date,6,7),\"-\",substr(income$date,9,10))\nincome$yearMonth = stri_paste(substr(income$date,1,4),\"-\",substr(income$date,6,7))\nincome$category1 = stri_split_fixed(income$category, \">\", simplify = TRUE)[,1]\nincome$category2 = stri_split_fixed(income$category, \">\", simplify = TRUE)[,2]\n\nsubIncome = subset(income, !(category1 %in% c('저축/보험','전월이월')))\n\ne_ym = subExpend %>% group_by(yearMonth, category1) %>% summarise(sumMoney=sum(totalExpend)) %>% mutate(type='expend')\ni_ym = subIncome %>% group_by(yearMonth, category2) %>% summarise(sumMoney = sum(income)) %>% mutate(type='income')\ne_category1 = subExpend %>% group_by(category1) %>% summarise(sumCash=sum(totalExpend))\ni_category1 = subIncome %>% group_by(category1) %>% summarise(sumIncome=sum(income))\n\n\nei_ym = rbind(e_ym, i_ym)\n\nggplot(ei_ym, aes(x=yearMonth, y=sumMoney, group=type, colour=type)) + geom_point() + geom_line() + theme(axis.text.x = element_text(angle = 90, hjust = 1))\nggplot(subset(e_ym, yearMonth<'2016-01'), aes(x=yearMonth, y=sumMoney, group=category1, colour=category1)) + geom_point() + geom_line() + theme(axis.text.x = element_text(angle = 90, hjust = 1))\nggplot(i_ym, aes(x=yearMonth, y=sumMoney, group=category2, colour=category2)) + geom_point() + geom_line() + theme(axis.text.x = element_text(angle = 90, hjust = 1))\n\nggplot(e_category1, aes(x=category1, y=sumCash)) + geom_bar(stat = \"identity\")\nggplot(i_category1, aes(x=category1, y=sumIncome)) + geom_bar(stat = \"identity\")\n\n\ntheme.text <- element_text(family=\"Apple SD Gothic Neo\", size=10)\n+ theme(axis.text.x=theme.text)\n",
+    "created" : 1462510601118.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "4150626084",
+    "id" : "E198F81E",
+    "lastKnownWriteTime" : 1464875360,
+    "last_content_update" : 0,
+    "path" : "~/GitHub/RWork/HouseKeepingBook/eda.R",
+    "project_path" : "eda.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

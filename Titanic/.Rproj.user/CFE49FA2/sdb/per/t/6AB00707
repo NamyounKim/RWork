@@ -1,0 +1,17 @@
+{
+    "contents" : "library(rpart)\nlibrary(rattle)\nlibrary(rpart.plot)\nlibrary(RColorBrewer)\n\nseed <- 100\nf=rpart(count~hour,data=train, control=rpart.control(minbucket = 900 ,cp=0.001))\nfancyRpartPlot(f)\nplotcp(f)\n\nregistered=rpart(registered~hour,data=train, control=rpart.control(minbucket = 900 ,cp=0.0075))\nfancyRpartPlot(registered)\nplotcp(registered)\n\nmean(train[train$humidity < 13, \"registered\"])\n\n\n\n\n\n\n\n\n\n\n\n",
+    "created" : 1459394816337.000,
+    "dirty" : true,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3987318580",
+    "id" : "6AB00707",
+    "lastKnownWriteTime" : 1457684295,
+    "path" : "D:/GitHub/RWork/tests/decisionTree.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "type" : "r_source"
+}

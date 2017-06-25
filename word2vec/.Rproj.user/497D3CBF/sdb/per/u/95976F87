@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "test = read.csv(\"/Users/kimnamyoun/develop/workspace/TextConvert4TM/out.csv\",header = FALSE, encoding=\"UTF8\", stringsAsFactors = FALSE)\ntest[1,2]\ntest = data.frame(test)\ncolnames(test) = c(\"id\", \"content\")\n\nlibrary(tm)\nrequire(dplyr)\nrequire(stringi)\nrequire(tm)\nrequire(reshape)\nrequire(slam)\nrequire(SnowballC)\ninstall.packages(\"tm\")\ninstall.packages(\"reshape\")\n\ncorp<-Corpus(DataframeSource(test))\ndtm<-DocumentTermMatrix(corp, control=list(removeNumbers=TRUE, wordLengths=c(2,Inf)))\ntdm<-TermDocumentMatrix(corp, control=list(removeNumbers=TRUE, wordLengths=c(2,Inf)))\ndtm <- removeSparseTerms(dtm, as.numeric(sparse))\n\nfindFreqTerms(dtm,lowfreq = 50)\ntermFreq = row_sums(tdm)\ntermFreq = as.data.frame(termFreq)\ntermFreq$word = row.names(termFreq)\ntermFreq %>% arrange()\ncorp\n",
+    "created" : 1481933127906.000,
+    "dirty" : true,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "4045954944",
+    "id" : "95976F87",
+    "lastKnownWriteTime" : 6,
+    "last_content_update" : 1481937974709,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "library(KoNLP)\n\nparsedData$pContent[1]\nextractNoun(parsedData$pContent[1])\nSimplePos09(parsedData$pContent[1])\n",
+    "created" : 1482762347481.000,
+    "dirty" : true,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "2467044969",
+    "id" : "C351724A",
+    "lastKnownWriteTime" : 6,
+    "last_content_update" : 1482762508948,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "tempName" : "Untitled2"
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

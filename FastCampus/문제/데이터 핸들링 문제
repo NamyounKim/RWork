@@ -1,0 +1,23 @@
+문제1. "hello text world"에서 o를 모두 x로 바꾸기
+ str = "hello text world"
+ 
+ 출력예시 : hellx text wxrld
+
+
+문제2. "1a2a3a4a5a6" 문자열을 "a"를 구분자로 나눠서 벡터형식으로 저장하기 
+  str= "1a2a3a4a5a6"
+
+
+문제3. dcast함수를 통해 Hyundai, Chevrolet, Audi, Toyota의 평균 가격을 TYPE별로 비교할 수 있는 데이터프레임 만들기  
+
+
+문제4. for문을 사용해서 1~10까지의 누적합 구하기.
+
+
+문제5. Cars93 데이터와 Type 값을 넘겨받아 넘겨받은 Type의 평균 MPG.city값 돌려받는 함수 만들기
+
+
+문제6. 자동차 type별 Origin 비율구한 후 비율 누적 Bar Chart 그리기
+
+
+문제7. 상위 20개 단어만 바차트로 보여주기
