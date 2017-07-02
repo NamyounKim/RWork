@@ -86,12 +86,6 @@ findFreqTerms(dtm, lowfreq = 20, highfreq = 341)
 wordDf = data.frame(word=names(freq), freq=freq)
 library(ggplot2)
 
-#맥북 사용자는 폰트 import하기
-install.packages("extrafont")
-library(extrafont)
-#font_import()
-loadfonts(device="postscript")
-
 #단어 빈도수 바차트로 보여주기
 ggplot(wordDf, aes(x=word, y=freq)) + geom_bar(stat = "identity")
 

@@ -13,7 +13,7 @@ Cars93
 ggplot(Cars93, aes(x=Type)) + geom_bar(stat = "count")
 ggplot(Cars93, aes(x=Type)) + geom_bar(stat = "count") + labs(x="Car Type") + theme_minimal()
 ggplot(Cars93, aes(x=Type)) + geom_bar(stat = "count") + labs(x="Car Type") + 
-  ggtitle("The Count by Car Type") + theme(plot.title = element_text(hjust = 0.1, size = 25)) # 차트에 제목 넣기
+  ggtitle("The Count by Car Type") + theme(plot.title = element_text(hjust = 0.5, size = 25)) # 차트에 제목 넣기
 
 ##2. Stack Bar Chart
 ggplot(Cars93, aes(x=Type, fill=Origin)) + geom_bar(stat = "count")
@@ -21,7 +21,7 @@ ggplot(Cars93, aes(x=Type, fill=Origin)) + geom_bar(stat = "count", position = "
 
 #type별 가격 평균값 구한 후 바차트 그리기
 mpg_temp = Cars93 %>% group_by(Type) %>% summarise(avgPrice = mean(Price))
-ggplot(mpg_temp, aes(x=Type, y=avgPrice)) + geom_bar(stat = "identity") #데이터프레임 내 값 그대로
+ggplot(mpg_temp, aes(x=Type, y=avgPrice)) + geom_bar(stat = "identity") #데이터셋 값 그대로
 
 #비율 누적 Bar Chart 구하기
 #자동차 type별 Origin 비율구한 후 비율 누적 Bar Chart 그리기
@@ -55,7 +55,7 @@ ggplot(economics, aes(x=pop, y=unemploy)) + geom_point()
 
 #축 눈금 간격 조절하기
 ggplot(economics, aes(x=pop, y=unemploy)) + geom_point() + 
-  scale_x_continuous(breaks = seq(200000, max(economics$pop), 10000)) + 
+  scale_x_continuous(breaks = seq(200000, 330000, 10000)) + 
   theme(axis.text.x=element_text(angle = 45, hjust = 1))
 
 #연도별로 색깔 다르게해서 보여주기
@@ -63,7 +63,7 @@ economics$year = substr(economics$date,1,4)
 ggplot(economics, aes(x=pop, y=unemploy, color=factor(year))) + geom_point()
 
 ##6. 상관계수행렬 그리기
-subCars93 = Cars93 %>% select(Price, MPG.city, MPG.highway, EngineSize)
+subCars93 = Cars93 %>% dplyr::select(Price, MPG.city, MPG.highway, EngineSize)
 plot(subCars93)
 
 #상관계수 구하기

@@ -7,12 +7,12 @@ library(tm)
 library(slam)
 library(dplyr)
 library(readr)
+library(NLP4kec)
 
 #형태소 분석기 실행하기
-system("~/TextConvert4TM/Start.sh") #맥인 경우
-
-#분석 결과 가져오기
-parsedData =read_csv("~/TextConvert4TM/output/out_HomeApplication_cafe.csv") #맥인 경우
+parsedData = text_parser(path = "/Users/kimnamyoun/TextConvert4TM/input/HomeApplication_cafe.xlsx"
+                         ,language = "ko"
+                         ,korDicPath = "./dictionary.txt")
 
 
 ##################################################################
@@ -20,7 +20,7 @@ parsedData =read_csv("~/TextConvert4TM/output/out_HomeApplication_cafe.csv") #�
 ##################################################################
 
 #Corpus 생성
-corp = VCorpus(VectorSource(parsedData$parsedContent))
+corp = VCorpus(VectorSource(parsedData))
 
 #특수문자 제거
 corp = tm_map(corp, removePunctuation)
@@ -82,7 +82,7 @@ library(ggplot2)
 
 #맥북 사용자는 폰트 import하기
 install.packages("extrafont")
-library(extrafont) 
+library(extrafont)
 #font_import()
 loadfonts(device="postscript")
 
@@ -99,13 +99,15 @@ ggplot(head(arrange(wordDf,-freq),20), aes(x=reorder(word,-freq), y=freq)) + geo
 #Word Cloud 그리기
 install.packages("wordcloud")
 library(wordcloud)
-pal = brewer.pal(n = 3, name = "Set2") # n:사용할 색깔 수, name:색깔 조합 이름
+
+pal = brewer.pal(n = 12, name = "Set2") # n:사용할 색깔 수, name:색깔 조합 이름
+# http://colorbrewer2.org/ 참고
 
 wordcloud(wordDf$word # 단어
           , wordDf$freq # 빈도수
           , min.freq = 5 # 표현할 단어의 최소 빈도수
           , colors = pal # 위에서 만든 팔레트 정보 입력
-          , rot.per = 0 # 단어의 회전 각도
+          , rot.per = 0.5 #회전한 단어 비율
           , random.order = F # 단어의 노출 순서 랜덤 여부 결정
           , scale = c(3,1) # scale값에서 앞에 값이 커야 빈도수가 큰 단어 사이즈가 커야함
           , family="AppleGothic") # 맥 폰트 설정
