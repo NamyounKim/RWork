@@ -4,7 +4,7 @@ library(KoNLP)
 library(stringi)
 
 #KoNLP를 불러올때 에러가 난다면 JAVA의 경로를 다시 세팅
-#Sys.setenv(JAVA_HOME="C:/Program Files/Java/jre1.8.0_101")
+#Sys.setenv(JAVA_HOME="C:/Program Files/Java/jre1.8.0_131/")
 
 #문석 대상 텍스트
 sentence1 = "류현진(30·LA다저스)이 복귀전에서 5회를 버티지 못했다. 하지만 충분히 박수를 받을만한 경기였다."
@@ -21,10 +21,15 @@ useSejongDic()
 useNIADic(category_dic_nms = "sports")
 
 #POS 태깅 정보 추출
-SimplePos22(sentence)
+SimplePos22(sentence1)
 
 #################################################
 # NLP4kec와 비교
 library(NLP4kec)
 test = text_parser(path = "./test_text.csv", language = "ko", korDicPath = "./dictionary.txt")
 test
+
+
+
+
+

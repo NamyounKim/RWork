@@ -28,12 +28,12 @@ ggplot(mpg_temp, aes(x=Type, y=avgPrice)) + geom_bar(stat = "identity") #데이�
 df2 = Cars93 %>% group_by(Type, Origin) %>% summarise(n=n()) %>% 
   mutate(ratio = n/sum(n))
 
-ggplot(df2, aes(x=Type, y=ratio, fill=Origin)) + geom_bar(stat = "identity")
+ggplot(df3, aes(x=Type, y=ratio, fill=Origin)) + geom_bar(stat = "identity")
 
 
 ##3. Scatter Plot
 ggplot(Cars93, aes(x=MPG.city, y=Price)) + geom_point(stat = "identity")
-ggplot(Cars93, aes(x=MPG.city, y=Price)) + geom_point(shape=3) # 점모양 바꾸기
+ggplot(Cars93, aes(x=MPG.city, y=Price)) + geom_point(shape=9) # 점모양 바꾸기
 ggplot(Cars93, aes(x=MPG.city, y=Price, label = Manufacturer)) + geom_text(size=3) # 점 대신 라벨값 보여주기
 ggplot(Cars93, aes(x=MPG.city, y=Price)) + geom_point(shape=2) + geom_smooth(method=lm) # 선형식 그리기
 ggplot(Cars93, aes(x=MPG.city, y=Price)) + geom_point(shape=2) + geom_smooth() #다항식 그리기
@@ -61,6 +61,7 @@ ggplot(economics, aes(x=pop, y=unemploy)) + geom_point() +
 #연도별로 색깔 다르게해서 보여주기
 economics$year = substr(economics$date,1,4)
 ggplot(economics, aes(x=pop, y=unemploy, color=factor(year))) + geom_point()
+
 
 ##6. 상관계수행렬 그리기
 subCars93 = Cars93 %>% dplyr::select(Price, MPG.city, MPG.highway, EngineSize)

@@ -10,7 +10,7 @@ library(readr)
 library(NLP4kec)
 
 #형태소 분석기 실행하기
-parsedData = text_parser(path = "/Users/kimnamyoun/TextConvert4TM/input/HomeApplication_cafe.xlsx"
+parsedData = text_parser(path = "./HomeApplication_cafe.xlsx"
                          ,language = "ko"
                          ,korDicPath = "./dictionary.txt")
 
@@ -99,15 +99,16 @@ ggplot(head(arrange(wordDf,-freq),20), aes(x=reorder(word,-freq), y=freq)) + geo
 #Word Cloud 그리기
 install.packages("wordcloud")
 library(wordcloud)
-pal = brewer.pal(n = 3, name = "Set2") # n:사용할 색깔 수, name:색깔 조합 이름
+pal = brewer.pal(n = 5, name = "Set2") # n:사용할 색깔 수, name:색깔 조합 이름
 
 wordcloud(wordDf$word # 단어
           , wordDf$freq # 빈도수
           , min.freq = 5 # 표현할 단어의 최소 빈도수
           , colors = pal # 위에서 만든 팔레트 정보 입력
-          , rot.per = 0 # 단어의 회전 각도
+          , rot.per = 0.5 # 단어의 회전 각도
           , random.order = F # 단어의 노출 순서 랜덤 여부 결정
-          , scale = c(3,1)) # scale값에서 앞에 값이 커야 빈도수가 큰 단어 사이즈가 커야함
+          , scale = c(5,1)
+          ) # scale값에서 앞에 값이 커야 빈도수가 큰 단어 사이즈가 커야함
 
 
 #treeMap 그리기
