@@ -23,7 +23,6 @@ parsedData = gsub(" ","  ",parsedData)
 ##################################################################
 #Corpus 생성
 corp=VCorpus(VectorSource(parsedData))
-#corp=VCorpus(VectorSource(parsedDataRe$parsedContent))
 
 #특수문자 제거
 corp = tm_map(corp, removePunctuation)
@@ -102,7 +101,7 @@ parsedData = as.data.frame(parsedData)
 parsedData$rown = as.numeric(row.names(parsedData))
 id_topic = merge(doc_topic_df, doc_Prob_df, by="rown")
 id_topic = merge(id_topic, parsedData, by="rown", all.y = TRUE)
-id_topic = subset(id_topic,select=c("rown","doc_topic","maxProb"))
+id_topic = subset(id_topic,select=c("rown","parsedData","doc_topic","maxProb"))
 
 #문서별 토픽 번호 및 확률값 출력하기
 filePathName = paste0("./LDA_output/",name,"_",k,"_DOC","_LDA_Result.csv",sep="")

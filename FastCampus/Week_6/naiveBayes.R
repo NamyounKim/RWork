@@ -1,7 +1,5 @@
-system("tctStart")
-
 #package check & install & load
-install.packages(c("pROC","gmodels","klaR","e1071"))
+install.packages(c("pROC","gmodels","klaR","e1071","readr"))
 library(dplyr)
 library(stringi)
 library(tm)
@@ -11,26 +9,24 @@ library(gmodels)
 library(e1071)
 library(klaR)
 library(readr)
+library(NLP4kec)
 
-
-# 형태소분석 완료된 문서 가져오기
-parsedData =read_csv("c:/TextConvert4TM_v1.0/output/out_Blog_TrainingSet_Spam.csv")
+#형태소 분석기 실행하기
+parsedData = text_parser(path = "./Blog_TrainingSet_Spam.xlsx"
+                         ,language = "ko"
+                         ,korDicPath = "./dictionary.txt")
 
 # 예측 변수값 가져오기
 target_val = read_csv("./training_target_val.csv")
 
-#컬럼명 변경하기
-colnames(parsedData) = c("id","pContent")
-
 ## 단어간 스페이스 하나 더 추가하기 ##
-parsedDataRe = parsedData
-parsedDataRe$pContent = gsub(" ","  ",parsedDataRe$pContent)
+parsedData = gsub(" ","  ",parsedData)
 
 ################################
 #Text Pre-processing
 ################################
 #Corpus 생성
-corp = VCorpus(VectorSource(parsedDataRe$pContent))
+corp = VCorpus(VectorSource(parsedData))
 
 #특수문자 제거
 corp = tm_map(corp, removePunctuation)
@@ -96,21 +92,19 @@ nb_pred_result = CrossTable(table(testSet$target, nbPred), prop.chisq=FALSE)
 # 정답지가 없는 새로운 문서를 분류할 경우             
 ########################################################################################################
 
-# 새로운 문서 가져오기
-newData =read_csv("c:/TextConvert4TM_v1.0/output/out_Blog_TestSet_Spam.csv")
-
-#컬럼명 변경하기
-colnames(newData) = c("id","pContent")
+# 새로운 문서 형태소 분석 실행하기
+newData = text_parser(path = "./Blog_TestSet_Spam.xlsx"
+                         ,language = "ko"
+                         ,korDicPath = "./dictionary.txt")
 
 ## 단어간 스페이스 하나 더 추가하기 ##
-newDataRe = newData
-newDataRe$pContent = gsub(" ","  ",newDataRe$pContent)
+newData = gsub(" ","  ", newData)
 
 #############################
 #Text Pre-processing
 #############################
 #Corpus 생성
-newCorp = VCorpus(VectorSource(newDataRe$pContent))
+newCorp = VCorpus(VectorSource(newData))
 
 #특수문자 제거
 newCorp = tm_map(newCorp, removePunctuation)
@@ -162,5 +156,5 @@ nbPred_new = predict(nbModel, newDtmDf)
 test_target_val = read_csv("./test_target_val.csv")
 nbPred_new_df = data.frame(pred = nbPred_new, original = test_target_val$spam_yn)
 nbPred_new_result = CrossTable(table(nbPred_new_df$original, nbPred_new_df$pred), prop.chisq=FALSE)
-(nbPred_new_result$t[1,1] + nbPred_new_result$t[2,2]) / nrow(newData)
+(nbPred_new_result$t[1,1] + nbPred_new_result$t[2,2]) / length(newData)
 
