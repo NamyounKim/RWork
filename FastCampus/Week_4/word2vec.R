@@ -10,9 +10,10 @@ library(tsne)
 library(readr)
 
 #형태소 분석기 실행하기
-system("tctStart")
-targetData = read_csv("/Users/kimnamyoun/TextConvert4TM/output/out_HomeApplication_cafe.csv")
-targetData = read_csv("c:/TextConvert4TM_v1.0/output/out_HomeApplication_cafe.csv")
+parsedData = text_parser(path = "./HomeApplication_cafe.xlsx"
+                         ,language = "ko"
+                         ,korDicPath = "./dictionary.txt")
+
 
 #word2vec Train용 TXT파일 만들기
 write.table(targetData$parsedContent,file = "./trainTxt.txt", row.names = FALSE, col.names = FALSE, quote = F)

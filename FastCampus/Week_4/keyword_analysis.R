@@ -15,15 +15,14 @@ cor_term = cor(dtm_m)
 cor_ref = cor_term[,"냉장고"]
 
 #TF-IDF 값으로 연관 키워드 추출하기
-dtmW = DocumentTermMatrix(corp, control=list(removeNumbers=FALSE,
-                                              wordLengths=c(2,Inf),
-                                              weighting = function(x) weightTfIdf(x, normalize = TRUE))) #Tf-Idf 가중치 주기
+dtmW = DocumentTermMatrix(corp, control=list(wordLengths=c(2,Inf),
+                                            weighting = function(x) weightTfIdf(x, normalize = TRUE))) #Tf-Idf 가중치 주기
 
 ## 단어 양옆 스페이스 제거 및 한글자 단어 제외하기
-colnames(dtm) = trimws(colnames(dtm))
-dtm = dtm[,nchar(colnames(dtm)) > 1]
+colnames(dtmW) = trimws(colnames(dtmW))
+dtmW = dtmW[,nchar(colnames(dtmW)) > 1]
 
-dtmW = removeSparseTerms(dtmW, as.numeric(0.96))
+dtmW = removeSparseTerms(dtmW, as.numeric(0.97))
 
 findAssocs(dtmW, "냉장고", 0.2)
 
@@ -42,13 +41,13 @@ dtmW_m = as.matrix(dtmW)
 cor_termW = cor(dtmW_m)
 
 #Edge 개수 조절하기
-cor_termW[cor_termW < 0.1] = 0
+cor_termW[cor_termW < 0.25] = 0
 
 # Network Map을 그리기 위한 객체 만들기
 net = network(cor_termW, directed = FALSE)
 
 # Network의 betweenness값을 구하여 상위 10% 이상인 node에는 노란색 입혀주기
-net %v% "mode" <- ifelse(betweenness(net) > quantile(betweenness(net), 0.9), "big", "small")
+net %v% "mode" = ifelse(betweenness(net) > quantile(betweenness(net), 0.9), "big", "small")
 node_color = c("small" = "grey", "big" = "gold")
 
 # Network edge size 값 설정하기 (단어간 상관계수 값 * 2)
@@ -62,8 +61,12 @@ ggnet2(net # 네트워크 객체
        ,palette = node_color # 노드 색상
        ,size = "degree" # 노드의 크기를 degree cetrality값에 따라 다르게 하기
        ,edge.size = "edgeSize" # 엣지의 굵기를 위에서 계산한 단어간 상관계수에 따라 다르게 하기
-       ,family="AppleGothic")
-
+       ,family="AppleGothic"
+       ,mode = "circrand")
+#"circle"
+#"kamadakawai"
+#"fruchtermanreingold"
+#circrand
 
 word_network = data.frame(word = rownames(cor_termW),
                           centrality = degree(net),

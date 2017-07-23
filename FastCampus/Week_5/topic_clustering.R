@@ -11,7 +11,7 @@ library(dplyr)
 library(NLP4kec)
 
 #형태소 분석기 실행하기
-parsedData = text_parser(path = "/Users/kimnamyoun/TextConvert4TM/input/HomeApplication_cafe.xlsx"
+parsedData = text_parser(path = "./HomeApplication_cafe.xlsx"
                          ,language = "ko"
                          ,korDicPath = "./dictionary.txt")
 
@@ -139,7 +139,7 @@ freq_matrix = data.frame(ST = colnames(new_dtm_m),
                           Freq = colSums(new_dtm_m))
 
 # 위에서 구한 값들을 파라메터 값으로 넘겨서 시각화를 하기 위한 데이터를 만들어 줍니다.
-source("./createNamJson_v2.R")
+source("./Week_5/createNamJson_v2.R")
 json_lda = createNamJson(phi = phi, theta = theta,
                           vocab = vocab,
                           doc.length = doc_length,
