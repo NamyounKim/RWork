@@ -1,3 +1,5 @@
+library(caret)
+
 #### Naive Bayes ####
 cvtrain <- trainControl(method="cv", number=3, classProbs = TRUE, selectionFunction = "best")
 grid <- data.frame(fL=c(1,2), usekernel=FALSE, adjust=FALSE)

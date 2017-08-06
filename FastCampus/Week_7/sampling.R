@@ -27,8 +27,6 @@ trainSet5 = dtmDf[folds$Fold5,]
 tapply(trainSet1$target, trainSet1$target, function(y) length(y)/nrow(trainSet1))
 tapply(trainSet4$target, trainSet4$target, function(y) length(y)/nrow(trainSet4))
 
-
-
 #### 부트스트랩 샘플링 ####
 bootStrap = createResample(dtmDf$target, times = 5)
 
@@ -42,7 +40,4 @@ trainSet5 = dtmDf[bootStrap$Resample5,]
 #비율 확인하기
 tapply(trainSet1$target, trainSet1$target, function(y) length(y)/nrow(trainSet1))
 tapply(trainSet4$target, trainSet4$target, function(y) length(y)/nrow(trainSet4))
-
-
-
 

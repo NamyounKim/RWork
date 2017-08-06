@@ -15,6 +15,9 @@ parsedData = text_parser(path = "./Blog_TrainingSet_Spam.xlsx"
                          ,language = "ko"
                          ,korDicPath = "./dictionary.txt")
 
+saveRDS(parsedData, "./parsedData.RDS")
+parsedData = readRDS("./parsedData.RDS")
+
 # 예측 변수값 가져오기
 target_val = read_csv("./training_target_val.csv")
 
@@ -68,13 +71,15 @@ dtmDf$target = target_val$spam_yn
 
 #Traing Set, Test Set 만들기
 trainingSet = dtmDf[1:8000,] #Training 데이터 8,000개
-testSet = dtmDf[8001:nrow(dtmDf),] #Test 데이터 2,612개
+testSet = dtmDf[8001:nrow(dtmDf),] #Test 데이터 2,012개
 
 
 #SVM 모델링
 trainingSet$target = as.factor(trainingSet$target)
 svmModel = svm(target ~ . , data = trainingSet, type = "C-classification", 
                kernel="linear", gamma=0.1, cost=1)
+
+svmModel = readRDS("./Week_6/svmModel.rds")
 
 #Spam 문서 예측하기
 svmPred =  predict(svmModel, newdata = testSet[,1:(ncol(testSet)-1)])
