@@ -10,6 +10,9 @@ library(readr)
 library(caret)
 library(NLP4kec)
 
+source("./makeFunc.R")
+dtm_test = makeDtm(bindData$parsedContent, stopWord$stopWord, 0.98)
+
 #형태소 분석기 실행하기
 negSet = text_parser(path = "./Week_8/comment_neg.xlsx"
                          ,language = "ko"
@@ -18,6 +21,8 @@ negSet = text_parser(path = "./Week_8/comment_neg.xlsx"
 posSet = text_parser(path = "./Week_8/comment_pos.xlsx"
                      ,language = "ko"
                      ,korDicPath = "./dictionary.txt")
+
+stopWord  
 
 # NULL 값 처리하기 (댓글은 원문이 짧기 때문에 형태소 분석 결과가 없는 경우가 발생한다.)
 negSet = negSet[negSet != ""]
@@ -92,10 +97,13 @@ dtmDf$target = bindData$sentiment
 #### Random Forest ####
 dtmDf$target = as.factor(dtmDf$target)
 
-cvtrain = trainControl(method="cv", number=3, classProbs = TRUE, summaryFunction = twoClassSummary)
+cvtrain = trainControl(method="cv"
+                       , number=3
+                       , classProbs = TRUE
+                       , summaryFunction = twoClassSummary)
 #cvtrain = trainControl(method="cv", number=7, classProbs = TRUE)
 
-grid = data.frame(mtry=9) # 적정한 독립변수의 개수를 정한다. (전체 변수개수의 제곱근)
+grid = data.frame(mtry=c(8,9)) # 적정한 독립변수의 개수를 정한다. (전체 변수개수의 제곱근)
 
 rfModel_caret = train(target ~ ., data=dtmDf, method="parRF",	
                         trControl=cvtrain,	

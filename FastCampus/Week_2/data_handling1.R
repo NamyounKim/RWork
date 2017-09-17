@@ -49,13 +49,19 @@ subset(iris, select = c(Sepal.Length, Sepal.Width)) # Subset 함수로 Sepal.Len
 iris[1,] # 첫번째 행(row) 값 가져오기
 iris[2,] # 두번째 행(row) 값 가져오기
 iris[1:3,] # 첫번째부터 세번째 행 가져오기
-
 iris[4,2] # 네번째 행의 2번째 열 값 가져오기 
 subset(iris, iris$Sepal.Width > 4) # Sepal.Width 가 4보다 큰 행만 가져오기 
 
 #3-3. 특정 행, 열값만 가져오기
 iris[3,4] # 3번째 행의 4번째 열 값 가져오기
 subset(iris, iris$Sepal.Width > 4,  select = c(Sepal.Length)) # Sepal.Width 가 4보다 큰 행에서 Sepal.Length 열만 가져오기
+
+#3-4. 서로 같은 값(하나만) 매칭하여 가져오기
+subset(iris, iris$Species == "setosa")
+
+#3-5. 서로 같은 값들 매칭하여 가져오기
+subset(iris, iris$Species %in% c("setosa","virginica"))
+
 
 #4-1.행, 열개수 확인하기
 nrow(iris)
@@ -92,21 +98,22 @@ df1 = data.frame(id = c(1,2,3,4,5,6),
 df2 = data.frame(id=c(2,4,6,8), 
                  location=c("Seoul","LA", "Paris","Rome"))
 
-#10-1.Inner Join
+#11-1.Inner Join
 merge(df1, df2, by="id")
 
-#10-2. Left Join
+#11-2. Left Join
 merge(df1, df2, all.x = TRUE)
 
-#10-3 Right Join
+#11-3 Right Join
 merge(df1, df2, all.y = TRUE) 
 
-#10-4 조인키가 서로 다를때
+#11-4 조인키가 서로 다를때
 merge(df1, df2, all.x = TRUE, by.x = "dd", by.y = "aa")
 
 
-#11.Data Export
-write.csv(iris, file = "./iris.csv", row.names = FALSE)
+#12.Data Export
+write.csv(iris, file = "./iris.csv", row.names = FALSE) 
+write.table(iris, file = "./iris.txt", row.names = FALSE, quote = F, sep = ",")
 
 
 

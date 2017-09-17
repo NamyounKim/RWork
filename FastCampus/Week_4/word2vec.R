@@ -16,7 +16,7 @@ parsedData = text_parser(path = "./HomeApplication_cafe.xlsx"
 
 
 #word2vec Train용 TXT파일 만들기
-write.table(targetData$parsedContent,file = "./trainTxt.txt", row.names = FALSE, col.names = FALSE, quote = F)
+write.table(targetData$parsedContent, file = "./trainTxt.txt", row.names = FALSE, col.names = FALSE, quote = F)
 
 #모델 Training
 model = train_word2vec("./trainTxt.txt", output_file = "w2vModel.bin", 
