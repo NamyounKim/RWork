@@ -1,18 +1,16 @@
 install.packages("tm") #텍스트 마이닝을 위한 패키지
 install.packages("slam")
 install.packages("dplyr")
-install.packages("readr") #파일을 읽어오기 위한 패키지
 
 library(tm)
 library(slam)
 library(dplyr)
-library(readr)
 library(NLP4kec)
 
 #형태소 분석기 실행하기
-parsedData = text_parser(path = "./HomeApplication_cafe.xlsx"
-                         ,language = "ko"
-                         ,korDicPath = "./dictionary.txt")
+parsedData = text_parser(path = "./HomeApplication_cafe.xlsx" # 분석 대상 원문 파일 (엑셀, CSV 파일만 가능)
+                         ,language = "ko"                     # 분석 대상 원문 언어 타입
+                         ,korDicPath = "./dictionary.txt")    # 사용자 사전
 
 
 ## 단어간 스페이스 하나 더 추가하기 ##
@@ -49,14 +47,14 @@ for (j in seq(corp))
 corp = tm_map(corp, PlainTextDocument)
 
 #Document Term Matrix 생성 (단어 Length는 2로 세팅)
-dtm = DocumentTermMatrix(corp, control=list(removeNumbers=FALSE, wordLengths=c(2,Inf)))
+dtm = DocumentTermMatrix(corp, control=list(wordLengths=c(2,Inf)))
 
 ## 단어 양옆 스페이스 제거 및 한글자 단어 제외하기
 colnames(dtm) = trimws(colnames(dtm))
 dtm = dtm[,nchar(colnames(dtm)) > 1]
 
 #Term Document Matirx 생성 (DTM에서 행과 열만 바뀐 matrix)
-tdm = TermDocumentMatrix(corp, control=list(removeNumbers=TRUE, wordLengths=c(2,Inf)))
+tdm = TermDocumentMatrix(corp, control=list(wordLengths=c(2,Inf)))
 
 #Sparse Terms 삭제 (값이 작아질 수록 term수가 줄어든다.)
 dtm = removeSparseTerms(dtm, as.numeric(0.99))
@@ -96,19 +94,33 @@ ggplot(head(wordDf,10), aes(x=word, y=freq)) + geom_bar(stat = "identity")
 ggplot(head(arrange(wordDf,-freq),20), aes(x=reorder(word,-freq), y=freq)) + geom_bar(stat = "identity")
 
 
-#Word Cloud 그리기
+# Word Cloud 그리기
 install.packages("wordcloud")
 library(wordcloud)
 pal = brewer.pal(n = 5, name = "Set2") # n:사용할 색깔 수, name:색깔 조합 이름
-
-wordcloud(wordDf$word # 단어
-          , wordDf$freq # 빈도수
+wordcloud(words = wordDf$word # 단어
+          , freq = wordDf$freq # 빈도수
           , min.freq = 5 # 표현할 단어의 최소 빈도수
           , colors = pal # 위에서 만든 팔레트 정보 입력
-          , rot.per = 0.5 # 단어의 회전 각도
-          , random.order = F # 단어의 노출 순서 랜덤 여부 결정
-          , scale = c(3,1)
-          ) # scale값에서 앞에 값이 커야 빈도수가 큰 단어 사이즈가 커야함
+          , rot.per = 0 # 회전되는 단어의 비율
+          , random.order = T # 단어의 노출 순서 랜덤 여부 결정
+          , scale = c(5,1)
+          ) # scale값에서 앞에 값이 커야 빈도수가 큰 단어 사이즈가 커짐
+
+
+# Word Cloud 그리기 2
+install.packages("wordcloud2")
+library(wordcloud2)
+wordcloud2(data = wordDf
+           , color = "random-light"
+           , shape = "star"
+           , size = 0.5
+           , fontFamily = "나눔고딕")
+
+letterCloud(wordDf
+            , word = "R"
+            , size = 1
+            , fontFamily = "나눔고딕")
 
 
 #treeMap 그리기
