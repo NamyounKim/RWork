@@ -16,34 +16,37 @@ shinyUI(
   # Sidebar with a slider input for number of bins
   sidebarLayout(
     sidebarPanel(
-      fileInput("file1", 
-                "Choose CSV File",
-                accept = c(
-                  "text/csv",
-                  "text/comma-separated-values,text/plain",
-                  ".csv")
+      fileInput("inputFile" # 객체명
+                , "Choose CSV File" # 화면 표시 내용
+                , accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")
                 ),
       
-      textInput("stopTerm",
-                "Stop Term: (word1,word2,word3)"
+      textInput("stopTerm" # 객체명
+                , "Stop Term: (word1,word2,word3)" # 화면 표시 내용
                 ),
       
-      sliderInput("sparse",
-                  "Sparse Ratio:",
-                  min = 0.9,  max = 1, value = 0.98, step=0.005
+      sliderInput("sparse"
+                  , "Sparse Ratio:"
+                  , min = 0.9
+                  , max = 1
+                  , value = 0.98
+                  , step=0.005
                   ),
       
-      sliderInput("corLimit",
-                  "Cut-off point(cor):",
-                  min = 0.05,  max = 0.95, value = 0.25, step=0.05
+      sliderInput("corLimit"
+                  ,"Cut-off point(cor):"
+                  , min = 0.05
+                  , max = 0.95
+                  , value = 0.25
+                  , step=0.05
                   )
       ),
     
     # Show a plot of the generated distribution
     mainPanel(
-      verbatimTextOutput("text"),
-      #tableOutput('contents')
-      plotOutput("network",height = 800)
+      verbatimTextOutput("displayRow"),
+      plotOutput("networkPlot"
+                 ,height = 800)
       )
     )
   )

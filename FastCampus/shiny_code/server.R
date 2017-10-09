@@ -15,20 +15,20 @@ library(readr)
 function(input, output) {
   
   
-  output$network <- renderPlot({
+  output$networkPlot <- renderPlot({
     # input$file1 will be NULL initially. After the user selects
     # and uploads a file, it will be a data frame with 'name',
     # 'size', 'type', and 'datapath' columns. The 'datapath'
     # column will contain the local filenames where the data can
     # be found.
     
-    inFile <- input$file1
+    inFile <- input$inputFile
     
     if (is.null(inFile))
       return(NULL)
     parsedData = read_csv(inFile$datapath)
     
-    output$text <- renderText({
+    output$displayRow <- renderText({
       paste0("The number of document is: ", nrow(parsedData))
     })
     
@@ -38,13 +38,13 @@ function(input, output) {
     corp = tm_map(corp, removePunctuation)
     
     if(nchar(stri_split_fixed(input$stopTerm, ",")) > 0 ){
-      disuse.term <- unlist(stri_split_fixed(input$stopTerm, ","))
-      corp <- tm_map(corp, removeWords, disuse.term)
+      disuse.term = unlist(stri_split_fixed(input$stopTerm, ","))
+      corp = tm_map(corp, removeWords, disuse.term)
     }
-    corp <- tm_map(corp, PlainTextDocument)
+    corp = tm_map(corp, PlainTextDocument)
     
     #Document Term Matrix 생성
-    dtmW<-DocumentTermMatrix(corp, control=list(removeNumbers=FALSE, 
+    dtmW = DocumentTermMatrix(corp, control=list(removeNumbers=FALSE, 
                                                 wordLengths=c(2,Inf), 
                                                 weighting = function(x) weightTfIdf(x, normalize = TRUE)))
     
@@ -52,7 +52,7 @@ function(input, output) {
     colnames(dtmW) = trimws(colnames(dtmW))
     dtmW = dtmW[,nchar(colnames(dtmW)) > 1]
     
-    dtmW <- removeSparseTerms(dtmW, as.numeric(input$sparse))
+    dtmW = removeSparseTerms(dtmW, as.numeric(input$sparse))
     
     #매트릭스 크기 조절하기
     dtmW_m = as.matrix(dtmW)
