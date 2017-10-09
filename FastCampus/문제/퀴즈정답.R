@@ -25,8 +25,6 @@ for(i in 1:20){
 }
 x
 
-https://goo.gl/xzksDy
-
 
 
 
