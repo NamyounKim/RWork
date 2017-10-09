@@ -9,21 +9,28 @@ library(wordVectors)
 library(tsne)
 library(readr)
 
-#형태소 분석기 실행하기
-parsedData = text_parser(path = "./HomeApplication_cafe.xlsx"
-                         ,language = "ko"
-                         ,korDicPath = "./dictionary.txt")
-
+# 이전에 만들었던 corpus를 다시 리스트 형태로 변경
+targetData = NULL
+for(i in 1:length(corp)){
+  temp = corp[[i]]$content
+  targetData[i] = temp
+}
 
 #word2vec Train용 TXT파일 만들기
-write.table(targetData$parsedContent, file = "./trainTxt.txt", row.names = FALSE, col.names = FALSE, quote = F)
+write.table(targetData, file = "./trainTxt.txt", row.names = FALSE, col.names = FALSE, quote = F)
 
 #모델 Training
-model = train_word2vec("./trainTxt.txt", output_file = "w2vModel.bin", 
-                       threads=3, vectors=100, force = T)
+model = train_word2vec(train_file = "./trainTxt.txt"
+                       , threads=3
+                       , vectors=100
+                       , force = T
+                       , window = 10)
 
-#word2vector 확인하기
-read.vectors("./w2vModel.bin")
+#word2vector model 확인하기
+model
+
+#</s> 삭제하기
+model = model[rownames(model)!="</s>",]
 
 #연관 키워드 추출하기
 nearest_to(model,model[["냉장고"]], 20)
@@ -36,21 +43,20 @@ subVec = model[rownames(model)=="냉장고",] - model[rownames(model) == "디오
 nearest_to(model, subVec, 20)
 
 #전체 단어 관계 시각화
+install.packages("extrafont")
 library(extrafont) 
 par(family="AppleGothic") 
 
 plot(model)
 
-######### 전처리 하기 ############
-#영어 소문자로 바꾸기
-targetData$parsedContent = tolower(targetData$parsedContent)
-
-
-
+#Cosine 거리
+cosineDist(model[["김치"]], model[["김치냉장고"]])
+cosineDist(model[["김치"]], model[["세탁기"]])
 
 #Cosine 유사도 (= 1 - Cosine거리)
-cosineSimilarity(model[["냉장고"]], model[["그룹"]])
+cosineSimilarity(model[["김치"]], model[["김치냉장고"]])
+cosineSimilarity(model[["김치"]], model[["세탁기"]])
 
 #Euclidean Distance
-dist(model[(row.names(model)=="냉장고" | row.names(model)=="그룹"),])
-
+dist(model[(row.names(model)=="김치" | row.names(model)=="김치냉장고"),])
+dist(model[(row.names(model)=="김치" | row.names(model)=="세탁기"),])

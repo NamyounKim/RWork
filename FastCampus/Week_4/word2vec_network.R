@@ -1,13 +1,13 @@
-#단어간 코사인 거리 구하기
-temp = cosineDist(model, model)
+# 단어간 코사인 거리 구하기
+temp = cosineSimilarity(model, model)
 
-#한글자 단어 삭제하기 
+# 한글자 단어 삭제하기 
 temp = temp[nchar(rownames(temp)) > 1, nchar(colnames(temp)) > 1]
 
-#Edge 개수 조절하기 (1~2 사이 값으로 세팅)
-temp[temp < 1.1] = 0
+# Edge 개수 조절하기 (0~1 사이 값으로 세팅)
+temp[temp < 0.7] = 0
 
-#Node 개수 조절하기 (0인 값 제외)
+# Node 개수 조절하기 (0인 값 제외)
 temp = temp[,colSums(temp)!=0]
 temp = temp[rowSums(temp)!=0,]
 
@@ -29,5 +29,5 @@ ggnet2(net # 네트워크 객체
        ,palette = node_color # 노드 색상
        ,size = "degree" # 노드의 크기를 degree cetrality값에 따라 다르게 하기
        ,edge.size = "edgeSize" # 엣지의 굵기를 위에서 계산한 단어간 상관계수에 따라 다르게 하기
-       ,family="AppleGothic") 
+       ) 
 

@@ -41,7 +41,7 @@ dtmW_m = as.matrix(dtmW)
 cor_termW = cor(dtmW_m)
 
 #Edge 개수 조절하기
-cor_termW[cor_termW < 0.25] = 0
+cor_termW[cor_termW < 0.1] = 0
 
 # Network Map을 그리기 위한 객체 만들기
 net = network(cor_termW, directed = FALSE)
@@ -61,20 +61,23 @@ ggnet2(net # 네트워크 객체
        ,palette = node_color # 노드 색상
        ,size = "degree" # 노드의 크기를 degree cetrality값에 따라 다르게 하기
        ,edge.size = "edgeSize" # 엣지의 굵기를 위에서 계산한 단어간 상관계수에 따라 다르게 하기
-       ,family="AppleGothic"
-       ,mode = "circrand")
+       ,mode = "fruchtermanreingold"
+       )
 #"circle"
 #"kamadakawai"
 #"fruchtermanreingold"
 #circrand
 
 word_network = data.frame(word = rownames(cor_termW),
-                          centrality = degree(net),
-                          betweenness = betweenness(net),
-                          eigenvector = evcent(net))
+                          centrality = degree(net), #연결 중심성 구하기 
+                          betweenness = betweenness(net), #매개 중심성 구하기
+                          
+                          closeness = closeness(net), # 근접 중심성 구하기
+                          eigenvector = evcent(net) # 고유벡터 중심성 구하기
+                          )
 
 ## 특정 키워드만 선택한 네트워크 맵 그리기 ##
-keyword = c("정수기","추천","할인")
+keyword = c("정수기","혜택","드럼")
 sub_cor_term = cor_termW[,keyword]
 sub_cor_term = sub_cor_term[!(rownames(sub_cor_term) %in% keyword),]
 sub_cor_term = sub_cor_term[rowSums(sub_cor_term)>0,]
@@ -86,4 +89,4 @@ ggnet2(net2 # 네트워크 객체
        ,label.size = 3 # 라벨 폰트 사이즈
        ,edge.size = sub_cor_term[sub_cor_term>0] * 2
        ,size = degree(net2) # 노드의 크기를 degree cetrality값에 따라 다르게 하기
-       ,family="AppleGothic")
+       )
