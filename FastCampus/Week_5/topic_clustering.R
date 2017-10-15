@@ -45,7 +45,7 @@ for (j in seq(corp))
 corp = tm_map(corp, PlainTextDocument)
 
 #Document Term Matrix 생성 (단어 Length는 2로 세팅)
-dtm = DocumentTermMatrix(corp, control=list(removeNumbers=FALSE, wordLengths=c(2,Inf)))
+dtm = DocumentTermMatrix(corp, control=list(wordLengths=c(2,Inf)))
 
 ## 한글자 단어 제외하기 ##
 colnames(dtm) = trimws(colnames(dtm))
@@ -138,8 +138,8 @@ freq_matrix = data.frame(ST = colnames(new_dtm_m),
                           Freq = colSums(new_dtm_m))
 
 # 위에서 구한 값들을 파라메터 값으로 넘겨서 시각화를 하기 위한 데이터를 만들어 줍니다.
-source("./Week_5/createNamJson_v2.R")
-json_lda = createNamJson(phi = phi, theta = theta,
+source("./Week_5/createJsonForChart_v2.R")
+json_lda = createJson(phi = phi, theta = theta,
                           vocab = vocab,
                           doc.length = doc_length,
                           term.frequency = freq_matrix$Freq,
@@ -148,6 +148,6 @@ json_lda = createNamJson(phi = phi, theta = theta,
 )
 
 # 톰캣으로 보내기
-serVis(json_lda, out.dir = paste("C:/apache-tomcat-8.5.11/webapps/",name,"_",k,sep=""), open.browser = FALSE)
+serVis(json_lda, out.dir = paste("C:/tomcat8/webapps/",name,"_",k,sep=""), open.browser = FALSE)
 serVis(json_lda, open.browser = T) # MAC인 경우 
 
