@@ -150,4 +150,9 @@ json_lda = createJson(phi = phi, theta = theta,
 # 톰캣으로 보내기
 serVis(json_lda, out.dir = paste("C:/tomcat8/webapps/",name,"_",k,sep=""), open.browser = FALSE)
 serVis(json_lda, open.browser = T) # MAC인 경우 
-
+  
+  
+  
+  
+  
+  

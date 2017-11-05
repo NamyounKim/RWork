@@ -15,8 +15,8 @@ parsedData = text_parser(path = "./Blog_TrainingSet_Spam.xlsx"
                          ,language = "ko"
                          ,korDicPath = "./dictionary.txt")
 
-saveRDS(parsedData, "./parsedData.RDS")
-parsedData = readRDS("./parsedData.RDS")
+# OR
+parsedData = readRDS("./parsedData.RDS") #저장한 데이터셋 불러오기
 
 # 예측 변수값 가져오기
 target_val = read_csv("./training_target_val.csv")
@@ -37,7 +37,8 @@ corp = tm_map(corp, removePunctuation)
 corp = tm_map(corp, tolower)
 
 #특정 단어 삭제
-corp = tm_map(corp, removeWords, c("있다", "하다","그렇다","되다","같다","가다","없다","보다","정도","000원","030원","주세요","어떻다"))
+stopWord = read_csv("./stopword_ko.csv")
+corp = tm_map(corp, removeWords, stopWord$stopword)
 
 #동의어 처리
 for (j in seq(corp))
@@ -51,7 +52,7 @@ for (j in seq(corp))
 corp = tm_map(corp, PlainTextDocument)
 
 #Document Term Matrix 생성 (단어 Length는 2로 세팅)
-dtm = DocumentTermMatrix(corp, control=list(removeNumbers=FALSE, wordLengths=c(2,Inf)))
+dtm = DocumentTermMatrix(corp, control=list(wordLengths=c(2,Inf)))
 
 ## 한글자 단어 제외하기 ##
 colnames(dtm) = trimws(colnames(dtm))
@@ -73,6 +74,8 @@ dtmDf$target = target_val$spam_yn
 trainingSet = dtmDf[1:8000,] #Training 데이터 8,000개
 testSet = dtmDf[8001:nrow(dtmDf),] #Test 데이터 2,012개
 
+dtmDf$target
+tapply(dtmDf$target, dtmDf$target, length)
 
 #SVM 모델링
 trainingSet$target = as.factor(trainingSet$target)

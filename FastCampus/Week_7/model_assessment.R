@@ -2,7 +2,7 @@ saveRDS(svmModel, "./파일경로/파일명.rds")
 svmModel = readRDS("./svmModel.rds")
 
 ## SVM 모델로 TestSet 예측하기. 이때 decision.values 옵셥을 주어 예측 결정값을 계산하다.
-svmPred =  predict(svmModel, newdata = testSet[,1:(ncol(testSet)-1)], decision.values = TRUE)
+svmPred =  predict(svmModel, newdata = testSet[,1:(ncol(testSet)-1)], decision.values = T)
 
 
 #### 오분류표 해석하기 ####
@@ -21,7 +21,7 @@ svm_pred_result$t[2,2] / (svm_pred_result$t[2,2] + svm_pred_result$t[2,1])
 #특이도(Specificity) 계산하기
 svm_pred_result$t[1,1] / (svm_pred_result$t[1,1] + svm_pred_result$t[1,2])
 
-#정밀도(Precision) 계산하기
+#정밀도(Precision) 계산하기 
 svm_pred_result$t[2,2] / (svm_pred_result$t[2,2] + svm_pred_result$t[1,2])
 
 
