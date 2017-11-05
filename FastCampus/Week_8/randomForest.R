@@ -10,9 +10,6 @@ library(readr)
 library(caret)
 library(NLP4kec)
 
-source("./makeFunc.R")
-dtm_test = makeDtm(bindData$parsedContent, stopWord$stopWord, 0.98)
-
 #형태소 분석기 실행하기
 negSet = text_parser(path = "./Week_8/comment_neg.xlsx"
                          ,language = "ko"
@@ -21,8 +18,6 @@ negSet = text_parser(path = "./Week_8/comment_neg.xlsx"
 posSet = text_parser(path = "./Week_8/comment_pos.xlsx"
                      ,language = "ko"
                      ,korDicPath = "./dictionary.txt")
-
-stopWord  
 
 # NULL 값 처리하기 (댓글은 원문이 짧기 때문에 형태소 분석 결과가 없는 경우가 발생한다.)
 negSet = negSet[negSet != ""]
@@ -60,8 +55,11 @@ corp = VCorpus(VectorSource(bindData$parsedContent))
 #특수문자 제거
 corp = tm_map(corp, removePunctuation)
 
-#특정 단어 삭제
-corp = tm_map(corp, removeWords, c("있다", "하다","그렇다","되다","같다","가다","없다","보다","정도","000원","030원","주세요","어떻다"))
+#Stopword 사전 읽어오기
+stopWord = read_csv("./stopword_ko.csv")
+
+#Stopword 삭제
+corp = tm_map(corp, removeWords, stopWord$stopword)
 
 #동의어 처리
 for (j in seq(corp))
@@ -76,7 +74,7 @@ for (j in seq(corp))
 corp = tm_map(corp, PlainTextDocument)
 
 #Document Term Matrix 생성 (단어 Length는 2로 세팅)
-dtm = DocumentTermMatrix(corp, control=list(removeNumbers=FALSE, wordLengths=c(2,Inf)))
+dtm = DocumentTermMatrix(corp, control=list(wordLengths=c(2,Inf)))
 
 ## 한글자 단어 제외하기 ##
 colnames(dtm) = trimws(colnames(dtm))
