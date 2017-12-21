@@ -33,7 +33,7 @@ posSet$sentiment = "pos"
 
 # Pos Set의 데이터 크기가 크기 때문에 문자열이 긴 데이터 순으로 1645개 추출
 posSet$len = nchar(posSet$posSet)
-posSet = posSet %>% arrange(-len)
+posSet = posSet %>% arrange(-len) #문자열 기준으로 내림차순
 head_posSet = head(posSet, 1645)
 
 #컬럼명 변경하기
@@ -96,7 +96,7 @@ dtmDf$target = bindData$sentiment
 dtmDf$target = as.factor(dtmDf$target)
 
 cvtrain = trainControl(method="cv"
-                       , number=3
+                       , number=4
                        , classProbs = TRUE
                        , summaryFunction = twoClassSummary)
 #cvtrain = trainControl(method="cv", number=7, classProbs = TRUE)

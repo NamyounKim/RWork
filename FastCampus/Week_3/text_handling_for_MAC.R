@@ -14,7 +14,9 @@ parsedData = text_parser(path = "/Users/kimnamyoun/TextConvert4TM/input/HomeAppl
                          ,language = "ko"
                          ,korDicPath = "./dictionary.txt")
 
-
+parsedData = as.data.frame(parsedData)
+colnames(parsedData) = "parsedContent"
+write.csv(parsedData, "./shiny_code/parsedData.csv", row.names = F)
 ##################################################################
 #Text Pre-processing
 ##################################################################

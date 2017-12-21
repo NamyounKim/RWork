@@ -31,6 +31,7 @@ model
 
 #</s> 삭제하기
 model = model[rownames(model)!="</s>",]
+model = model[nchar(rownames(model))>1,]
 
 #연관 키워드 추출하기
 nearest_to(model,model[["냉장고"]], 20)
@@ -45,7 +46,7 @@ nearest_to(model, subVec, 20)
 #전체 단어 관계 시각화
 install.packages("extrafont")
 library(extrafont) 
-par(family="AppleGothic") 
+par(family="나눔고딕") 
 
 plot(model)
 

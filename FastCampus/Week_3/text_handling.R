@@ -118,7 +118,7 @@ wordcloud2(data = wordDf
            , fontFamily = "나눔고딕")
 
 letterCloud(wordDf
-            , word = "R"
+            , word = "TEXT"
             , size = 1
             , fontFamily = "나눔고딕")
 

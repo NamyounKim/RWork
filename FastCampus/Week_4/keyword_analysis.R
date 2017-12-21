@@ -41,14 +41,14 @@ dtmW_m = as.matrix(dtmW)
 cor_termW = cor(dtmW_m)
 
 #Edge 개수 조절하기
-cor_termW[cor_termW < 0.1] = 0
+cor_termW[cor_termW < 0.2] = 0
 
 # Network Map을 그리기 위한 객체 만들기
 net = network(cor_termW, directed = FALSE)
 
 # Network의 betweenness값을 구하여 상위 10% 이상인 node에는 노란색 입혀주기
-net %v% "mode" = ifelse(betweenness(net) > quantile(betweenness(net), 0.9), "big", "small")
-node_color = c("small" = "grey", "big" = "gold")
+net %v% "mode" = ifelse(betweenness(net) > quantile(betweenness(net), 0.8), ifelse(evcent(net) > quantile(evcent(net), 0.9),"High","Medium"), "Low")
+node_color = c("Low" = "grey", "Medium" = "darkgoldenrod1", "High"="brown1")
 
 # Network edge size 값 설정하기 (단어간 상관계수 값 * 2)
 set.edge.value(net, "edgeSize", cor_termW * 2)
@@ -62,6 +62,7 @@ ggnet2(net # 네트워크 객체
        ,size = "degree" # 노드의 크기를 degree cetrality값에 따라 다르게 하기
        ,edge.size = "edgeSize" # 엣지의 굵기를 위에서 계산한 단어간 상관계수에 따라 다르게 하기
        ,mode = "fruchtermanreingold"
+       ,family = "나눔고딕"
        )
 #"circle"
 #"kamadakawai"
@@ -77,7 +78,7 @@ word_network = data.frame(word = rownames(cor_termW),
                           )
 
 ## 특정 키워드만 선택한 네트워크 맵 그리기 ##
-keyword = c("정수기","혜택","드럼")
+keyword = c("세탁기","티비","견적")
 sub_cor_term = cor_termW[,keyword]
 sub_cor_term = sub_cor_term[!(rownames(sub_cor_term) %in% keyword),]
 sub_cor_term = sub_cor_term[rowSums(sub_cor_term)>0,]
@@ -89,4 +90,5 @@ ggnet2(net2 # 네트워크 객체
        ,label.size = 3 # 라벨 폰트 사이즈
        ,edge.size = sub_cor_term[sub_cor_term>0] * 2
        ,size = degree(net2) # 노드의 크기를 degree cetrality값에 따라 다르게 하기
+       ,family = "나눔고딕"
        )

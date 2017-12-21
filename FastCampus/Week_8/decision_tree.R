@@ -11,7 +11,7 @@ Cars93
 tapply(Cars93$Type, Cars93$Type, length)
 
 # 훈련 데이터셋 만들기
-trainSet = Cars93 %>% select(-Type)
+trainSet = Cars93 %>% dplyr::select(-Type)
 
 # 의사결정트리 모델 만들기
 fit = C5.0(trainSet, Cars93$Type)
