@@ -1,6 +1,10 @@
 {
-    "path" : "~/GitHub/RWork/FastCampus",
+    "path" : "~/GitHub/RWork/FastCampus/Week_3",
     "sortOrder" : [
+        {
+            "ascending" : true,
+            "columnIndex" : 1
+        },
         {
             "ascending" : false,
             "columnIndex" : 4

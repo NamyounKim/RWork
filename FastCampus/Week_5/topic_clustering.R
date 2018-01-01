@@ -10,35 +10,46 @@ library(slam)
 library(dplyr)
 library(NLP4kec)
 
+textData = readRDS("./raw_data/petitions.RDS")
+textData = textData[nchar(textData$content)>30,]
+
 #형태소 분석기 실행하기
-parsedData = text_parser(path = "./HomeApplication_cafe.xlsx"
-                         ,language = "ko"
-                         ,korDicPath = "./dictionary.txt")
+parsedData = r_parser_r(textData$content, language = "ko", useEn = T, korDicPath = "./dictionary/user_dictionary.txt")
+
+#동의어 / 불용어 사전 불러오기
+stopWordDic = read_csv("./dictionary/stopword_ko.csv")
+synonymDic = read_csv("./dictionary/synonym.csv")
+
+###################################################################
+#---------------------- Text Pre-processing ----------------------#
+###################################################################
+
+# 동의어 처리
+for (i in 1:nrow(synonymDic)){
+  targetDocIdx = which(ll <- grepl(synonymDic$originWord[i], parsedData))
+  for(j in 1:length(targetDocIdx)){
+    docNum = targetDocIdx[j]
+    parsedData[docNum] = gsub(synonymDic$originWord[i], synonymDic$changeWord[i], parsedData[docNum])
+  }
+}
 
 ## 단어간 스페이스 하나 더 추가하기 ##
 parsedData = gsub(" ","  ",parsedData)
 
-##################################################################
-#Text Pre-processing
-##################################################################
 #Corpus 생성
-corp=VCorpus(VectorSource(parsedData))
+corp = VCorpus(VectorSource(parsedData))
 
 #특수문자 제거
 corp = tm_map(corp, removePunctuation)
+
+#숫자 삭제
+corp = tm_map(corp, removeNumbers)
 
 #소문자로 변경
 corp = tm_map(corp, tolower)
 
 #특정 단어 삭제
-corp = tm_map(corp, removeWords, c("있다", "하다","그렇다","되다","같다","가다","없다","보다","정도","000원","030원","주세요","어떻다"))
-
-#동의어 처리
-for (j in seq(corp))
-{
-  corp[[j]] = gsub("lg", "엘지", corp[[j]])
-  corp[[j]] = gsub("samsung", "삼성", corp[[j]])
-}
+corp = tm_map(corp, removeWords, stopWordDic$stopword)
 ##################################################################
 
 #텍스트문서 형식으로 변환
@@ -60,28 +71,25 @@ term_tfidf = tapply(dtm$v/row_sums(dtm)[dtm$i], dtm$j, mean) * log2(nDocs(dtm)/c
 
 #박스그래프로 분포 확인
 boxplot(term_tfidf)
+quantile(term_tfidf, seq(0,1,0.1))
 
 # Tf-Idf 값 기준으로 dtm 크기 줄여서 new_dtm 만들기
-new_dtm = dtm[,term_tfidf >= 0.1]
+new_dtm = dtm[,term_tfidf >= 0.05]
 new_dtm = new_dtm[row_sums(new_dtm) > 0,]
 
 ############################################
 ## Running LDA
 ############################################
 #분석명, 랜덤 seed, 클러스트 개수 setup
-name = "HomeApplication"
-SEED = 2017
-k = 10 #클러스터 개수 세팅
+name = "petition"
+SEED = 2018
+k = 20 #클러스터 개수 세팅
 
 #LDA 실행
 lda_tm = LDA(new_dtm, control=list(seed=SEED), k)
 
 #토픽별 핵심단어 저장하기
 term_topic = terms(lda_tm, 30)
-
-#토픽별 핵심 단어 파일로 출력하기
-filePathName = paste0("./LDA_output/",name,"_",k,"_LDA_Result.csv")
-write.table(term_topic, filePathName, sep=",", row.names=FALSE)
 
 #문서별 토픽 번호 저장하기
 doc_topic = topics(lda_tm, 1)
@@ -102,13 +110,18 @@ parsedData$rown = as.numeric(row.names(parsedData))
 id_topic = merge(doc_topic_df, doc_Prob_df, by="rown")
 id_topic = merge(id_topic, parsedData, by="rown", all.y = TRUE)
 id_topic = subset(id_topic,select=c("rown","parsedData","doc_topic","maxProb"))
+id_topic$content = textData$content
+
+#단어별 토픽 확률값 출력하기
+posterior(lda_tm)$terms
+
+#토픽별 핵심 단어 파일로 출력하기
+filePathName = paste0("./LDA_output/",name,"_",k,"_LDA_Result.csv")
+write.table(term_topic, filePathName, sep=",", row.names=FALSE)
 
 #문서별 토픽 번호 및 확률값 출력하기
 filePathName = paste0("./LDA_output/",name,"_",k,"_DOC","_LDA_Result.csv",sep="")
 write.table(id_topic, filePathName, sep=",", row.names=FALSE)
-
-#단어별 토픽 확률값 출력하기
-posterior(lda_tm)$terms
 
 #########################################
 ## Make visualization
@@ -149,10 +162,5 @@ json_lda = createJson(phi = phi, theta = theta,
 
 # 톰캣으로 보내기
 serVis(json_lda, out.dir = paste("C:/tomcat8/webapps/",name,"_",k,sep=""), open.browser = FALSE)
-serVis(json_lda, open.browser = T) # MAC인 경우 
-  
-  
-  
-  
-  
+serVis(json_lda, open.browser = T) # MAC인 경우
   

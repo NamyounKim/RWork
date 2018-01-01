@@ -7,12 +7,12 @@ library(tm)
 # 연관키워드 추출하기
 #======================================
 # "냉장고"의 연관 키워드 구하기
-findAssocs(dtm, terms = "냉장고", corlimit = 0.2)
+findAssocs(dtm, terms = "청원", corlimit = 0.2)
 
 #직접 단어간 상관관계 구하기
 dtm_m = as.matrix(dtm)
 cor_term = cor(dtm_m)
-cor_ref = cor_term[,"냉장고"]
+cor_ref = cor_term[,"청원"]
 
 #TF-IDF 값으로 연관 키워드 추출하기
 dtmW = DocumentTermMatrix(corp, control=list(wordLengths=c(2,Inf),
@@ -22,9 +22,9 @@ dtmW = DocumentTermMatrix(corp, control=list(wordLengths=c(2,Inf),
 colnames(dtmW) = trimws(colnames(dtmW))
 dtmW = dtmW[,nchar(colnames(dtmW)) > 1]
 
-dtmW = removeSparseTerms(dtmW, as.numeric(0.97))
+dtmW = removeSparseTerms(dtmW, as.numeric(0.98))
 
-findAssocs(dtmW, "냉장고", 0.2)
+findAssocs(dtmW, "청원", 0.1)
 
 #======================================
 # 연관키워드 네트워크 맵 그리기
@@ -41,7 +41,11 @@ dtmW_m = as.matrix(dtmW)
 cor_termW = cor(dtmW_m)
 
 #Edge 개수 조절하기
-cor_termW[cor_termW < 0.2] = 0
+cor_termW[cor_termW < 0.35] = 0
+
+# 다른 노드와 연관성이 0인 노트 제거하기
+removeTarget = colSums(cor_termW) == 1
+cor_termW = cor_termW[!removeTarget, !removeTarget]
 
 # Network Map을 그리기 위한 객체 만들기
 net = network(cor_termW, directed = FALSE)
@@ -63,6 +67,7 @@ ggnet2(net # 네트워크 객체
        ,edge.size = "edgeSize" # 엣지의 굵기를 위에서 계산한 단어간 상관계수에 따라 다르게 하기
        ,mode = "fruchtermanreingold"
        ,family = "나눔고딕"
+       ,layout.par = list(cell.pointpointrad=0, cell.jitter = 0.5) # 네트워크 맵 레이아웃 조정하기
        )
 #"circle"
 #"kamadakawai"
@@ -78,7 +83,12 @@ word_network = data.frame(word = rownames(cor_termW),
                           )
 
 ## 특정 키워드만 선택한 네트워크 맵 그리기 ##
-keyword = c("세탁기","티비","견적")
+keyword = c("박수진","특혜","삼성병원")
+keyword = c("이국종","생명","정치")
+
+cor_termW = cor(dtmW_m)
+cor_termW[cor_termW < 0.1] = 0
+
 sub_cor_term = cor_termW[,keyword]
 sub_cor_term = sub_cor_term[!(rownames(sub_cor_term) %in% keyword),]
 sub_cor_term = sub_cor_term[rowSums(sub_cor_term)>0,]

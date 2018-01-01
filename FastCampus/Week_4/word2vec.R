@@ -1,10 +1,8 @@
 #======================================
 # word2vec로 연관 키워드 추출하기
 #======================================
+install.packages("/Users/kimnamyoun/GitHub/wordVectors_2.0.tgz", repos = NULL, type = "source")
 install.packages("tsne")
-install.packages("devtools")
-library(devtools)   #Rtools는 Windows에 깔때 별도로 깔아야 한다.
-install_github("bmschmidt/wordVectors")
 library(wordVectors)
 library(tsne)
 library(readr)
@@ -24,23 +22,25 @@ model = train_word2vec(train_file = "./trainTxt.txt"
                        , threads=3
                        , vectors=100
                        , force = T
-                       , window = 10)
+                       , window = 6)
 
 #word2vector model 확인하기
 model
 
 #</s> 삭제하기
 model = model[rownames(model)!="</s>",]
+
+# 한글자 단어 삭제하기
 model = model[nchar(rownames(model))>1,]
 
 #연관 키워드 추출하기
-nearest_to(model,model[["냉장고"]], 20)
+nearest_to(model,model[["청원"]], 20)
 
 #2가지 이상 키워드에 대한 연관 키워드 추출하기
-nearest_to(model,model[[c("냉장고","양문")]], 20)
+nearest_to(model,model[[c("청원","청와대")]], 20)
 
 #단어간 연산하기
-subVec = model[rownames(model)=="냉장고",] - model[rownames(model) == "디오스",] + model[rownames(model) == "트롬",]
+subVec = model[rownames(model)=="청원",] - model[rownames(model) == "청와대",] + model[rownames(model) == "국회의원",]
 nearest_to(model, subVec, 20)
 
 #전체 단어 관계 시각화
@@ -51,13 +51,13 @@ par(family="나눔고딕")
 plot(model)
 
 #Cosine 거리
-cosineDist(model[["김치"]], model[["김치냉장고"]])
-cosineDist(model[["김치"]], model[["세탁기"]])
+cosineDist(model[["청원"]], model[["청와대"]])
+cosineDist(model[["청원"]], model[["국회의원"]])
 
 #Cosine 유사도 (= 1 - Cosine거리)
-cosineSimilarity(model[["김치"]], model[["김치냉장고"]])
-cosineSimilarity(model[["김치"]], model[["세탁기"]])
+cosineSimilarity(model[["청원"]], model[["청와대"]])
+cosineSimilarity(model[["청원"]], model[["국회의원"]])
 
 #Euclidean Distance
-dist(model[(row.names(model)=="김치" | row.names(model)=="김치냉장고"),])
-dist(model[(row.names(model)=="김치" | row.names(model)=="세탁기"),])
+dist(model[(row.names(model)=="청원" | row.names(model)=="청와대"),])
+dist(model[(row.names(model)=="청원" | row.names(model)=="국회의원"),])

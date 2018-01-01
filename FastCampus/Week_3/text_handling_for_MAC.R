@@ -9,17 +9,28 @@ library(dplyr)
 library(readr)
 library(NLP4kec)
 
-#형태소 분석기 실행하기
-parsedData = text_parser(path = "/Users/kimnamyoun/TextConvert4TM/input/HomeApplication_cafe.xlsx"
-                         ,language = "ko"
-                         ,korDicPath = "./dictionary.txt")
+textData = readRDS("./raw_data/petitions.RDS")
+textData = textData[nchar(textData$content)>30,]
 
-parsedData = as.data.frame(parsedData)
-colnames(parsedData) = "parsedContent"
-write.csv(parsedData, "./shiny_code/parsedData.csv", row.names = F)
-##################################################################
-#Text Pre-processing
-##################################################################
+#형태소 분석기 실행하기
+parsedData = r_parser_r(textData$content, language = "ko", useEn = T, korDicPath = "./dictionary/user_dictionary.txt")
+
+#동의어 / 불용어 사전 불러오기
+stopWordDic = read_csv("./dictionary/stopword_ko.csv")
+synonymDic = read_csv("./dictionary/synonym.csv")
+
+###################################################################
+#---------------------- Text Pre-processing ----------------------#
+###################################################################
+
+# 동의어 처리
+for (i in 1:nrow(synonymDic)){
+  targetDocIdx = which(ll <- grepl(synonymDic$originWord[i], parsedData))
+  for(j in 1:length(targetDocIdx)){
+    docNum = targetDocIdx[j]
+    parsedData[docNum] = gsub(synonymDic$originWord[i], synonymDic$changeWord[i], parsedData[docNum])
+  }
+}
 
 #Corpus 생성
 corp = VCorpus(VectorSource(parsedData))
@@ -34,14 +45,8 @@ corp = tm_map(corp, removeNumbers)
 corp = tm_map(corp, tolower)
 
 #특정 단어 삭제
-corp = tm_map(corp, removeWords, c("있다", "하다","그렇다","되다","같다","가다","없다","보다","정도"))
+corp = tm_map(corp, removeWords, stopWordDic$stopword)
 
-#동의어 처리
-for (j in seq(corp))
-{
-  corp[[j]] <- gsub("lg", "엘지", corp[[j]])
-  corp[[j]] <- gsub("samsung", "삼성", corp[[j]])
-}
 ##################################################################
 
 #텍스트문서 형식으로 변환
@@ -49,7 +54,6 @@ corp = tm_map(corp, PlainTextDocument)
 
 #Document Term Matrix 생성 (단어 Length는 2로 세팅)
 dtm = DocumentTermMatrix(corp, control=list(removeNumbers=FALSE, wordLengths=c(2,Inf)))
-
 
 #Term Document Matirx 생성 (DTM에서 행과 열만 바뀐 matrix)
 tdm = TermDocumentMatrix(corp, control=list(removeNumbers=TRUE, wordLengths=c(2,Inf)))
@@ -95,25 +99,21 @@ ggplot(wordDf, aes(x=word, y=freq)) + geom_bar(stat = "identity") + theme(axis.t
 ggplot(head(wordDf,10), aes(x=word, y=freq)) + geom_bar(stat = "identity") + theme(axis.text.x = element_text(family = "AppleGothic"))
 
 #상위 20개 단어만 바차트로 보여주기
-ggplot(head(arrange(wordDf,-freq),20), aes(x=reorder(word,-freq), y=freq)) + geom_bar(stat = "identity") + theme(axis.text.x = element_text(family = "AppleGothic"))
+#문제
 
+# Word Cloud 그리기
+install.packages("wordcloud2")
+library(wordcloud2)
+wordcloud2(data = wordDf
+           , color = "random-light"
+           , shape = "star"
+           , size = 0.5
+           , fontFamily = "나눔고딕")
 
-#Word Cloud 그리기
-install.packages("wordcloud")
-library(wordcloud)
-
-pal = brewer.pal(n = 12, name = "Set2") # n:사용할 색깔 수, name:색깔 조합 이름
-# http://colorbrewer2.org/ 참고
-
-wordcloud(wordDf$word # 단어
-          , wordDf$freq # 빈도수
-          , min.freq = 5 # 표현할 단어의 최소 빈도수
-          , colors = pal # 위에서 만든 팔레트 정보 입력
-          , rot.per = 0.5 #회전한 단어 비율
-          , random.order = F # 단어의 노출 순서 랜덤 여부 결정
-          , scale = c(3,1) # scale값에서 앞에 값이 커야 빈도수가 큰 단어 사이즈가 커야함
-          , family="AppleGothic") # 맥 폰트 설정
-
+letterCloud(wordDf
+            , word = "TEXT"
+            , size = 1
+            , fontFamily = "나눔고딕")
 
 #treeMap 그리기
 install.packages("treemap")

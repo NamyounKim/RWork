@@ -6,19 +6,34 @@ library(tm)
 library(slam)
 library(dplyr)
 library(NLP4kec)
+library(readr)
+
+#원문 데이터 가져오기
+textData = readRDS("./raw_data/petitions.RDS")
+textData = textData[nchar(textData$content)>30,] #불필요한 데이터 제거
 
 #형태소 분석기 실행하기
-parsedData = text_parser(path = "./HomeApplication_cafe.xlsx" # 분석 대상 원문 파일 (엑셀, CSV 파일만 가능)
-                         ,language = "ko"                     # 분석 대상 원문 언어 타입
-                         ,korDicPath = "./dictionary.txt")    # 사용자 사전
+parsedData = r_parser_r(textData$content, language = "ko", useEn = T, korDicPath = "./dictionary/user_dictionary.txt")
 
+#동의어 / 불용어 사전 불러오기
+stopWordDic = read_csv("./dictionary/stopword_ko.csv")
+synonymDic = read_csv("./dictionary/synonym.csv")
+
+###################################################################
+#---------------------- Text Pre-processing ----------------------#
+###################################################################
+
+# 동의어 처리
+for (i in 1:nrow(synonymDic)){
+  targetDocIdx = which(ll <- grepl(synonymDic$originWord[i], parsedData))
+  for(j in 1:length(targetDocIdx)){
+    docNum = targetDocIdx[j]
+    parsedData[docNum] = gsub(synonymDic$originWord[i], synonymDic$changeWord[i], parsedData[docNum])
+  }
+}
 
 ## 단어간 스페이스 하나 더 추가하기 ##
 parsedData = gsub(" ","  ",parsedData)
-
-##################################################################
-#Text Pre-processing
-##################################################################
 
 #Corpus 생성
 corp = VCorpus(VectorSource(parsedData))
@@ -33,14 +48,7 @@ corp = tm_map(corp, removeNumbers)
 corp = tm_map(corp, tolower)
 
 #특정 단어 삭제
-corp = tm_map(corp, removeWords, c("있다", "하다","그렇다","되다","같다","가다","없다","보다","정도"))
-
-#동의어 처리
-for (j in seq(corp))
-{
-  corp[[j]] <- gsub("lg", "엘지", corp[[j]])
-  corp[[j]] <- gsub("samsung", "삼성", corp[[j]])
-}
+corp = tm_map(corp, removeWords, stopWordDic$stopword)
 ##################################################################
 
 #텍스트문서 형식으로 변환
@@ -57,7 +65,7 @@ dtm = dtm[,nchar(colnames(dtm)) > 1]
 tdm = TermDocumentMatrix(corp, control=list(wordLengths=c(2,Inf)))
 
 #Sparse Terms 삭제 (값이 작아질 수록 term수가 줄어든다.)
-dtm = removeSparseTerms(dtm, as.numeric(0.99))
+dtm = removeSparseTerms(dtm, as.numeric(0.98))
 
 #단어 발생 빈도 구하기
 freq = colSums(as.matrix(dtm))
@@ -93,22 +101,7 @@ ggplot(head(wordDf,10), aes(x=word, y=freq)) + geom_bar(stat = "identity")
 #상위 20개 단어만 바차트로 보여주기
 ggplot(head(arrange(wordDf,-freq),20), aes(x=reorder(word,-freq), y=freq)) + geom_bar(stat = "identity")
 
-
 # Word Cloud 그리기
-install.packages("wordcloud")
-library(wordcloud)
-pal = brewer.pal(n = 5, name = "Set2") # n:사용할 색깔 수, name:색깔 조합 이름
-wordcloud(words = wordDf$word # 단어
-          , freq = wordDf$freq # 빈도수
-          , min.freq = 5 # 표현할 단어의 최소 빈도수
-          , colors = pal # 위에서 만든 팔레트 정보 입력
-          , rot.per = 0 # 회전되는 단어의 비율
-          , random.order = T # 단어의 노출 순서 랜덤 여부 결정
-          , scale = c(5,1)
-          ) # scale값에서 앞에 값이 커야 빈도수가 큰 단어 사이즈가 커짐
-
-
-# Word Cloud 그리기 2
 install.packages("wordcloud2")
 library(wordcloud2)
 wordcloud2(data = wordDf
@@ -121,7 +114,6 @@ letterCloud(wordDf
             , word = "TEXT"
             , size = 1
             , fontFamily = "나눔고딕")
-
 
 #treeMap 그리기
 install.packages("treemap")

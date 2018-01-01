@@ -19,12 +19,12 @@ ggplot(Cars93, aes(x=Type)) + geom_bar(stat = "count") + labs(x="Car Type") +
 ggplot(Cars93, aes(x=Type, fill=AirBags)) + geom_bar(stat = "count")
 ggplot(Cars93, aes(x=Type, fill=AirBags)) + geom_bar(stat = "count", position = "dodge") # Stack 하지 않기
 
-#type별 가격 평균값 구한 후 바차트 그리기
+# type별 가격 평균값 구한 후 바차트 그리기
 temp_set = Cars93 %>% group_by(Type) %>% summarise(avgPrice = mean(Price))
 ggplot(temp_set, aes(x=Type, y=avgPrice)) + geom_bar(stat = "identity") #막대의 높이를 값으로 할 경우
 
-#비율 누적 Bar Chart 구하기
-#자동차 type별 Origin 비율구한 후 비율 누적 Bar Chart 그리기
+# 비율 누적 Bar Chart 구하기
+# 자동차 type별 Origin 비율구한 후 비율 누적 Bar Chart 그리기
 temp_set = Cars93 %>% group_by(Type, AirBags) %>% summarise(n=n()) %>% 
   mutate(ratio = n/sum(n))
 
@@ -41,39 +41,34 @@ ggplot(Cars93, aes(x=MPG.city, y=Price, color=factor(Manufacturer))) + geom_poin
 ggplot(Cars93, aes(x=MPG.city, y=Price, color=factor(Manufacturer), size=EngineSize)) + geom_point(shape=18) #특정 범주형 값 별로 색깔/크기 다르게 하기
 
 ## 4. Box Plot
-ggplot(Cars93, aes(x=factor(AirBags), y=Price)) + geom_boxplot() + theme(axis.text.x=element_text(angle = 45, hjust = 1))
-ggplot(Cars93, aes(x=factor(Type), y=Price, fill=factor(AirBags))) + geom_boxplot()
+boxplot(Cars93$Price ~ Cars93$AirBags)
+ggplot(Cars93, aes(x=AirBags, y=Price)) + geom_boxplot()
+ggplot(Cars93, aes(x=AirBags, y=Price)) + geom_boxplot() + theme(axis.text.x=element_text(angle = 45, hjust = 1)) # x축 텍스트 회전시키기
 
 #샘플 데이터 가져오기
-data("economics")
-economics
+data("economics_long")
+economics_long
+df = economics_long %>% filter(variable %in% c("psavert", "uempmed")) %>% filter(date >= "1990-01-01") #개인 저축율, 실업이 지속된 기간(주)
 
 ## 5. Line Chart
-ggplot(economics, aes(x=date, y=pop)) + geom_line()
+ggplot(df, aes(x=date, y=value)) + geom_line()
+ggplot(df, aes(x=date, y=value, color=variable)) + geom_line()
 
-ggplot(economics, aes(x=pop, y=unemploy)) + geom_point()
+# Line Stack Chart
+ggplot(df, aes(x=date, y=value, fill=variable)) + geom_area() + geom_line(position = "stack")
 
 #축 눈금 간격 조절하기
-ggplot(economics, aes(x=pop, y=unemploy)) + geom_point() + 
-  scale_x_continuous(breaks = seq(200000, 330000, 10000)) + # 20만 ~ 33만 사이를 만단위로 나눠서 X축에 표시하기
-  theme(axis.text.x=element_text(angle = 45, hjust = 1))    # X축 텍스트를 45도 기울여서 표시하기
-
-#연도별로 색깔 다르게해서 보여주기
-economics$year = substr(economics$date,1,4)
-ggplot(economics, aes(x=pop, y=unemploy, color=factor(year))) + geom_point()
+ggplot(df, aes(x=date, y=value, fill=variable)) + geom_area() + geom_line(position = "stack") +
+  scale_x_date(date_breaks = "1 year",  date_labels = "%Y") + # X축에 연도 표시하기
+  theme(axis.text.x=element_text(angle = 45, hjust = 1))    # X축 텍스트를 45도 기울여서 표시하기a
 
 
 ## 6. 상관계수행렬 그리기
 subCars93 = Cars93 %>% dplyr::select(Price, MPG.city, MPG.highway, EngineSize)
 plot(subCars93)
 
+library(psych)
+pairs.panels(subCars93)
+
 #상관계수 구하기
 corDf = cor(subCars93)
-
-#상관계수 차트 그리기 
-install.packages("corrplot")
-library(corrplot)
-corrplot(corDf)
-corrplot(corDf, method = "shade", tl.srt=45)
-corrplot(corDf, method = "shade", tl.srt=45, addCoef.col = "black")
-corrplot(corDf, method = "shade", tl.srt=45, addCoef.col = "black", type = "lower")
