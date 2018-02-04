@@ -67,7 +67,7 @@ subset(iris, iris$Species %in% c("setosa","virginica"))
 nrow(iris)
 ncol(iris)
 
-#4-2. Vector의 길이 구하기
+#4-2. Vector, List 의 길이 구하기
 length(iris[,1])
 length(iris[1,])
 
@@ -102,19 +102,28 @@ df2 = data.frame(id=c(2,4,6,8),
 merge(df1, df2, by="id")
 
 #11-2. Left Join
-merge(df1, df2, all.x = TRUE)
+merge(df1, df2, by="id", all.x = TRUE)
 
 #11-3 Right Join
-merge(df1, df2, all.y = TRUE) 
+merge(df1, df2, by="id", all.y = TRUE) 
 
 #11-4 조인키가 서로 다를때
 merge(df1, df2, all.x = TRUE, by.x = "dd", by.y = "aa")
-
 
 #12.Data Export
 write.csv(iris, file = "./iris.csv", row.names = FALSE) 
 write.table(iris, file = "./iris.txt", row.names = FALSE, quote = F, sep = ",")
 
+#13. Data Read
+install.packages("readr")
+library(readr)
+read.csv()
+temp = read_csv(file = "./dictionary/stopword_ko.csv")
 
+install.packages("readxl")
+library(readxl)
+read_xlsx()
+
+getwd()
 
 

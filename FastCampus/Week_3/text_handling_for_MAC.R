@@ -99,7 +99,7 @@ ggplot(wordDf, aes(x=word, y=freq)) + geom_bar(stat = "identity") + theme(axis.t
 ggplot(head(wordDf,10), aes(x=word, y=freq)) + geom_bar(stat = "identity") + theme(axis.text.x = element_text(family = "AppleGothic"))
 
 #상위 20개 단어만 바차트로 보여주기
-#문제
+ggplot(head(arrange(wordDf,-freq),20), aes(x=reorder(word,-freq), y=freq)) + geom_bar(stat = "identity")
 
 # Word Cloud 그리기
 install.packages("wordcloud2")
@@ -124,5 +124,5 @@ treemap(wordDf # 대상 데이터 설정
         ,vSize = "freq"  # 박스 크기 기준
         ,fontfamily.labels = "AppleGothic" # 맥 폰트 설정
         ,fontsize.labels = 12 # 폰트 크기 설정
-        ,palette=pal # 위에서 만든 팔레트 정보 입력
+        #,palette=pal # 위에서 만든 팔레트 정보 입력
         ,border.col = "white") # 경계선 색깔 설정

@@ -8,6 +8,9 @@ library(dplyr)
 library(NLP4kec)
 library(readr)
 
+# Java버전 확인
+.jcall("java/lang/System", "S", "getProperty", "java.runtime.version")
+
 #원문 데이터 가져오기
 textData = readRDS("./raw_data/petitions.RDS")
 textData = textData[nchar(textData$content)>30,] #불필요한 데이터 제거
@@ -80,7 +83,7 @@ write_excel_csv(dtm_df, "./dtm.csv")
 length(freq)
 
 #내림차순으로 단어 10개, sorting 하기
-freq[head(order(-freq), 5)]
+freq[head(order(-freq), 20)]
 
 #오름차순으로 단어 10개 sorting 하기
 freq[head(order(freq), 10)]
@@ -112,7 +115,7 @@ wordcloud2(data = wordDf
 
 letterCloud(wordDf
             , word = "TEXT"
-            , size = 1
+            , size = 0.5
             , fontFamily = "나눔고딕")
 
 #treeMap 그리기
@@ -123,5 +126,5 @@ treemap(wordDf # 대상 데이터 설정
         ,index = c("word") # 박스 안에 들어갈 변수 설정
         ,vSize = "freq"  # 박스 크기 기준
         ,fontsize.labels = 12 # 폰트 크기 설정
-        ,palette=pal # 위에서 만든 팔레트 정보 입력
+        #,palette = pal # 위에서 만든 팔레트 정보 입력
         ,border.col = "white") # 경계선 색깔 설정

@@ -22,7 +22,7 @@ substr(sentence, 4, 7)
 substr(sentence, 1, 6) = "I hate" # 1번째 문자에서 6문자 사이의 문자열 바꾸기
 
 #문자열 내에 해당 패턴이 나오는 첫번째 위치 구하기
-regexpr("hate",sentence)
+regexpr("like",sentence)
 
 #문자열 내에 해당 패턴이 나오는 모든 위치 구하기
 gregexpr("a", sentence)
@@ -46,16 +46,18 @@ Cars93
 
 #특정 column 선택하기
 dSample = dplyr::select(Cars93, Manufacturer, Model, Type, Price)
+head(dSample, 5)
 
 #특정 row 선택하기
 filter(dSample, Price > 30)
+filter(dSample, Price > 30 & Manufacturer =="Audi")
 filter(dSample, Type %in% c("Compact", "Van","Small","Midsize"))
 
 #Sorting 하기
-arrange(dSample, desc(Price))
+arrange(dSample, -Price)
 
 #파이프 연산자를 이용하여 Group by 하기
-dSampleBy = dSample %>% group_by(Manufacturer) %>% summarise(meanPrice = mean(Price))
+dSampleBy = dSample %>% group_by(Manufacturer, type) %>% summarise(meanPrice = mean(Price))
                                    
 #요약 column 2개만들기
 dSampleBy = dSample %>% group_by(Manufacturer) %>% summarise(totalPrice = sum(Price), n=n())
@@ -87,12 +89,12 @@ meltTest = melt(data = Cars93,
 a = c(1,8,5)
 
 #1. if문
-if(length(a) > 1){
+if(length(a) > 5){
   mean(a)
 }
 
 #2. else 문
-if(length(a) > 1){
+if(length(a) > 5){
   mean(a)
 } else {
   print("조건에 맞지 않습니다.")
