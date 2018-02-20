@@ -2,6 +2,9 @@ install.packages("tm") #텍스트 마이닝을 위한 패키지
 install.packages("slam")
 install.packages("dplyr")
 
+# JAVA_HOME 경로 설정
+#Sys.setenv(JAVA_HOME = "c:/Program Files/JAVA/jre1.8.0_131")
+
 library(tm)
 library(slam)
 library(dplyr)
