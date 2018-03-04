@@ -40,14 +40,14 @@ shinyUI(
                   , value = 0.25
                   , step=0.05
                   )
-      ),
+      ,width = 3),
     
     # Show a plot of the generated distribution
     mainPanel(
       verbatimTextOutput("displayRow"),
       plotOutput("networkPlot"
                  ,height = 800)
-      )
+      ,width = 9)
     )
   )
 )

@@ -1,5 +1,5 @@
 #package check & install & load
-install.packages(c("pROC","gmodels","klaR","e1071","readr"))
+install.packages(c("pROC","gmodels","klaR","e1071","readr","caret","randomForest"))
 library(dplyr)
 library(stringi)
 library(tm)
@@ -12,22 +12,36 @@ library(readr)
 library(NLP4kec)
 
 #형태소 분석기 실행하기
-parsedData = text_parser(path = "./Blog_TrainingSet_Spam.xlsx"
-                         ,language = "ko"
-                         ,korDicPath = "./dictionary.txt")
+parsedData = file_parser_r(path = "./raw_data/Blog_TrainingSet_Spam.xlsx"
+                           ,language = "ko"
+                           ,korDicPath = "./dictionary/user_dictionary.txt")
 
-saveRDS(parsedData, "./parsedData.RDS") #데이터셋 저장하기
-parsedData = readRDS("./parsedData.RDS") #저장한 데이터셋 불러오기
+saveRDS(parsedData, "./raw_data/parsedData.RDS") #데이터셋 저장하기
+parsedData = readRDS("./raw_data/parsedData.RDS") #저장한 데이터셋 불러오기
 
 # 예측 변수값 가져오기
-target_val = read_csv("./training_target_val.csv")
+target_val = read_csv("./raw_data/training_target_val.csv")
+
+#동의어 / 불용어 사전 불러오기
+stopWordDic = read_csv("./dictionary/stopword_ko.csv")
+synonymDic = read_csv("./dictionary/synonym.csv")
+
+###################################################################
+#---------------------- Text Pre-processing ----------------------#
+###################################################################
+
+# 동의어 처리
+for (i in 1:nrow(synonymDic)){
+  targetDocIdx = which(ll <- grepl(synonymDic$originWord[i], parsedData))
+  for(j in 1:length(targetDocIdx)){
+    docNum = targetDocIdx[j]
+    parsedData[docNum] = gsub(synonymDic$originWord[i], synonymDic$changeWord[i], parsedData[docNum])
+  }
+}
 
 ## 단어간 스페이스 하나 더 추가하기 ##
 parsedData = gsub(" ","  ",parsedData)
 
-################################
-#Text Pre-processing
-################################
 #Corpus 생성
 corp = VCorpus(VectorSource(parsedData))
 
@@ -38,18 +52,12 @@ corp = tm_map(corp, removePunctuation)
 corp = tm_map(corp, tolower)
 
 #특정 단어 삭제
-stopWord = read_csv("./stopword_ko.csv")
-corp = tm_map(corp, removeWords, stopWord$stopword)
-
-#동의어 처리
-for (j in seq(corp))
-{
-  corp[[j]] <- gsub("lg", "엘지", corp[[j]])
-  corp[[j]] <- gsub("sony", "소니", corp[[j]])
-}
+corp = tm_map(corp, removeWords, stopWordDic$stopword)
 
 #텍스트문서 형식으로 변환
 corp = tm_map(corp, PlainTextDocument)
+
+##################################################################
 
 #Document Term Matrix 생성 (단어 Length는 2로 세팅)
 dtm = DocumentTermMatrix(corp, control=list(wordLengths=c(2,Inf)))
@@ -67,7 +75,7 @@ dtmDf = as.data.frame(as.matrix(dtm_removed))
 #중복 Column 삭제
 dtmDf = dtmDf[,!duplicated(colnames(dtmDf))]
 
-#dtmDf$id = parsedData$id
+#dtm에 정답지 붙이기(타겟변수 붙이기)
 dtmDf$target = target_val$spam_yn
 
 #Traing Set, Test Set 만들기
@@ -97,16 +105,26 @@ nb_pred_result = CrossTable(table(testSet$target, nbPred), prop.chisq=FALSE)
 ########################################################################################################
 
 # 새로운 문서 형태소 분석 실행하기
-newData = text_parser(path = "./Blog_TestSet_Spam.xlsx"
-                         ,language = "ko"
-                         ,korDicPath = "./dictionary.txt")
-
-## 단어간 스페이스 하나 더 추가하기 ##
-newData = gsub(" ","  ", newData)
+newData = file_parser_r(path = "./raw_data/Blog_TestSet_Spam.xlsx"
+                        ,language = "ko"
+                        ,korDicPath = "./dictionary/user_dictionary.txt")
 
 #############################
 #Text Pre-processing
 #############################
+
+# 동의어 처리
+for (i in 1:nrow(synonymDic)){
+  targetDocIdx = which(ll <- grepl(synonymDic$originWord[i], newData))
+  for(j in 1:length(targetDocIdx)){
+    docNum = targetDocIdx[j]
+    newData[docNum] = gsub(synonymDic$originWord[i], synonymDic$changeWord[i], newData[docNum])
+  }
+}
+
+## 단어간 스페이스 하나 더 추가하기 ##
+newData = gsub(" ","  ", newData)
+
 #Corpus 생성
 newCorp = VCorpus(VectorSource(newData))
 
@@ -117,14 +135,9 @@ newCorp = tm_map(newCorp, removePunctuation)
 corp = tm_map(corp, tolower)
 
 #특정 단어 삭제
-newCorp = tm_map(newCorp, removeWords, c("있다", "하다","그렇다","되다","같다","가다","없다","보다","정도","000원","030원","주세요","어떻다"))
+newCorp = tm_map(newCorp, removeWords, stopWordDic$stopword)
 
-#동의어 처리
-for (j in seq(newCorp))
-{
-  newCorp[[j]] <- gsub("lg", "엘지", newCorp[[j]])
-  newCorp[[j]] <- gsub("sony", "소니", newCorp[[j]])
-}
+#===============================================
 
 #텍스트문서 형식으로 변환
 newCorp = tm_map(newCorp, PlainTextDocument)
@@ -157,7 +170,7 @@ newDtmDf = cbind(newDtmDf, forAdd) # newDtmDf에 붙여주기
 nbPred_new = predict(nbModel, newDtmDf)
 
 # 새로운 문서 예측결과 확인하기
-test_target_val = read_csv("./test_target_val.csv")
+test_target_val = read_csv("./raw_data/test_target_val.csv")
 nbPred_new_df = data.frame(pred = nbPred_new, original = test_target_val$spam_yn)
 nbPred_new_result = CrossTable(table(nbPred_new_df$original, nbPred_new_df$pred), prop.chisq=FALSE)
 (nbPred_new_result$t[1,1] + nbPred_new_result$t[2,2]) / length(newData)

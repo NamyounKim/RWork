@@ -6,13 +6,14 @@ library(tm)
 #======================================
 # 연관키워드 추출하기
 #======================================
-# "냉장고"의 연관 키워드 구하기
-findAssocs(dtm, terms = "청원", corlimit = 0.2)
+# "청원"의 연관 키워드 구하기
+findAssocs(dtm, terms = "청원", corlimit = 0.25)
 
 #직접 단어간 상관관계 구하기
 dtm_m = as.matrix(dtm)
 cor_term = cor(dtm_m)
 cor_ref = cor_term[,"청원"]
+cor_ref
 
 #TF-IDF 값으로 연관 키워드 추출하기
 dtmW = DocumentTermMatrix(corp, control=list(wordLengths=c(2,Inf),
@@ -43,15 +44,18 @@ cor_termW = cor(dtmW_m)
 #Edge 개수 조절하기
 cor_termW[cor_termW < 0.35] = 0
 
-# 다른 노드와 연관성이 0인 노트 제거하기
+# 다른 노드와 연관성이 0인 노드 제거하기
 removeTarget = colSums(cor_termW) == 1
 cor_termW = cor_termW[!removeTarget, !removeTarget]
 
 # Network Map을 그리기 위한 객체 만들기
 net = network(cor_termW, directed = FALSE)
 
-# Network의 betweenness값을 구하여 상위 10% 이상인 node에는 노란색 입혀주기
-net %v% "mode" = ifelse(betweenness(net) > quantile(betweenness(net), 0.8), ifelse(evcent(net) > quantile(evcent(net), 0.9),"High","Medium"), "Low")
+# betweenness값 상위 20% 이면서 eigenvector 값이 상위 10%이면 "High" -> 빨강색
+# betweenness값 상위 20% 이면서 eigenvector 값이 하위 90%이면 "Medium" -> 노란색
+# betweenness값 하위 80% 이면 "Low" -> 회색
+net %v% "mode" = ifelse(betweenness(net) > quantile(betweenness(net), 0.8)
+                        ,ifelse(evcent(net) > quantile(evcent(net), 0.9),"High","Medium"), "Low")
 node_color = c("Low" = "grey", "Medium" = "darkgoldenrod1", "High"="brown1")
 
 # Network edge size 값 설정하기 (단어간 상관계수 값 * 2)
@@ -66,8 +70,8 @@ ggnet2(net # 네트워크 객체
        ,size = "degree" # 노드의 크기를 degree cetrality값에 따라 다르게 하기
        ,edge.size = "edgeSize" # 엣지의 굵기를 위에서 계산한 단어간 상관계수에 따라 다르게 하기
        ,mode = "fruchtermanreingold"
-       ,family = "나눔고딕"
-       ,layout.par = list(cell.pointpointrad=0, cell.jitter = 0.5) # 네트워크 맵 레이아웃 조정하기
+       ,family = "AppleGothic"
+       ,layout.par = list(cell.pointcellrad=100000) # 네트워크 맵 레이아웃 조정하기
        )
 #"circle"
 #"kamadakawai"
@@ -77,13 +81,12 @@ ggnet2(net # 네트워크 객체
 word_network = data.frame(word = rownames(cor_termW),
                           centrality = degree(net), #연결 중심성 구하기 
                           betweenness = betweenness(net), #매개 중심성 구하기
-                          
-                          closeness = closeness(net), # 근접 중심성 구하기
+                          closeness = closeness(net, cmode="suminvundir"), # 근접 중심성 구하기
                           eigenvector = evcent(net) # 고유벡터 중심성 구하기
                           )
 
 ## 특정 키워드만 선택한 네트워크 맵 그리기 ##
-keyword = c("박수진","특혜","삼성병원")
+#keyword = c("박수진","특혜","삼성병원")
 keyword = c("이국종","생명","정치")
 
 cor_termW = cor(dtmW_m)
@@ -100,5 +103,5 @@ ggnet2(net2 # 네트워크 객체
        ,label.size = 3 # 라벨 폰트 사이즈
        ,edge.size = sub_cor_term[sub_cor_term>0] * 2
        ,size = degree(net2) # 노드의 크기를 degree cetrality값에 따라 다르게 하기
-       ,family = "나눔고딕"
+       ,family = "AppleGothic"
        )

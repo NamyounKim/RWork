@@ -1,6 +1,7 @@
 install.packages("topicmodels")
 install.packages("LDAvis")
 install.packages("servr")
+
 library(topicmodels)
 library(LDAvis)
 library(servr)
@@ -64,11 +65,11 @@ dtm = dtm[,nchar(colnames(dtm)) > 1]
 
 #Sparse Terms 삭제
 dtm = removeSparseTerms(dtm, as.numeric(0.997))
-
+dtm
 ## LDA 할 때 DTM 크기 조절
 #단어별 Tf-Idf 값 구하기
 term_tfidf = tapply(dtm$v/row_sums(dtm)[dtm$i], dtm$j, mean) * log2(nDocs(dtm)/col_sums(dtm > 0))
-
+term_tfidf
 #박스그래프로 분포 확인
 boxplot(term_tfidf)
 quantile(term_tfidf, seq(0,1,0.1))
@@ -76,25 +77,25 @@ quantile(term_tfidf, seq(0,1,0.1))
 # Tf-Idf 값 기준으로 dtm 크기 줄여서 new_dtm 만들기
 new_dtm = dtm[,term_tfidf >= 0.05]
 new_dtm = new_dtm[row_sums(new_dtm) > 0,]
-
+new_dtm
 ############################################
 ## Running LDA
 ############################################
 #분석명, 랜덤 seed, 클러스트 개수 setup
 name = "petition"
 SEED = 2018
-k = 20 #클러스터 개수 세팅
+k = 15 #클러스터 개수 세팅
 
 #LDA 실행
 lda_tm = LDA(new_dtm, control=list(seed=SEED), k)
 
 #토픽별 핵심단어 저장하기
 term_topic = terms(lda_tm, 30)
-
+term_topic
 #문서별 토픽 번호 저장하기
 doc_topic = topics(lda_tm, 1)
 doc_topic_df = as.data.frame(doc_topic)
-doc_topic_df$rown = as.numeric(row.names(doc_topic_df))
+doc_topic_df$rown = as.numeric(row.names(doc_topic_df)) # 조인키 만들기
 
 #문서별 토픽 확률값 계산하기
 doc_Prob = posterior(lda_tm)$topics
@@ -151,7 +152,7 @@ freq_matrix = data.frame(ST = colnames(new_dtm_m),
                           Freq = colSums(new_dtm_m))
 
 # 위에서 구한 값들을 파라메터 값으로 넘겨서 시각화를 하기 위한 데이터를 만들어 줍니다.
-source("./Week_5/createJsonForChart_v2.R")
+source("./Week_6/createJsonForChart_v2.R")
 json_lda = createJson(phi = phi, theta = theta,
                           vocab = vocab,
                           doc.length = doc_length,
@@ -163,4 +164,9 @@ json_lda = createJson(phi = phi, theta = theta,
 # 톰캣으로 보내기
 serVis(json_lda, out.dir = paste("C:/tomcat8/webapps/",name,"_",k,sep=""), open.browser = FALSE)
 serVis(json_lda, open.browser = T) # MAC인 경우
-  
+
+
+localhost:8080/petition_LDA_15
+
+
+

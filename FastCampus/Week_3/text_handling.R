@@ -1,6 +1,10 @@
 install.packages("tm") #텍스트 마이닝을 위한 패키지
 install.packages("slam")
 install.packages("dplyr")
+install.packages("readr")
+
+# JAVA_HOME 경로 설정
+#Sys.setenv(JAVA_HOME = "c:/Program Files/JAVA/jre1.8.0_131")
 
 # JAVA_HOME 경로 설정
 #Sys.setenv(JAVA_HOME = "c:/Program Files/JAVA/jre1.8.0_131")
@@ -15,7 +19,7 @@ library(readr)
 .jcall("java/lang/System", "S", "getProperty", "java.runtime.version")
 
 #원문 데이터 가져오기
-textData = readRDS("./raw_data/petitions.RDS")
+textData = readRDS("./raw_data/petitions2.RDS")
 textData = textData[nchar(textData$content)>30,] #불필요한 데이터 제거
 
 #형태소 분석기 실행하기
@@ -86,7 +90,7 @@ write_excel_csv(dtm_df, "./dtm.csv")
 length(freq)
 
 #내림차순으로 단어 10개, sorting 하기
-freq[head(order(-freq), 20)]
+freq[head(order(-freq), 10)]
 
 #오름차순으로 단어 10개 sorting 하기
 freq[head(order(freq), 10)]

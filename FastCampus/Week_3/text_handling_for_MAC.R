@@ -3,6 +3,8 @@ install.packages("slam")
 install.packages("dplyr")
 install.packages("readr") #파일을 읽어오기 위한 패키지
 
+options(java.parameters = c("-Xmx2g", "-Dfile.encoding=UTF-8"))
+
 library(tm)
 library(slam)
 library(dplyr)
@@ -89,7 +91,7 @@ library(ggplot2)
 #맥북 사용자는 폰트 import하기
 install.packages("extrafont")
 library(extrafont)
-#font_import()
+font_import()
 loadfonts(device="postscript")
 
 #단어 빈도수 바차트로 보여주기

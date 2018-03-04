@@ -43,7 +43,7 @@ ggplot(Cars93, aes(x=MPG.city, y=Price, color=factor(Manufacturer), size=EngineS
 ## 4. Box Plot
 boxplot(Cars93$Price ~ Cars93$AirBags)
 ggplot(Cars93, aes(x=AirBags, y=Price)) + geom_boxplot()
-ggplot(Cars93, aes(x=AirBags, y=Price)) + geom_boxplot() + theme(axis.text.x=element_text(angle = 45, hjust = 1)) # x축 텍스트 회전시키기
+ggplot(Cars93, aes(x=AirBags, y=Price, color=factor(Manufacturer))) + geom_boxplot() + theme(axis.text.x=element_text(angle = 45, hjust = 1)) # x축 텍스트 회전시키기
 
 #샘플 데이터 가져오기
 data("economics_long")
@@ -67,6 +67,7 @@ ggplot(df, aes(x=date, y=value, fill=variable)) + geom_area() + geom_line(positi
 subCars93 = Cars93 %>% dplyr::select(Price, MPG.city, MPG.highway, EngineSize)
 plot(subCars93)
 
+install.packages("psych")
 library(psych)
 pairs.panels(subCars93)
 

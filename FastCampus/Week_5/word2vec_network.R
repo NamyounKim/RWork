@@ -4,13 +4,14 @@ library(sna)
 library(ggplot2)
 library(GGally)
 
-# 단어간 코사인 거리 구하기
+# 단어간 코사인 유사도 구하기
 temp = cosineSimilarity(model, model)
 
 # Edge 개수 조절하기 (0~1 사이 값으로 세팅)
 temp[temp < 0.9] = 0
 
 sparseRatio = colSums(temp == 0) / nrow(temp)
+# sparse ratio 값 분포 확인
 quantile(sparseRatio, seq(0,1,0.1))
 temp = temp[sparseRatio<0.9997, sparseRatio<0.9997]
 
@@ -36,6 +37,6 @@ ggnet2(net # 네트워크 객체
        ,palette = node_color # 노드 색상
        ,size = "degree" # 노드의 크기를 degree cetrality값에 따라 다르게 하기
        ,edge.size = "edgeSize" # 엣지의 굵기를 위에서 계산한 단어간 상관계수에 따라 다르게 하기
-       ,family = "나눔고딕"
+       ,family = "AppleGothic"
        ) 
 

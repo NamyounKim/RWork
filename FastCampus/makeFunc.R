@@ -1,35 +1,39 @@
-makeDtm = function(parsedData, stopWord, removeRatio){
+makeDtm = function(inputData, sparseRatio, tfIdf){
   
   #Corpus 생성
-  corp = VCorpus(VectorSource(parsedData))
+  corp = VCorpus(VectorSource(inputData))
   
   #특수문자 제거
   corp = tm_map(corp, removePunctuation)
   
-  #특정 단어 삭제
-  corp = tm_map(corp, removeWords, stopWord)
+  #숫자 삭제
+  corp = tm_map(corp, removeNumbers)
   
-  #동의어 처리
-  for (j in seq(corp))
-  {
-    corp[[j]] <- gsub("미장센", "미쟝센", corp[[j]])
-    corp[[j]] <- gsub("미쟝셴", "미쟝센", corp[[j]])
-    corp[[j]] <- gsub("미쟝셴", "미쟝센", corp[[j]])
-  }
+  #소문자로 변경
+  corp = tm_map(corp, tolower)
+  
+  #특정 단어 삭제
+  corp = tm_map(corp, removeWords, stopWordDic$stopword)
+  
   ##################################################################
   
   #텍스트문서 형식으로 변환
   corp = tm_map(corp, PlainTextDocument)
   
-  #Document Term Matrix 생성 (단어 Length는 2로 세팅)
-  dtm = DocumentTermMatrix(corp, control=list(removeNumbers=FALSE, wordLengths=c(2,Inf)))
+  if(tfIdf == TRUE){
+    dtm = DocumentTermMatrix(corp, control=list(wordLengths=c(2,Inf),
+                                                 weighting = function(x) weightTfIdf(x, normalize = TRUE))) #Tf-Idf 가중치 주기
+    
+  }else{
+    dtm = DocumentTermMatrix(corp, control=list(wordLengths=c(2,Inf)))
+  }
   
   ## 한글자 단어 제외하기 ##
   colnames(dtm) = trimws(colnames(dtm))
   dtm = dtm[,nchar(colnames(dtm)) > 1]
   
   #Sparse Terms 삭제
-  dtm = removeSparseTerms(dtm, as.numeric(removeRatio))
+  dtm = removeSparseTerms(dtm, as.numeric(sparseRatio))
   
   return(dtm)
 }

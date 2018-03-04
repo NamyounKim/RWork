@@ -46,9 +46,9 @@ nearest_to(model, subVec, 20)
 #전체 단어 관계 시각화
 install.packages("extrafont")
 library(extrafont) 
-par(family="나눔고딕") 
+par(family="AppleGothic")
 
-plot(model)
+plot(model, ... = )
 
 #Cosine 거리
 cosineDist(model[["청원"]], model[["청와대"]])

@@ -11,7 +11,7 @@ dateTopic$id = paste0(dateTopic$startDate,"_",dateTopic$topicNo)
 # 토픽번호별 문서가 없는 일자를 핸들링하기 위한 작업
 allDate = seq(min(dateTopic$startDate), max(dateTopic$startDate), by="day")
 allDate = data.frame(startDate = allDate)
-topicNo = data.frame(topicNo = seq(1,20,1))
+topicNo = data.frame(topicNo = seq(1,max(textData$topicNo),1))
 allDate = merge(allDate, topicNo, all=T)
 allDate$id = paste0(allDate$startDate,"_",allDate$topicNo)
 
