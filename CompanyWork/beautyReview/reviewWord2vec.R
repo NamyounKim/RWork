@@ -1,9 +1,11 @@
 library(wordVectors)
 library(tsne)
 library(ggplot2)
+library(dplyr)
 
 source("./tm_function.R")
-source("../ggRadar.R")
+source("../../ggRader.R")
+source("../../ggRader2.R")
 
 ##### word2vec 만들기 #####
 raw_review_strength$parsedContent = parsed_strength
@@ -130,24 +132,4 @@ for(i in 1:10){
   temp = rawData %>% filter(product =="페이셜 마일드 필링") %>% select(aname)
   barplot(quantile(temp[,1], seq(0,1,0.2)), xlim = c(0,1), horiz = T, main = aname)
 }
-
-
-raw_review_strength %>% group_by(brand_nm) %>% dplyr::summarise(n=n()) %>% arrange(-n)
-brand_score = raw_review_weakness %>% group_by(brand_nm) %>% dplyr::summarise(발색 = mean(a1),
-                                                                         커버력= mean(a2),
-                                                                         밀착력_지속력= mean(a3),
-                                                                         세정력= mean(a4),
-                                                                         향= mean(a5),
-                                                                         흡수력= mean(a6),
-                                                                         보습력= mean(a7),
-                                                                         안티에이징_미백= mean(a8),
-                                                                        천연= mean(a9),
-                                                                         휴대성= mean(a10),
-                                                                         가성비= mean(a11),
-                                                                         사용편리성= mean(a12))
-brand_score = brand_score %>% filter(brand_nm %in% c("설화수","아이오페","헤라"))
-brand_score = brand_score %>% filter(brand_nm %in% c("이니스프리 본품","아리따움","에뛰드하우스"))
-
-ggRadar(data = brand_score, groupvar = "brand_nm")
-
 
