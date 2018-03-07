@@ -2,7 +2,6 @@ library(tm)
 
 makeDtm <- function(parsedText, sr, dtmType){
   
-  parsedText = as.vector(parsedText$parsed)
   #Corpus 생성
   corp = VCorpus(VectorSource(parsedText))
   

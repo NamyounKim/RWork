@@ -2,15 +2,14 @@ library(wordVectors)
 library(tsne)
 library(ggplot2)
 library(dplyr)
+library(readr)
 
 source("./tm_function.R")
-source("../../ggRader.R")
-source("../../ggRader2.R")
 
 ##### word2vec 만들기 #####
 raw_review_strength$parsedContent = parsed_strength
 raw_review_weakness$parsedContent = parsed_weakness
-#inputData = raw_review_strength %>% filter(brand_nm == "이니스프리 본품")
+
 
 write.table(raw_review_strength$parsedContent, file = "./strength_review.txt", row.names = F, col.names = F, quote = F)
 write.table(raw_review_weakness$parsedContent, file = "./weakness_review.txt", row.names = F, col.names = F, quote = F)
@@ -31,9 +30,9 @@ weakness_model = train_word2vec(train_file = "./weakness_review.txt"
 weakness_model = weakness_model[rownames(weakness_model) != "</s>",]
 weakness_model = weakness_model[nchar(rownames(weakness_model)) > 1,]
 
-#plot(model)
 
-nearest_to(weakness_model, weakness_model[["휴대"]], 30)
+
+nearest_to(strength_model, weakness_model[["발색"]], 30)
 nearest_to(model, model[[c("세정력","클렌징","말끔하다")]], 30)
 cosineSimilarity(model[["밀착력"]], model[["지속력"]])
 
@@ -47,10 +46,10 @@ thesaurus = read_csv("../dic/thesaurusForBeauty", col_names = T)
 attKeyword = thesaurus$word
 
 #TDM 만들기
-strength_tdm = makeDtm(raw_review_strength %>% select(parsedContent), 0.999, "tdm-tf")
+strength_tdm = makeDtm(raw_review_strength$parsedContent , 0.999, "tdm-tf")
 strength_tdmMat = as.matrix(strength_tdm)
 
-weakness_tdm = makeDtm(raw_review_weakness %>% select(parsedContent), 0.999, "tdm-tf")
+weakness_tdm = makeDtm(raw_review_weakness$parsedContent, 0.999, "tdm-tf")
 weakness_tdmMat = as.matrix(weakness_tdm)
 rm(strength_tdm, weakness_tdm)
 
@@ -116,6 +115,8 @@ strength_att$funcSim["휴대", which(strength_att$sub_tdmMat[,targetDocNo] > 0)]
 strength_score = apply(strength_score, 2, function(x){(x-min(x))/(max(x)-min(x))})
 weakness_score = apply(weakness_score, 2, function(x){(x-min(x))/(max(x)-min(x))})
 
+# 0 가
+
 #원문에 붙이기
 raw_review_strength = cbind(raw_review_strength, strength_score)
 raw_review_weakness = cbind(raw_review_weakness, weakness_score)
@@ -123,13 +124,4 @@ raw_review_weakness = cbind(raw_review_weakness, weakness_score)
 
 # 브랜드 별 평 산출
 raw_review_strength %>% group_by(brand_nm) %>% dplyr::summarise(n=n()) %>% arrange(-n)
-
-# 평점 구간 정하기
-attName = colnames(strength_score)[1:10]
-par(mfrow=c(2,5))
-for(i in 1:10){
-  aname = attName[i]
-  temp = rawData %>% filter(product =="페이셜 마일드 필링") %>% select(aname)
-  barplot(quantile(temp[,1], seq(0,1,0.2)), xlim = c(0,1), horiz = T, main = aname)
-}
 

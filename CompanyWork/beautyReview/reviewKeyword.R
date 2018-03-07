@@ -5,12 +5,13 @@ library(ggplot2)
 library(GGally)
 
 raw_review_weakness$parsedContent = parsed_weakness
+raw_review_strength$parsedContent = parsed_strength
 
-inputData = raw_review_weakness %>% filter(brand_nm == "이니스프리 본품")
+inputData = raw_review_strength %>% filter(brand_nm == "이니스프리")
 
 #write_csv(inputData, "./input.csv", col_names = T)
 
-dtmMat_weakness = getDtmTfidf(inputData$parsedContent, 0.996)
+dtmMat_weakness = getDtmTfidf(inputData$parsedContent, 0.998)
 wordAgg = colSums(dtmMat_weakness)
 wordAgg = as.data.frame(wordAgg)
 wordAgg$word = rownames(wordAgg)
