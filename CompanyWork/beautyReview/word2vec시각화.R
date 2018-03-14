@@ -1,11 +1,16 @@
 library(dplyr)
 library(lazyeval)
+library(wordcloud2)
+library(RColorBrewer)
 
 source("../../ggRader.R")
 source("../../ggRader2.R")
 
-raw_review_weakness = merge(raw_review_weakness, raw_review %>% select(review_no, product_nm, age_group, sex), by.x="id", by.y="review_no", all.x = T)
-raw_review_strength = merge(raw_review_strength, raw_review %>% select(review_no, product_nm, age_group, sex), by.x="id", by.y="review_no", all.x = T)
+raw_review_weakness = merge(raw_review_weakness, raw_review %>% select(review_no, product_nm, site_product_cd, age_group, sex, site_cd), by.x="id", by.y="review_no", all.x = T)
+raw_review_strength = merge(raw_review_strength, raw_review %>% select(review_no, product_nm, site_product_cd, age_group, sex, site_cd), by.x="id", by.y="review_no", all.x = T)
+
+
+mean(raw_review_weakness$a1[which(raw_review_weakness$a1>0)])
 
 makeSentimentalRadarChart = function(groupByCol, targetNm){
   #raw_review_weakness[,6:17] = apply(raw_review_weakness[,6:17], 2, function(x){replace(x,list=which(x==0),NA)})
@@ -48,9 +53,11 @@ makeSentimentalRadarChart = function(groupByCol, targetNm){
 
 # Radar Chart 만들기
 makeSentimentalRadarChart(groupByCol = "brand_nm", targetNm = "이니스프리")
-makeSentimentalRadarChart(groupByCol = "age_group", targetNm = NA)
+makeSentimentalRadarChart(groupByCol = "age_group", targetNm = 40)
 makeSentimentalRadarChart(groupByCol = "product_nm", targetNm = "더마 리페어 시카크림")
 
+#로즈워터 토너
+#더마 리페어 시카크림
 
 # 각 속성별 브랜드, 상품 순위보기
 targetBrands = raw_review_strength %>% group_by(brand_nm) %>% dplyr::summarise(n=n()) %>% filter(n>20) %>% select(brand_nm)
@@ -109,33 +116,63 @@ makeWordVecModel = function(inputData, filterName, vectorsSize= 100, windowSize 
   
   return(input_model)
 }
-input_model = makeWordVecModel(inputData = raw_review_strength, filterName = "이니스프리", vectorsSize = 200, windowSize=4)
+input_model = makeWordVecModel(inputData = raw_review_strength, filterName = "아리따움", vectorsSize = 200, windowSize=4)
 wordDf = nearest_to(input_model, input_model[["발색"]], 50)
 wordDf = (1-(as.data.frame(wordDf))) * 10
 wordDf$word = row.names(wordDf)
 wordDf = wordDf[,c(2,1)]
 
-library(wordcloud2)
-library(RColorBrewer)
-colorVec = rep(c('red', 'skyblue'), length.out=nrow(demoFreq))
+
+colfunc = colorRampPalette(c("royalblue", "white"))
+
 wordcloud2(data = wordDf
-           , color = brewer.pal(n = 10, "Spectral")
+           , color = colfunc(50)
            , shape = "circle"
-           , minRotation = -pi/2
-           , size = 0.2
+           , minRotation = 0
+           , gridSize =10
+           , size = 0.3
            , fontFamily = "나눔고딕"
            #, fontWeight = 300
            )
 
+#------------------  아쉬운점 -------------------------
+input_model = makeWordVecModel(inputData = raw_review_weakness, filterName = "아리따움", vectorsSize = 200, windowSize=4)
+wordDf = nearest_to(input_model, input_model[["밀착력"]], 50)
+wordDf = (1-(as.data.frame(wordDf))) * 10
+wordDf$word = row.names(wordDf)
+wordDf = wordDf[,c(2,1)]
+
+colfunc = colorRampPalette(c("firebrick3", "white"))
+
+wordcloud2(data = wordDf
+           , color = colfunc(50)
+           , shape = "circle"
+           , minRotation = 0
+           , gridSize =10
+           , size = 0.3
+           , fontFamily = "나눔고딕"
+           #, fontWeight = 300
+)
 
 
+#-----------------------------------
+temp = raw_review_strength %>% group_by(product_nm) %>% dplyr::summarise(n=n()) %>% arrange(-n) %>% head(10)
+ggplot(temp, aes(x=reorder(product_nm,n), y=n)) + geom_bar(stat = "identity") + coord_flip()
 
-
-
-
-
+#-----------------------------------
+temp = raw_review_strength %>% group_by(regDate) %>% dplyr::summarise(n=n())
+ggplot(temp, aes(x=as.character(regDate), y=n, group=1))  + 
+  geom_line(colour="grey20", size=1) + 
+  geom_point(colour="grey20", size=3) +     # Set title
+  theme_bw() +
+  theme(legend.position=c(.7, .4))+ theme(axis.text.x=element_text(angle = 45, hjust = 1)) # x축 텍스트 회전시키기
 
 raw_review_strength %>% filter(brand_nm %in% targetBrands$brand_nm) %>% group_by(brand_nm) %>% dplyr::summarise(커버력= mean(a2)) %>% arrange(-커버력)
+
+
+
+
+
 
 
 ggplot(raw_review_strength, aes(x=brand_nm, y=a2)) + geom_boxplot()

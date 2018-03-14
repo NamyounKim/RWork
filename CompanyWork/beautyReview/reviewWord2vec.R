@@ -32,7 +32,7 @@ weakness_model = weakness_model[nchar(rownames(weakness_model)) > 1,]
 
 
 
-nearest_to(strength_model, weakness_model[["발색"]], 30)
+nearest_to(weakness_model, weakness_model[["가성비"]], 30)
 nearest_to(model, model[[c("세정력","클렌징","말끔하다")]], 30)
 cosineSimilarity(model[["밀착력"]], model[["지속력"]])
 

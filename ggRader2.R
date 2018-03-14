@@ -138,7 +138,7 @@ ggRadar2=function(data,mapping=NULL,
     
   }
   p
-  p<- p+ xlab("")+ylab("")+theme(legend.position=legend.position)
+  p<- p+ xlab("")+ylab("")+theme(legend.position=legend.position, axis.text=element_text(size=12,face="bold", family = "NaumGothic"), legend.text=element_text(size=12, face="bold"))
   
   p<-p+coord_radar()
   
