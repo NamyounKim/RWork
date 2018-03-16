@@ -2,6 +2,7 @@ library(dplyr)
 library(lazyeval)
 library(wordcloud2)
 library(RColorBrewer)
+library(ggplot2)
 
 source("../../ggRader.R")
 source("../../ggRader2.R")
@@ -9,6 +10,7 @@ source("../../ggRader2.R")
 raw_review_weakness = merge(raw_review_weakness, raw_review %>% select(review_no, product_nm, site_product_cd, age_group, sex, site_cd), by.x="id", by.y="review_no", all.x = T)
 raw_review_strength = merge(raw_review_strength, raw_review %>% select(review_no, product_nm, site_product_cd, age_group, sex, site_cd), by.x="id", by.y="review_no", all.x = T)
 
+  raw_review_strength %>% group_by(skin_bright) %>% dplyr::summarise(n=n()) %>% head(20)
 
 mean(raw_review_weakness$a1[which(raw_review_weakness$a1>0)])
 
@@ -52,7 +54,13 @@ makeSentimentalRadarChart = function(groupByCol, targetNm){
 }
 
 # Radar Chart 만들기
-makeSentimentalRadarChart(groupByCol = "brand_nm", targetNm = "이니스프리")
+makeSentimentalRadarChart(groupByCol = "skin_tone", targetNm = "000000")
+makeSentimentalRadarChart(groupByCol = "skin_tone", targetNm = "001000")
+makeSentimentalRadarChart(groupByCol = "skin_tone", targetNm = "010000")
+makeSentimentalRadarChart(groupByCol = "skin_tone", targetNm = "100000")
+makeSentimentalRadarChart(groupByCol = "skin_tone", targetNm = NA)
+
+makeSentimentalRadarChart(groupByCol = "brand_nm", targetNm = "에뛰드 하우스")
 makeSentimentalRadarChart(groupByCol = "age_group", targetNm = 40)
 makeSentimentalRadarChart(groupByCol = "product_nm", targetNm = "더마 리페어 시카크림")
 
