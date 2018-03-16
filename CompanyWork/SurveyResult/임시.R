@@ -1,4 +1,4 @@
-#install.packages("readxl")
+#install.packages(c("readxl","readr","dplyr","stringi","igraph","network","sna","ggplot2","GGally"))
 library(readxl)
 library(readr)
 library(dplyr)
@@ -53,14 +53,21 @@ parsed_reviewExp = gsub(" ","  ",parsed_reviewExp)
 dtm = makeDtm(parsed_referSite, sr = 0.9999, dtmType = "tf")
 dtmMat = as.matrix(dtm)
 
-referRanking = sort(colSums(dtmMat), decreasing = T)[1:100]
+referRanking = as.data.frame(sort(colSums(dtmMat), decreasing = T)[1:100])
+referRanking$word = row.names(referRanking)
+
+# 단어별 문서수
+temp = as.data.frame(sort(apply(dtmMat, 2, function(x){length(which(x > 0))}), decreasing = T))
+temp$word = row.names(temp)
+referRanking = merge(referRanking, temp, by="word", all.x = T)
+colnames(referRanking) = c("word", "termFreq","docFreq")
+write_csv(referRanking, path = "./referRanking.csv")
 
 ## 리뷰 경험 부분 ------------------------------------------------------------------------------------
 dtm2 = makeDtm(parsed_reviewExp, sr = 0.999, dtmType = "tf")
 dtmMat2 = as.matrix(dtm2)
 
 sort(colSums(dtmMat2), decreasing = T)
-
 
 
 #Network Map용 데이터 만들기 (단어 X 단어 상관계수 매트릭스 생성)
@@ -105,8 +112,6 @@ dtmMat3 = as.matrix(dtm3)
 
 sort(colSums(dtmMat3), decreasing = T)
 
-
-
 #Network Map용 데이터 만들기 (단어 X 단어 상관계수 매트릭스 생성)
 cor_termW = cor(dtmMat3)
 
@@ -142,3 +147,5 @@ ggnet2(net # 네트워크 객체
        ,family = "AppleGothic"
        ,layout.par = list(cell.pointcellrad=100000) # 네트워크 맵 레이아웃 조정하기
 )
+
+raw_opinion$opinion[grepl("업데이트",parsed_opinion)]
