@@ -1,10 +1,5 @@
-<<<<<<< Updated upstream
-C:/Users/ap35002337/Documents/RWork/FastCampus/Week_3/konlp_test.R="C365751A"
-=======
-<<<<<<< HEAD
 /Users/kimnamyoun/GitHub/NLP4kec/R/RTextParser.R="BF54E92F"
 /Users/kimnamyoun/GitHub/RWork/CompanyWork/ApMallReview/textAnalysis.R="9125E329"
-/Users/kimnamyoun/GitHub/RWork/FastCampus/LDA_output/petition_15_LDA_Result.csv="E298ED0C"
 /Users/kimnamyoun/GitHub/RWork/FastCampus/NLP4kec_install.R="EC95CD0C"
 /Users/kimnamyoun/GitHub/RWork/FastCampus/R_Intro.R="6995DF1B"
 /Users/kimnamyoun/GitHub/RWork/FastCampus/R_update.R="B4A00283"
@@ -30,20 +25,15 @@ C:/Users/ap35002337/Documents/RWork/FastCampus/Week_3/konlp_test.R="C365751A"
 /Users/kimnamyoun/GitHub/RWork/FastCampus/Week_6/sub_topic_analysis.R="C1DBC891"
 /Users/kimnamyoun/GitHub/RWork/FastCampus/Week_6/topic_clustering.R="D83C7688"
 /Users/kimnamyoun/GitHub/RWork/FastCampus/Week_6/topic_stackedAreaChart.R="A1B90948"
-/Users/kimnamyoun/GitHub/RWork/FastCampus/Week_7/CopyOfrandomForest.R="C6446233"
 /Users/kimnamyoun/GitHub/RWork/FastCampus/Week_7/naiveBayes.R="DBC5254F"
 /Users/kimnamyoun/GitHub/RWork/FastCampus/Week_7/randomForest.R="2930873A"
 /Users/kimnamyoun/GitHub/RWork/FastCampus/Week_7/svm.R="4E975FE"
+/Users/kimnamyoun/GitHub/RWork/FastCampus/Week_8/sampling.R="F709B258"
 /Users/kimnamyoun/GitHub/RWork/FastCampus/dictionary/stopword_ko.csv="87D4370C"
 /Users/kimnamyoun/GitHub/RWork/FastCampus/dictionary/synonym.csv="BDCF14A4"
 /Users/kimnamyoun/GitHub/RWork/FastCampus/dictionary/user_dictionary.txt="CC801C7A"
 /Users/kimnamyoun/GitHub/RWork/FastCampus/iris.txt="E0768A14"
 /Users/kimnamyoun/GitHub/RWork/FastCampus/makeFunc.R="F3202465"
-/Users/kimnamyoun/GitHub/RWork/FastCampus/sub_1_2_9.csv="BF8C9037"
 /Users/kimnamyoun/GitHub/RWork/FastCampus/trainTxt.txt="2378FA0B"
 /Users/kimnamyoun/GitHub/RWork/FastCampus/문제_답_3주차.R="38214FEE"
 /Users/kimnamyoun/GitHub/wordVectors/R/word2vec.R="15146B8D"
-=======
-C:/Users/ap35002337/Documents/RWork/FastCampus/Week_3/konlp_test.R="C365751A"
->>>>>>> origin/master
->>>>>>> Stashed changes

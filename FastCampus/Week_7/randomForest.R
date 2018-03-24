@@ -97,6 +97,8 @@ rfModel_caret = train(target ~ ., data=trainingSet, method="parRF"
                       ,tuneGrid=grid
                       ,metric="Accuracy"
                       ,preProc=c("center", "scale"))	
+
+rfModel_caret = readRDS("./Week_7/rfModel_caret.RDS")
 print(rfModel_caret)
 
 # 중요변수 확인하기

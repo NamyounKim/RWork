@@ -18,6 +18,8 @@ folds = createFolds(dtmDf$target, k=5)
 
 #추출한 row index로 trainSet 만들기
 trainSet1 = dtmDf[folds$Fold1,]
+test1 = dtmDf[-folds$Fold1,]
+
 trainSet2 = dtmDf[folds$Fold2,]
 trainSet3 = dtmDf[folds$Fold3,]
 trainSet4 = dtmDf[folds$Fold4,]

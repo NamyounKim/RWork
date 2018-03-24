@@ -19,7 +19,7 @@ parsedData = file_parser_r(path = "./raw_data/Blog_TrainingSet_Spam.xlsx"
 saveRDS(parsedData, "./raw_data/parsedData.RDS") #데이터셋 저장하기
 parsedData = readRDS("./raw_data/parsedData.RDS") #저장한 데이터셋 불러오기
 
-# 예측 변수값 가져오기
+# 타겟 변수값 가져오기(정답지)
 target_val = read_csv("./raw_data/training_target_val.csv")
 
 #동의어 / 불용어 사전 불러오기
