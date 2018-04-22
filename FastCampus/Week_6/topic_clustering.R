@@ -11,19 +11,17 @@ library(slam)
 library(dplyr)
 library(NLP4kec)
 
-textData = readRDS("./raw_data/petitions.RDS")
-textData = textData[nchar(textData$content)>30,]
-
-#형태소 분석기 실행하기
-parsedData = r_parser_r(textData$content, language = "ko", useEn = T, korDicPath = "./dictionary/user_dictionary.txt")
+# 1. 원문 데이터 및 사전 불러오기 ----------------------------------------------------------------------------------------------------
+textData = readRDS("./raw_data/petitions_cleaned.RDS")
 
 #동의어 / 불용어 사전 불러오기
 stopWordDic = read_csv("./dictionary/stopword_ko.csv")
 synonymDic = read_csv("./dictionary/synonym.csv")
 
-###################################################################
-#---------------------- Text Pre-processing ----------------------#
-###################################################################
+
+# 2. 형태소 분석 및 전처리------------------------------------------------------------------------------------------------------------
+#형태소 분석기 실행하기
+parsedData = r_parser_r(textData$content, language = "ko", useEn = T, korDicPath = "./dictionary/user_dictionary.txt")
 
 # 동의어 처리
 for (i in 1:nrow(synonymDic)){
@@ -51,11 +49,11 @@ corp = tm_map(corp, tolower)
 
 #특정 단어 삭제
 corp = tm_map(corp, removeWords, stopWordDic$stopword)
-##################################################################
 
 #텍스트문서 형식으로 변환
 corp = tm_map(corp, PlainTextDocument)
 
+# 3. DTM 생성 및 Sparse Term 삭제 ----------------------------------------------------------------------------------------------------------
 #Document Term Matrix 생성 (단어 Length는 2로 세팅)
 dtm = DocumentTermMatrix(corp, control=list(wordLengths=c(2,Inf)))
 
@@ -66,10 +64,12 @@ dtm = dtm[,nchar(colnames(dtm)) > 1]
 #Sparse Terms 삭제
 dtm = removeSparseTerms(dtm, as.numeric(0.997))
 dtm
+
 ## LDA 할 때 DTM 크기 조절
 #단어별 Tf-Idf 값 구하기
 term_tfidf = tapply(dtm$v/row_sums(dtm)[dtm$i], dtm$j, mean) * log2(nDocs(dtm)/col_sums(dtm > 0))
 term_tfidf
+
 #박스그래프로 분포 확인
 boxplot(term_tfidf)
 quantile(term_tfidf, seq(0,1,0.1))
@@ -78,9 +78,9 @@ quantile(term_tfidf, seq(0,1,0.1))
 new_dtm = dtm[,term_tfidf >= 0.05]
 new_dtm = new_dtm[row_sums(new_dtm) > 0,]
 new_dtm
-############################################
-## Running LDA
-############################################
+
+
+# 4. Running LDA ----------------------------------------------------------------------------------------------------------------
 #분석명, 랜덤 seed, 클러스트 개수 setup
 name = "petition"
 SEED = 2018
@@ -124,10 +124,8 @@ write.table(term_topic, filePathName, sep=",", row.names=FALSE)
 filePathName = paste0("./LDA_output/",name,"_",k,"_DOC","_LDA_Result.csv",sep="")
 write.table(id_topic, filePathName, sep=",", row.names=FALSE)
 
-#########################################
-## Make visualization
-#########################################
 
+# 5. LDA결과 시각화 하기 --------------------------------------------------------------------------------
 # phi는 각 단어별 토픽에 포함될 확률값 입니다.
 phi = posterior(lda_tm)$terms %>% as.matrix
 
@@ -165,8 +163,5 @@ json_lda = createJson(phi = phi, theta = theta,
 serVis(json_lda, out.dir = paste("C:/tomcat8/webapps/",name,"_",k,sep=""), open.browser = FALSE)
 serVis(json_lda, open.browser = T) # MAC인 경우
 
-
-localhost:8080/petition_LDA_15
-
-
-
+# 예시 URL
+#localhost:8080/petition_LDA_15

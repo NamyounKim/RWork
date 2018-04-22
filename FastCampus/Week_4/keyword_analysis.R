@@ -3,13 +3,11 @@ library(tm)
 #아래 코드를 수행하기 이전에 반드시 DTM을 생성해야 합니다.
 #text_handling.R 소스코드 참고 하세요.
 
-#======================================
-# 연관키워드 추출하기
-#======================================
+# 1. 연관 키워드 추출 및 TF-IDF 가중치 ----------------------------------------------------------------------------------------
 # "청원"의 연관 키워드 구하기
 findAssocs(dtm, terms = "청원", corlimit = 0.25)
 
-#직접 단어간 상관관계 구하기
+# 직접 단어간 상관관계 구하기
 dtm_m = as.matrix(dtm)
 cor_term = cor(dtm_m)
 cor_ref = cor_term[,"청원"]
@@ -27,9 +25,8 @@ dtmW = removeSparseTerms(dtmW, as.numeric(0.98))
 
 findAssocs(dtmW, "청원", 0.1)
 
-#======================================
-# 연관키워드 네트워크 맵 그리기
-#======================================
+
+# 2. 키워드 네트워크 분석 및 시각화 -----------------------------------------------------------------------------------------
 install.packages(c("igraph", "network", "sna", "GGally")) #패키지 한꺼번에 설치하기
 library(igraph)
 library(network)
@@ -42,7 +39,7 @@ dtmW_m = as.matrix(dtmW)
 cor_termW = cor(dtmW_m)
 
 #Edge 개수 조절하기
-cor_termW[cor_termW < 0.35] = 0
+cor_termW[cor_termW < 0.15] = 0
 
 # 다른 노드와 연관성이 0인 노드 제거하기
 removeTarget = colSums(cor_termW) == 1
@@ -85,12 +82,13 @@ word_network = data.frame(word = rownames(cor_termW),
                           eigenvector = evcent(net) # 고유벡터 중심성 구하기
                           )
 
-## 특정 키워드만 선택한 네트워크 맵 그리기 ##
+
+# 3. 특정 키워드만 석택한 네트워크 맵 -----------------------------------------------------------------------------------------
 #keyword = c("박수진","특혜","삼성병원")
-keyword = c("이국종","생명","정치")
+keyword = c("미투","피해자","가해자")
 
 cor_termW = cor(dtmW_m)
-cor_termW[cor_termW < 0.1] = 0
+cor_termW[cor_termW < 0.07] = 0
 
 sub_cor_term = cor_termW[,keyword]
 sub_cor_term = sub_cor_term[!(rownames(sub_cor_term) %in% keyword),]

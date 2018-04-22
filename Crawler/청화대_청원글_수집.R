@@ -6,14 +6,14 @@ library(xml2)
 
 # List 가져오기
 petitionList = data.frame(link=as.character(), category=as.character())
-for(i in 1:50){
+for(i in 1:500){
   Sys.sleep(runif(1,1,7))
   print(i)
-  url = paste0("https://www1.president.go.kr/petitions?order=best&page=",i)
+  url = paste0("https://www1.president.go.kr/petitions?only=finished&page=",i)
   
-  link = read_html(url) %>% html_nodes(xpath = "//*[@id=\"cont_view\"]/div[2]/div/div[1]/div[2]") %>% html_nodes("a.cb") %>% html_attr("href")
+  link = read_html(url) %>% html_nodes(xpath = "//*[@id=\"cont_view\"]/div[2]/div/div[1]/div/div/div[2]") %>% html_nodes("a.cb") %>% html_attr("href")
   #link = link[2:length(link)]
-  category = read_html(url) %>% html_nodes(xpath = "//*[@id=\"cont_view\"]/div[2]/div/div[1]/div[2]") %>% html_nodes("div.bl_category.cs") %>% html_text()
+  category = read_html(url) %>% html_nodes(xpath = "//*[@id=\"cont_view\"]/div[2]/div/div[1]/div/div/div[2]") %>% html_nodes("div.bl_category.cs") %>% html_text()
   
   rows = data.frame(link, category, stringsAsFactors = F)
   petitionList = rbind(petitionList, rows)
@@ -46,4 +46,4 @@ for(i in 1:nrow(petitionList)){
 
 
 petitions = cbind(petitionList, petitions)
-saveRDS(petitions, "./petitions2.RDS")
+saveRDS(petitions, "./petitions_finished.RDS")

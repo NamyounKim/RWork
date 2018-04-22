@@ -19,10 +19,11 @@ paste(sentence, "And I have the apple.")
 
 #특정 위치 문자열 가져오기
 substr(sentence, 4, 7)
+substr(x = sentence, start = 4, stop = 7)
 substr(sentence, 1, 6) = "I hate" # 1번째 문자에서 6문자 사이의 문자열 바꾸기
 
 #문자열 내에 해당 패턴이 나오는 첫번째 위치 구하기
-regexpr("like",sentence)
+regexpr("hate",sentence)
 
 #문자열 내에 해당 패턴이 나오는 모든 위치 구하기
 gregexpr("a", sentence)
@@ -54,13 +55,13 @@ filter(dSample, Price > 30 & Manufacturer =="Audi")
 filter(dSample, Type %in% c("Compact", "Van","Small","Midsize"))
 
 #Sorting 하기
-arrange(dSample, -Price)
+arrange(dSample, -Price) #내림차순
 
 #파이프 연산자를 이용하여 Group by 하기
-dSampleBy = dSample %>% group_by(Manufacturer, type) %>% summarise(meanPrice = mean(Price))
+dSampleBy = dSample %>% group_by(Manufacturer, Type) %>% summarise(meanPrice = mean(Price))
                                    
 #요약 column 2개만들기
-dSampleBy = dSample %>% group_by(Manufacturer) %>% summarise(totalPrice = sum(Price), n=n())
+dSampleBy = dSample %>% group_by(Manufacturer, Type) %>% summarise(totalPrice = mean(Price), s=n())
 
 #새로운 column 추가하기(mutate)
 dSampleMutate = dSample %>% group_by(Manufacturer) %>% summarise(totalPrice = sum(Price), n=n()) %>% mutate(meanPrice = totalPrice / n)
@@ -89,7 +90,7 @@ meltTest = melt(data = Cars93,
 a = c(1,8,5)
 
 #1. if문
-if(length(a) > 5){
+if(length(a) > 1){
   mean(a)
 }
 
@@ -101,7 +102,7 @@ if(length(a) > 5){
 }
 
 #3. ifelse문
-ifelse(length(a) > 1, mean(a), "조건에 맞지 않습니다.")
+ifelse(length(a) > 5, mean(a), "조건에 맞지 않습니다.")
 
 #4.for문 (ex. 0부터 10까지 더하기)
 sum=0
@@ -119,12 +120,15 @@ while(i<=10){
 
 
 #6.Function 만들기
-myFunction = function(data, company){
+myFunction = function(data, company,){
   temp = subset(data, data$Manufacturer == company)
   sumPrice = sum(temp$Price)
   
   return(sumPrice)
 }
 
-aa = myFunction(Cars93, "Acura")
+aa = myFunction(Cars93, "Ford")
 aa
+
+
+write_csv(Cars93, "./Cars93.csv")

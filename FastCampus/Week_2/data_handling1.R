@@ -50,6 +50,7 @@ iris[1,] # 첫번째 행(row) 값 가져오기
 iris[2,] # 두번째 행(row) 값 가져오기
 iris[1:3,] # 첫번째부터 세번째 행 가져오기
 iris[4,2] # 네번째 행의 2번째 열 값 가져오기 
+
 subset(iris, iris$Sepal.Width > 4) # Sepal.Width 가 4보다 큰 행만 가져오기 
 
 #3-3. 특정 행, 열값만 가져오기
@@ -79,8 +80,11 @@ iris = rbind(iris, addRow)
 addCol = sample(1:151, 151)
 iris = cbind(iris, addCol)
 
+head(iris)
+head(iris, 10)
+
 #7.열 이름 불러오기
-colnames(iris)
+colnames(iris)[2]
 
 #8.열 이름 바꾸기
 colnames(iris)[6] = "ChangeColName" # 6번째 열이름 바꾸기
@@ -93,9 +97,9 @@ colnames(iris)
 tapply(iris$Sepal.Length, iris$Species, mean) # Species별로 Sepal.Length의 평균 구하기
 
 #10.Data Join
-df1 = data.frame(id = c(1,2,3,4,5,6), 
-                 name=c("Jonh", "Jessica", "Tom","Rodrio","James","Alessia"))
-df2 = data.frame(id=c(2,4,6,8), 
+df1 = data.frame(dd = c(1,2,3,4,5,6), 
+                 name= c("Jonh", "Jessica", "Tom","Rodrio","James","Alessia"))
+df2 = data.frame(aa = c(2,4,6,8), 
                  location=c("Seoul","LA", "Paris","Rome"))
 
 #11-1.Inner Join
@@ -108,10 +112,10 @@ merge(df1, df2, by="id", all.x = TRUE)
 merge(df1, df2, by="id", all.y = TRUE) 
 
 #11-4 조인키가 서로 다를때
-merge(df1, df2, all.x = TRUE, by.x = "dd", by.y = "aa")
+merge(df1, df2, by.x = "dd", by.y = "aa")
 
 #12.Data Export
-write.csv(iris, file = "./iris.csv", row.names = FALSE) 
+write.csv(iris, file = "./iris.csv", row.names = FALSE)
 write.table(iris, file = "./iris.txt", row.names = FALSE, quote = F, sep = ",")
 
 #13. Data Read

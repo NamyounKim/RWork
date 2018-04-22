@@ -15,14 +15,15 @@ for(i in 1:length(corp)){
 }
 
 #word2vec Train용 TXT파일 만들기
-write.table(targetData, file = "./trainTxt.txt", row.names = FALSE, col.names = FALSE, quote = F)
+write.table(targetData, file = "./Week_5/trainTxt.txt", row.names = FALSE, col.names = FALSE, quote = F)
 
 #모델 Training
-model = train_word2vec(train_file = "./trainTxt.txt"
+model = train_word2vec(train_file = "./Week_5/trainTxt.txt"
                        , threads=3
                        , vectors=100
                        , force = T
-                       , window = 6)
+                       , window = 6
+                       , output_file = "./Week_5/trainTxt.bin")
 
 #word2vector model 확인하기
 model
@@ -48,7 +49,7 @@ install.packages("extrafont")
 library(extrafont) 
 par(family="AppleGothic")
 
-plot(model, ... = )
+plot(model)
 
 #Cosine 거리
 cosineDist(model[["청원"]], model[["청와대"]])
