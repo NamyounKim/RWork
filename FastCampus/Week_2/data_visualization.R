@@ -60,7 +60,7 @@ ggplot(df, aes(x=date, y=value, fill=variable)) + geom_area() + geom_line(positi
 #축 눈금 간격 조절하기
 ggplot(df, aes(x=date, y=value, fill=variable)) + geom_area() + geom_line(position = "stack") +
   scale_x_date(date_breaks = "1 year",  date_labels = "%Y") + # X축에 연도 표시하기
-  theme(axis.text.x=element_text(angle = 45, hjust = 1))    # X축 텍스트를 45도 기울여서 표시하기
+  theme(axis.text.x=element_text(angle = 90, hjust = 1))    # X축 텍스트를 45도 기울여서 표시하기
 
 
 ## 6. 상관계수행렬 그리기 ----------------------------------------------------------------------------------------------------------------------------

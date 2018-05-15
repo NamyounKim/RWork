@@ -11,6 +11,7 @@ require(sna)
 require(ggplot2)
 require(GGally)
 library(readr)
+options(shiny.maxRequestSize = 30 * 1024 ^ 2) 
 
 function(input, output) {
 
@@ -52,7 +53,7 @@ function(input, output) {
     #Document Term Matrix 생성
     dtmW = DocumentTermMatrix(corp, control=list(removeNumbers=T
                                                 ,wordLengths=c(2,Inf)
-                                                #,weighting = function(x) weightTfIdf(x, normalize = TRUE)
+                                                ,weighting = function(x) weightTfIdf(x, normalize = TRUE)
                                                 )
                               )
     

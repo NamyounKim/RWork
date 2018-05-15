@@ -24,6 +24,8 @@ synonymDic = read_csv("./dictionary/synonym.csv")
 #형태소 분석기 실행하기
 parsedData = r_parser_r(textData$content, language = "ko", useEn = T, korDicPath = "./dictionary/user_dictionary.txt")
 
+parsedData2 = r_extract_noun(textData$content, language = "ko", useEn = T, korDicPath = "./dictionary/user_dictionary.txt")
+
 # 동의어 처리
 for (i in 1:nrow(synonymDic)){
   targetDocIdx = which(ll <- grepl(synonymDic$originWord[i], parsedData))

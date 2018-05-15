@@ -8,12 +8,13 @@ library(GGally)
 temp = cosineSimilarity(model, model)
 
 # Edge 개수 조절하기 (0~1 사이 값으로 세팅)
-temp[temp < 0.9] = 0
+temp[temp < 0.74] = 0
 
 sparseRatio = colSums(temp == 0) / nrow(temp)
+
 # sparse ratio 값 분포 확인
 quantile(sparseRatio, seq(0,1,0.1))
-temp = temp[sparseRatio<0.9997, sparseRatio<0.9997]
+temp = temp[sparseRatio<0.999, sparseRatio<0.999]
 
 # Node 개수 조절하기 (0인 값 제외)
 temp = temp[,colSums(temp)!=0]

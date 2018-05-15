@@ -38,14 +38,14 @@ attScore = as.data.frame(attScore)
 attScore = t(attScore)
 
 # 각 문서별 스코어 확인 하기
-attScore[8,]
-textData[8,"content"]
+attScore[800,]
+textData[800,"content"]
 
-attScore[187,]
-textData[187,"content"]
+attScore[1477,]
+textData[1477,"content"]
 
-attScore[186,]
-textData[186,"content"]
+attScore[2377,]
+textData[2377,"content"]
 
 # 각 문서별 속성 스코어 붙이기
 textData2 = cbind(textData, attScore)
@@ -61,9 +61,9 @@ textData2 = cbind(textData2, maxAttName, maxAttVal)
 
 # 전체 속성별 분류 개수 확인하기
 tapply(textData2$title, textData2$maxAttName, length)
+textData2 %>% filter(maxAttName == "성추행", maxAttVal > 0.4) %>% select(title, maxAttVal)
 
-
-textData2 %>% filter(maxAttName == "성추행", maxAttVal < 0.4) %>% select(title, maxAttVal)
+read.binary.vectors("./Week_5/trainTxt.bin")
 
 
 

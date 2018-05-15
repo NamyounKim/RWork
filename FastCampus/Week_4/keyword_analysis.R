@@ -5,7 +5,7 @@ library(tm)
 
 # 1. 연관 키워드 추출 및 TF-IDF 가중치 ----------------------------------------------------------------------------------------
 # "청원"의 연관 키워드 구하기
-findAssocs(dtm, terms = "청원", corlimit = 0.25)
+findAssocs(dtm, terms = "청원", corlimit = 0.1)
 
 # 직접 단어간 상관관계 구하기
 dtm_m = as.matrix(dtm)
@@ -36,7 +36,7 @@ library(GGally)
 
 #Network Map용 데이터 만들기 (단어 X 단어 상관계수 매트릭스 생성)
 dtmW_m = as.matrix(dtmW)
-cor_termW = cor(dtmW_m)
+cor_termW = cor(dtmW_m) # 상관계수 매트릭스 초기화
 
 #Edge 개수 조절하기
 cor_termW[cor_termW < 0.15] = 0
@@ -52,7 +52,8 @@ net = network(cor_termW, directed = FALSE)
 # betweenness값 상위 20% 이면서 eigenvector 값이 하위 90%이면 "Medium" -> 노란색
 # betweenness값 하위 80% 이면 "Low" -> 회색
 net %v% "mode" = ifelse(betweenness(net) > quantile(betweenness(net), 0.8)
-                        ,ifelse(evcent(net) > quantile(evcent(net), 0.9),"High","Medium"), "Low")
+                        ,ifelse(evcent(net) > quantile(evcent(net), 0.9),"High","Medium")
+                        , "Low")
 node_color = c("Low" = "grey", "Medium" = "darkgoldenrod1", "High"="brown1")
 
 # Network edge size 값 설정하기 (단어간 상관계수 값 * 2)
@@ -67,6 +68,7 @@ ggnet2(net # 네트워크 객체
        ,size = "degree" # 노드의 크기를 degree cetrality값에 따라 다르게 하기
        ,edge.size = "edgeSize" # 엣지의 굵기를 위에서 계산한 단어간 상관계수에 따라 다르게 하기
        ,mode = "fruchtermanreingold"
+       #,mode = "circle"
        ,family = "AppleGothic"
        ,layout.par = list(cell.pointcellrad=100000) # 네트워크 맵 레이아웃 조정하기
        )
@@ -81,7 +83,7 @@ word_network = data.frame(word = rownames(cor_termW),
                           closeness = closeness(net, cmode="suminvundir"), # 근접 중심성 구하기
                           eigenvector = evcent(net) # 고유벡터 중심성 구하기
                           )
-
+word_network %>% arrange(-betweenness)
 
 # 3. 특정 키워드만 석택한 네트워크 맵 -----------------------------------------------------------------------------------------
 #keyword = c("박수진","특혜","삼성병원")

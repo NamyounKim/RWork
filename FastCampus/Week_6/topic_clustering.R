@@ -75,7 +75,7 @@ boxplot(term_tfidf)
 quantile(term_tfidf, seq(0,1,0.1))
 
 # Tf-Idf 값 기준으로 dtm 크기 줄여서 new_dtm 만들기
-new_dtm = dtm[,term_tfidf >= 0.05]
+new_dtm = dtm[,term_tfidf >= 0.1]
 new_dtm = new_dtm[row_sums(new_dtm) > 0,]
 new_dtm
 

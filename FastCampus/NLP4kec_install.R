@@ -1,7 +1,7 @@
 # on Mac
 # JDK 1.8 이상 설치 우선 진행
-Sys.setenv(JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk1.8.0_131.jdk/Contents/Home/jre")
-dyn.load('/Library/Java/JavaVirtualMachines/jdk1.8.0_131.jdk/Contents/Home/jre/lib/server/libjvm.dylib')
+Sys.setenv(JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk1.8.0_121.jdk/Contents/Home/jre")
+dyn.load('/Library/Java/JavaVirtualMachines/jdk1.8.0_121.jdk/Contents/Home/jre/lib/server/libjvm.dylib')
 
 install.packages("rJava")
 install.packages("~/GitHub/NLP4kec_1.1.0.tgz", repos = NULL, type = .Platform$pkgType)

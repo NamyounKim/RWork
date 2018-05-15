@@ -2,6 +2,8 @@
 # word2vec로 연관 키워드 추출하기
 #======================================
 install.packages("/Users/kimnamyoun/GitHub/wordVectors_2.0.tgz", repos = NULL, type = "source")
+install.packages("경로명/wordVectors.zip", repo = NULL, type = "source")
+
 install.packages("tsne")
 library(wordVectors)
 library(tsne)
@@ -28,6 +30,8 @@ model = train_word2vec(train_file = "./Week_5/trainTxt.txt"
 #word2vector model 확인하기
 model
 
+wordVectors::
+
 #</s> 삭제하기
 model = model[rownames(model)!="</s>",]
 
@@ -35,7 +39,7 @@ model = model[rownames(model)!="</s>",]
 model = model[nchar(rownames(model))>1,]
 
 #연관 키워드 추출하기
-nearest_to(model,model[["청원"]], 20)
+nearest_to(model, model[["청원"]], 20)
 
 #2가지 이상 키워드에 대한 연관 키워드 추출하기
 nearest_to(model,model[[c("청원","청와대")]], 20)
@@ -46,19 +50,20 @@ nearest_to(model, subVec, 20)
 
 #전체 단어 관계 시각화
 install.packages("extrafont")
-library(extrafont) 
+library(extrafont)
 par(family="AppleGothic")
 
 plot(model)
 
 #Cosine 거리
-cosineDist(model[["청원"]], model[["청와대"]])
+cosineDist(model[["세월호"]], model[["침몰"]])
 cosineDist(model[["청원"]], model[["국회의원"]])
 
 #Cosine 유사도 (= 1 - Cosine거리)
-cosineSimilarity(model[["청원"]], model[["청와대"]])
+cosineSimilarity(model[["세월호"]], model[["침몰"]])
 cosineSimilarity(model[["청원"]], model[["국회의원"]])
 
 #Euclidean Distance
-dist(model[(row.names(model)=="청원" | row.names(model)=="청와대"),])
+dist(model[(row.names(model)=="세월호" | row.names(model)=="침몰"),])
 dist(model[(row.names(model)=="청원" | row.names(model)=="국회의원"),])
+

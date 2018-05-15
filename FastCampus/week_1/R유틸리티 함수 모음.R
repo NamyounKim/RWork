@@ -74,5 +74,5 @@ Sys.getenv("JAVA_HOME")
 Sys.setenv(JAVA_HOME="C:/Program Files/Java/jre1.8.0_151/")
 
 #JAVA_HOME 설정 (MAC 경우)
-dyn.load("/usr/java/jdk1.8.0_151/jre/lib/amd64/server/libjvm.so")
+dyn.load('/Library/Java/JavaVirtualMachines/jdk1.8.0_121.jdk/Contents/Home/jre/lib/server/libjvm.dylib')
 
