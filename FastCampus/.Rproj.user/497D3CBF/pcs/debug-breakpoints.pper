@@ -45,21 +45,6 @@
                 "path" : "~/GitHub/RWork/FastCampus/Week_4/shiny_code/server.R",
                 "state" : 1,
                 "type" : 1
-            },
-            {
-                "editor_line_number" : 39,
-                "editor_state" : 1,
-                "function_name" : "toplevel",
-                "function_steps" : "",
-                "id" : 5,
-                "is_package_breakpoint" : false,
-                "is_pending_debug_completion" : false,
-                "line_number" : 39,
-                "needs_updated_steps" : false,
-                "package_name" : "",
-                "path" : "~/GitHub/RWork/FastCampus/Week_5/word2vec.R",
-                "state" : 1,
-                "type" : 1
             }
         ]
     }
