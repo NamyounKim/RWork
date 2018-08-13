@@ -98,7 +98,7 @@ rfModel_caret = train(target ~ ., data=trainingSet, method="parRF"
                       ,metric="Accuracy"
                       ,preProc=c("center", "scale"))	
 
-rfModel_caret = readRDS("./Week_7/rfModel_caret.RDS")
+rfModel_caret = readRDS("./Week_7/rfModel_caret.RDS") # 미리 저장해놓은 모델 불러오기
 print(rfModel_caret)
 
 # 중요변수 확인하기
@@ -109,13 +109,13 @@ plot(importance_var)
 tapply(testSet$target, testSet$target, length)
 
 #Spam 문서 예측하기
-nbPred = predict(rfModel_caret, testSet[,1:(ncol(testSet)-1)])
+rfPred = predict(rfModel_caret, testSet[,1:(ncol(testSet)-1)])
 
 #예측 결과 확인하기
-nb_pred_result = CrossTable(table(testSet$target, nbPred), prop.chisq=FALSE)
+rf_pred_result = CrossTable(table(testSet$target, rfPred), prop.chisq=FALSE)
 
 #정확도 계산하기
-(nb_pred_result$t[1,1] + nb_pred_result$t[2,2]) / nrow(testSet)
+(rf_pred_result$t[1,1] + rf_pred_result$t[2,2]) / nrow(testSet)
 
 ########################################################################################################
 # 정답지가 없는 새로운 문서를 분류할 경우             

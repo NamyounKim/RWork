@@ -32,3 +32,6 @@ HouseKeepingBook/.RData
 HouseKeepingBook/.RData
 
 Crawler/petitions_finished.RDS
+*.pper
+*.RDS
+*.pper

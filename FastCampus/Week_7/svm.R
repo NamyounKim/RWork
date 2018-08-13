@@ -69,7 +69,7 @@ colnames(dtm) = trimws(colnames(dtm))
 dtm = dtm[,nchar(colnames(dtm)) > 1]
 
 #Sparse Terms 삭제
-dtm <- removeSparseTerms(dtm, as.numeric(0.98))
+dtm = removeSparseTerms(dtm, as.numeric(0.98))
 
 #Covert to Dataframe
 dtmDf = as.data.frame(as.matrix(dtm))
@@ -91,10 +91,14 @@ tapply(dtmDf$target, dtmDf$target, length)
 # SVM 모델링
 #########################
 trainingSet$target = as.factor(trainingSet$target)
-svmModel = svm(target ~ . , data = trainingSet, type = "C-classification", 
-               kernel="linear", gamma=0.1, cost=1)
+svmModel = svm(target ~ . 
+               , data = trainingSet
+               , type = "C-classification"
+               , kernel="linear"
+               , gamma=0.1
+               , cost=1)
 
-svmModel = readRDS("./Week_7/svmModel.rds")
+svmModel = readRDS("./Week_7/svmModel.rds") # 미리 저장해놓은 모델 불러오기
 
 #Spam 문서 예측하기
 svmPred =  predict(svmModel, newdata = testSet[,1:(ncol(testSet)-1)])

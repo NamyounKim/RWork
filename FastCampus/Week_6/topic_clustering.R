@@ -71,8 +71,8 @@ term_tfidf = tapply(dtm$v/row_sums(dtm)[dtm$i], dtm$j, mean) * log2(nDocs(dtm)/c
 term_tfidf
 
 #박스그래프로 분포 확인
-boxplot(term_tfidf)
-quantile(term_tfidf, seq(0,1,0.1))
+boxplot(term_tfidf, outline = T)
+quantile(term_tfidf, seq(0, 1, 0.25))
 
 # Tf-Idf 값 기준으로 dtm 크기 줄여서 new_dtm 만들기
 new_dtm = dtm[,term_tfidf >= 0.1]
@@ -92,6 +92,7 @@ lda_tm = LDA(new_dtm, control=list(seed=SEED), k)
 #토픽별 핵심단어 저장하기
 term_topic = terms(lda_tm, 30)
 term_topic
+
 #문서별 토픽 번호 저장하기
 doc_topic = topics(lda_tm, 1)
 doc_topic_df = as.data.frame(doc_topic)
@@ -102,15 +103,17 @@ doc_Prob = posterior(lda_tm)$topics
 doc_Prob_df = as.data.frame(doc_Prob)
 
 #최대 확률값 찾기
-doc_Prob_df$maxProb = apply(doc_Prob_df, 1, max)
+doc_Prob_df$maxProb = apply(doc_Prob_df, 1, max) #--> 행기준으로 max값을 찾겠다.
 
 #문서별 토픽번호 및 확률값 추출하기
 doc_Prob_df$rown = doc_topic_df$rown
 parsedData = as.data.frame(parsedData)
 parsedData$rown = as.numeric(row.names(parsedData))
+
 id_topic = merge(doc_topic_df, doc_Prob_df, by="rown")
 id_topic = merge(id_topic, parsedData, by="rown", all.y = TRUE)
-id_topic = subset(id_topic,select=c("rown","parsedData","doc_topic","maxProb"))
+
+id_topic = id_topic %>% select(rown, parsedData, doc_topic, maxProb) #코드 변경됨
 id_topic$content = textData$content
 
 #단어별 토픽 확률값 출력하기
@@ -160,7 +163,7 @@ json_lda = createJson(phi = phi, theta = theta,
 )
 
 # 톰캣으로 보내기
-serVis(json_lda, out.dir = paste("C:/tomcat8/webapps/",name,"_",k,sep=""), open.browser = FALSE)
+serVis(json_lda, out.dir = paste("C:/tomcat8_33/webapps/",name,"_",k,sep=""), open.browser = FALSE)
 serVis(json_lda, open.browser = T) # MAC인 경우
 
 # 예시 URL

@@ -86,7 +86,9 @@ testSet = dtmDf[8001:nrow(dtmDf),] #Test 데이터 2,012개
 # Naive Bayes 모델링
 #########################
 trainingSet$target = as.factor(trainingSet$target)
-nbModel = e1071::naiveBayes(target ~ ., data = trainingSet, fL=1)
+nbModel = e1071::naiveBayes(target ~ .
+                            , data = trainingSet
+                            , fL=1)
 
 #Test 데이터 확인하기
 tapply(testSet$target, testSet$target, length)

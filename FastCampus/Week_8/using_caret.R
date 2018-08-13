@@ -24,14 +24,16 @@ nbModel_caret = train(target ~ ., data=dtmDf
                       #,metric= "Accuracy"
                       ,preProc=c("center", "scale"))
 saveRDS(nbModel_caret, "./Week_8/nbModel_caret.RDS")
-nbModel_caret
+
+nbModel_caret = readRDS("./Week_8/nbModel_caret.RDS")
 
 #########################
 #---------- SVM --------#
 #########################
-grid = data.frame(.C=c(1, 2)) # 비교할 Cost값을 입력한다.
+grid = data.frame(.C=c(1, 2, 3, 10, 200)) # 비교할 Cost값을 입력한다.
 
-svmModel_caret = train(target ~ ., data=dtmDf
+svmModel_caret = train(target ~ .
+                       , data=dtmDf
                        ,method="svmLinear"
                        ,trControl=cvtrain
                        ,tuneGrid=grid
@@ -39,6 +41,9 @@ svmModel_caret = train(target ~ ., data=dtmDf
                        ,preProc=c("center", "scale"))	
 
 saveRDS(svmModel_caret, "./Week_8/svmModel_caret.RDS")
+
+svmModel_caret = readRDS("./Week_8/svmModel_caret.RDS")
+
 
 #########################
 #---- Random Forest ----#
@@ -54,3 +59,7 @@ rfModel_caret = train(target ~ ., data=dtmDf
                       ,preProc=c("center", "scale"))
 
 saveRDS(rfModel_caret, "./Week_8/rfModel_caret.RDS")
+
+rfModel_caret = readRDS("./Week_8/rfModel_caret.RDS")
+rfModel_caret
+

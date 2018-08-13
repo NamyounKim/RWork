@@ -96,3 +96,4 @@ unlist(rfAuc@y.values)
 
 # Cut off 그래프 그리기
 plot(performance(rfPrediction, measure = "acc"))
+

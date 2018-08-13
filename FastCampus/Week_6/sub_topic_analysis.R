@@ -1,22 +1,27 @@
 
 #추출하고 싶은 토픽 번호
-select_topic = c(2)
+select_topic = c(13)
 
 #선택한 토픽번호를 갖는 문서 추출
 sub_parsedData = id_topic %>% filter(doc_topic %in% select_topic) %>% dplyr::select(parsedData, doc_topic)
 
-source("./makeFunc.R")
-#-------------------------------------------------------------------
+#source("./makeFunc.R")
+source("./tm_function.R")
+
+https://goo.gl/xzksDy
+
+#------------------------------------------------------------------------------------
 # sub_corpus로 DTM을 만드는 함수 작성하기
-dtm = makeDtm(inputData = sub_parsedData$parsedData, sparseRatio = 0.97, tfIdf = F)
-#-------------------------------------------------------------------
+#dtm = makeDtm(inputData = sub_parsedData$parsedData, sparseRatio = 0.97, tfIdf = F)
+dtm = makeDtm(parsedData = sub_parsedData$parsedData, sr = 0.98, type = "tf-idf")
+#------------------------------------------------------------------------------------
 
 #Network Map용 데이터 만들기 (단어 X 단어 상관계수 매트릭스 생성)
 dtm_m = as.matrix(dtm)
 cor_term = cor(dtm_m)
 
 #Edge 개수 조절하기
-cor_term[cor_term < 0.7] = 0
+cor_term[cor_term < 0.4] = 0
 
 # 다른 노드와 연관성이 0인 노드 제거하기
 removeTarget = colSums(cor_term) == 1

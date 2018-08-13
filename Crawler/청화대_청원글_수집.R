@@ -6,14 +6,19 @@ library(xml2)
 
 # List 가져오기
 petitionList = data.frame(link=as.character(), category=as.character())
-for(i in 1:500){
-  Sys.sleep(runif(1,1,7))
+for(i in 1:2){
+  Sys.sleep(runif(1,1,5))
   print(i)
   url = paste0("https://www1.president.go.kr/petitions?only=finished&page=",i)
   
-  link = read_html(url) %>% html_nodes(xpath = "//*[@id=\"cont_view\"]/div[2]/div/div[1]/div/div/div[2]") %>% html_nodes("a.cb") %>% html_attr("href")
+  read_url_result = read_html(url)
+  
+  link = read_url_result %>% html_nodes(xpath = "//*[@id=\"cont_view\"]/div/div/div[1]/div/div/div[2]") %>% html_nodes("a.cb") %>% html_attr("href")
   #link = link[2:length(link)]
-  category = read_html(url) %>% html_nodes(xpath = "//*[@id=\"cont_view\"]/div[2]/div/div[1]/div/div/div[2]") %>% html_nodes("div.bl_category.cs") %>% html_text()
+  category = read_url_result %>% html_nodes(xpath = "//*[@id=\"cont_view\"]/div/div/div[1]/div/div/div[2]") %>% html_nodes("div.bl_category.cs") %>% html_text()
+  
+  
+  agree_count = read_url_result %>% html_nodes(xpath = "//*[@id=\"cont_view\"]/div/div/div[1]/div/div/div[2]") %>% html_node("div.bl_agree.cb") %>% html_text()
   
   rows = data.frame(link, category, stringsAsFactors = F)
   petitionList = rbind(petitionList, rows)
@@ -25,23 +30,29 @@ for(i in 1:nrow(petitionList)){
 #for(i in 1:10){
   print(i)
   
-  title = read_html(petitionList$link[i]) %>% html_nodes("h5.big.bold.cb") %>% html_text()
-  title = trimws(unlist(str_split(trimws(title),"\r\n",2))[2])
+  # 수집한 링크 읽어오기
+  read_html_result = read_html(petitionList$link[i])
   
-  content = read_html(petitionList$link[i]) %>% html_nodes("div.cspv_contents.text") %>% html_text()
+  # 제목 가져오기
+  title = read_html_result %>% html_nodes("h3.petitionsView_title") %>% html_text()
+  #title = trimws(unlist(str_split(trimws(title),"\r\n",2))[2])
+  
+  # 내용 가져오기
+  content = read_html_result %>% html_nodes("div.View_write") %>% html_text()
   content = trimws(content)
   
-  temp = read_html(petitionList$link[i]) %>% html_nodes("span.light") %>% html_text()
-  startDate = as.Date(temp[1])
-  endDate = as.Date(temp[2])
+  # 날짜 가져오기
+  startDate = read_html_result %>% html_nodes(xpath = "//*[@id=\"cont_view\"]/div/div[1]/div/div[1]/div/div[2]/ul/li[2]/text()") %>% html_text()
+  endDate = read_html_result %>% html_nodes(xpath = "//*[@id=\"cont_view\"]/div/div[1]/div/div[1]/div/div[2]/ul/li[3]/text()") %>% html_text()
   
-  agreeCount = read_html(petitionList$link[i]) %>% html_node(xpath = "//*[@id=\"cont_view\"]/div[2]/div/div/div/div[2]/div[2]/div[2]/h4/mark") %>% html_text()
-  agreeCount = str_replace_all(agreeCount, ",","")
+  # 동의수
+  agreeCount = read_html_result %>% html_node(xpath = "//*[@id=\"cont_view\"]/div/div[1]/div/div[1]/div/h2/span") %>% html_text()
+ # agreeCount = str_replace_all(agreeCount, ",","")
   agreeCount = as.numeric(agreeCount)
   
   row = data.frame(title, content, startDate, endDate, agreeCount, stringsAsFactors = F)
   petitions = rbind(petitions, row)
-  Sys.sleep(runif(1,1,7))
+  Sys.sleep(runif(1,1,5))
 }
 
 
