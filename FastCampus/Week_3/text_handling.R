@@ -15,7 +15,7 @@ library(readr)
 .jcall("java/lang/System", "S", "getProperty", "java.runtime.version")
 
 # 1. 원문 데이터 및 사전 불러오기 ----------------------------------------------------------------------------------------------------
-textData = readRDS("./raw_data/petitions_cleaned.RDS")
+textData = readRDS("./raw_data/petitions_content_2018.RDS")
 
 #동의어 / 불용어 사전 불러오기
 stopWordDic = read_csv("./dictionary/stopword_ko.csv")
@@ -25,6 +25,9 @@ synonymDic = read_csv("./dictionary/synonym.csv")
 # 2. 형태소 분석 및 전처리------------------------------------------------------------------------------------------------------------
 #형태소 분석기 실행하기
 parsedData = r_parser_r(textData$content, language = "ko", useEn = T, korDicPath = "./dictionary/user_dictionary.txt")
+
+#명사 추출
+parsedData_noun = r_extract_noun(textData$content, language = "ko", useEn = T, korDicPath = "./dictionary/user_dictionary.txt")
 
 # 동의어 처리
 for (i in 1:nrow(synonymDic)){

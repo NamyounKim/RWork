@@ -115,19 +115,16 @@ merge(df1, df2, by="id", all.y = TRUE)
 merge(df1, df2, by.x = "dd", by.y = "aa")
 
 #12.Data Export
-write.csv(iris, file = "./iris.csv", row.names = FALSE)
-write.table(iris, file = "./iris.txt", row.names = FALSE, quote = F, sep = ",")
-
-#13. Data Read
 install.packages("readr")
 library(readr)
-read.csv()
-temp = read_csv(file = "./dictionary/stopword_ko.csv")
 
-install.packages("readxl")
-library(readxl)
-read_xlsx()
+write_csv(iris, path = "./iris.csv", col_names = T)
+write_delim(iris, path = "./iris.txt", delim = "|", col_names = T)
 
-getwd()
+#13. Data Read
+iris_2 = read_csv("./iris.csv")
+
+
+
 
 

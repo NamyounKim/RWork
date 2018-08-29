@@ -4,7 +4,7 @@ Sys.setenv(JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk1.8.0_121.jdk/Content
 dyn.load('/Library/Java/JavaVirtualMachines/jdk1.8.0_121.jdk/Contents/Home/jre/lib/server/libjvm.dylib')
 
 install.packages("rJava")
-install.packages("~/GitHub/NLP4kec_1.1.0.tgz", repos = NULL, type = .Platform$pkgType)
+install.packages("~/GitHub/NLP4kec_1.2.0.tgz", repos = NULL, type = .Platform$pkgType)
 
 library(NLP4kec)
 

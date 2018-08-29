@@ -32,9 +32,33 @@ rm(x)
 
 #패키지의 있는 함수명 확인하기
 readr:: #패키지명 뒤에 ::를 붙이면 패키지에 포함된 내용을 보여준다.
+  
+# 한글 깨질경우 터미널에서 아래 라인 실행 (MAC 경우)
+# defaults write org.R-project.R force.LANG en_US.UTF-8
+  
+# 2. Java 설정 관련 ---------------------------------------------------------------------------------------------------------
+# rJava 패키지 설치
+install.packages("rJava")
+
+# rJava 불러오기
+library(rJava)
+
+#JAVA버전 확인
+.jinit()
+.jcall("java/lang/System","S","getProperty","java.runtime.version")
+
+#JAVA_HOME 위치 보기
+Sys.getenv("JAVA_HOME")
+
+#JAVA_HOME 설정 (윈도우 경우)
+Sys.setenv(JAVA_HOME="C:/Program Files/Java/jre1.8.0_121/")
+
+#JAVA_HOME 설정 (MAC 경우)
+dyn.load('/Library/Java/JavaVirtualMachines/jdk1.8.0_121.jdk/Contents/Home/jre/lib/server/libjvm.dylib')
 
   
-# 2. 파일 import, export ------------------------------------------------------------------------------------------------
+# 3. 파일 import, export ------------------------------------------------------------------------------------------------
+
 #CSV파일 읽어오기
 read_csv(file = "CSV 파일위치", col_names = T) #각 파라미터는 콤마로 구분된다.
 
@@ -57,22 +81,4 @@ saveRDS(데이터Set, "저장하고자 하는 위치와 파일명")
 svmModel = readRDS("읽어오고자 하는 파일명")
 
 
-# 3. Java 설정 관련 ---------------------------------------------------------------------------------------------------------
-# rJava 패키지 설치
-install.packages("rJava")
-
-# rJava 불러오기
-library(rJava)
-
-#JAVA버전 확인
-.jcall("java/lang/System","S","getProperty","java.runtime.version")
-
-#JAVA_HOME 위치 보기
-Sys.getenv("JAVA_HOME")
-
-#JAVA_HOME 설정 (윈도우 경우)
-Sys.setenv(JAVA_HOME="C:/Program Files/Java/jre1.8.0_151/")
-
-#JAVA_HOME 설정 (MAC 경우)
-dyn.load('/Library/Java/JavaVirtualMachines/jdk1.8.0_121.jdk/Contents/Home/jre/lib/server/libjvm.dylib')
 
