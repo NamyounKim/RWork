@@ -23,7 +23,7 @@ dtmW = dtmW[,nchar(colnames(dtmW)) > 1]
 
 dtmW = removeSparseTerms(dtmW, as.numeric(0.98))
 
-findAssocs(dtmW, "청원", 0.1)
+findAssocs(dtmW, "청원", 0.05)
 
 
 # 2. 키워드 네트워크 분석 및 시각화 -----------------------------------------------------------------------------------------
@@ -87,10 +87,10 @@ word_network %>% arrange(-betweenness)
 
 # 3. 특정 키워드만 석택한 네트워크 맵 -----------------------------------------------------------------------------------------
 #keyword = c("박수진","특혜","삼성병원")
-keyword = c("미투","피해자","가해자")
+keyword = c("대한항공","갑질","국민")
 
 cor_termW = cor(dtmW_m)
-cor_termW[cor_termW < 0.07] = 0
+cor_termW[cor_termW < 0.05] = 0
 
 sub_cor_term = cor_termW[,keyword]
 sub_cor_term = sub_cor_term[!(rownames(sub_cor_term) %in% keyword),]

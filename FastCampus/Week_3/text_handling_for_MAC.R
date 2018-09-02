@@ -22,8 +22,11 @@ synonymDic = read_csv("./dictionary/synonym.csv")
 
 # 2. 형태소 분석 및 전처리------------------------------------------------------------------------------------------------------------
 #형태소 분석기 실행하기
+#명사, 동사, 형용사만 추출
 parsedData = r_parser_r(textData$content, language = "ko", useEn = T, korDicPath = "./dictionary/user_dictionary.txt")
+saveRDS(parsedData, file = "./raw_data/parsedData.RDS")
 
+#명사만 추출
 parsedData_noun = r_extract_noun(textData$content, language = "ko", useEn = T, korDicPath = "./dictionary/user_dictionary.txt")
 
 # 동의어 처리
@@ -99,34 +102,30 @@ library(extrafont)
 font_import()
 loadfonts(device="postscript")
 
-#단어 빈도수 바차트로 보여주기
-ggplot(wordDf, aes(x=word, y=freq)) + geom_bar(stat = "identity") + theme(axis.text.x = element_text(family = "AppleGothic"))
+#상위 단어 10개만 바차트로 보여주기
+top10 = wordDf %>% top_n(10) #상위 10개 단어만 추출
+ggplot(top10, aes(x=word, y=freq)) + geom_bar(stat = "identity") + theme(axis.text.x = element_text(family = "AppleGothic"))
 
-#단어 10개만 바차트로 보여주기
-ggplot(head(wordDf,10), aes(x=word, y=freq)) + geom_bar(stat = "identity") + theme(axis.text.x = element_text(family = "AppleGothic"))
-
-#상위 20개 단어만 바차트로 보여주기
-ggplot(head(arrange(wordDf,-freq),20), aes(x=reorder(word,-freq), y=freq)) + geom_bar(stat = "identity") + theme(axis.text.x = element_text(family = "AppleGothic"))
+#상위 10개 단어 빈도순으로 정렬하여 바차트로 보여주기
+ggplot(top10, aes(x=reorder(word,-freq), y=freq)) + geom_bar(stat = "identity") + theme(axis.text.x = element_text(family = "AppleGothic"))
 
 
 # Word Cloud 그리기
 install.packages("wordcloud2")
 library(wordcloud2)
-wordcloud2(data = wordDf
+
+top100 = wordDf %>% top_n(100) # 상위 100개 단어만 추출
+
+wordcloud2(data = top100
            , color = "random-light"
            , shape = "star"
            , size = 0.5
            , fontFamily = "나눔고딕")
 
-letterCloud(wordDf
-            , word = "TEXT"
-            , size = 1
-            , fontFamily = "나눔고딕")
-
 #treeMap 그리기
 install.packages("treemap")
 library(treemap)
-treemap(wordDf # 대상 데이터 설정
+treemap(top100 # 대상 데이터 설정
         ,title = "Word Tree Map"
         ,index = c("word") # 박스 안에 들어갈 변수 설정
         ,vSize = "freq"  # 박스 크기 기준

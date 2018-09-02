@@ -12,7 +12,7 @@ library(dplyr)
 library(NLP4kec)
 
 # 1. 원문 데이터 및 사전 불러오기 ----------------------------------------------------------------------------------------------------
-textData = readRDS("./raw_data/petitions_cleaned.RDS")
+textData = readRDS("./raw_data/petitions_content_2018.RDS")
 
 #동의어 / 불용어 사전 불러오기
 stopWordDic = read_csv("./dictionary/stopword_ko.csv")

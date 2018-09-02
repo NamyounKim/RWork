@@ -1,8 +1,8 @@
 #======================================
 # word2vec로 연관 키워드 추출하기
 #======================================
-install.packages("/Users/kimnamyoun/GitHub/wordVectors_2.0.tgz", repos = NULL, type = "source")
-install.packages("경로명/wordVectors.zip", repo = NULL, type = "source")
+install.packages("/Users/kimnamyoun/GitHub/wordVectors_2.0_mac.tgz", repos = NULL, type = "source")
+install.packages("경로명/wordVectors_2.0_win.zip", repo = NULL, type = "source")
 
 install.packages("tsne")
 library(wordVectors)

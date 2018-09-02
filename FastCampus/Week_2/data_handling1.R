@@ -97,9 +97,9 @@ colnames(iris)
 tapply(iris$Sepal.Length, iris$Species, mean) # Species별로 Sepal.Length의 평균 구하기
 
 #10.Data Join
-df1 = data.frame(dd = c(1,2,3,4,5,6), 
+df1 = data.frame(id = c(1,2,3,4,5,6), 
                  name= c("Jonh", "Jessica", "Tom","Rodrio","James","Alessia"))
-df2 = data.frame(aa = c(2,4,6,8), 
+df2 = data.frame(id = c(2,4,6,8), 
                  location=c("Seoul","LA", "Paris","Rome"))
 
 #11-1.Inner Join

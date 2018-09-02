@@ -58,16 +58,16 @@ filter(dSample, Type %in% c("Compact", "Van","Small","Midsize"))
 arrange(dSample, -Price) #내림차순
 
 #파이프 연산자를 이용하여 Group by 하기
-dSampleBy = dSample %>% group_by(Manufacturer, Type) %>% summarise(meanPrice = mean(Price))
+dSampleBy = dSample %>% group_by(Manufacturer, Type) %>% summarise(mean_price = mean(Price))
                                    
 #요약 column 2개만들기
-dSampleBy = dSample %>% group_by(Manufacturer, Type) %>% summarise(totalPrice = mean(Price), s=n())
+dSampleBy = dSample %>% group_by(Manufacturer, Type) %>% summarise(total_price = mean(Price), car_n = n())
 
 #새로운 column 추가하기(mutate)
-dSampleMutate = dSample %>% group_by(Manufacturer) %>% summarise(totalPrice = sum(Price), n=n()) %>% mutate(meanPrice = totalPrice / n)
+dSampleMutate = dSample %>% group_by(Manufacturer) %>% summarise(total_price = sum(Price), car_n = n()) %>% mutate(mean_price = total_price / car_n)
 
 #파이프 연산자만 사용하기
-dSampleAll = Cars93 %>% dplyr::select(Manufacturer, Model, Type, Price) %>% filter(Price > 30) %>% group_by(Manufacturer) %>% summarise(meanPrice = mean(Price)) %>% arrange(desc(meanPrice))
+dSampleAll = Cars93 %>% dplyr::select(Manufacturer, Model, Type, Price) %>% filter(Price > 30) %>% group_by(Manufacturer) %>% summarise(mean_price = mean(Price)) %>% arrange(desc(mean_price))
 
 #################################################################
 # reshape2 패키지 (데이터의 구조를 변형시킬 수 있는 패키지)
