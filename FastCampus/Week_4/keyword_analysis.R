@@ -48,6 +48,7 @@ cor_termW = cor_termW[!removeTarget, !removeTarget]
 # Network Map을 그리기 위한 객체 만들기
 net = network(cor_termW, directed = FALSE)
 
+# 노드 색상 결정
 # betweenness값 상위 20% 이면서 eigenvector 값이 상위 10%이면 "High" -> 빨강색
 # betweenness값 상위 20% 이면서 eigenvector 값이 하위 90%이면 "Medium" -> 노란색
 # betweenness값 하위 80% 이면 "Low" -> 회색
@@ -55,6 +56,11 @@ net %v% "mode" = ifelse(betweenness(net) > quantile(betweenness(net), 0.8)
                         ,ifelse(evcent(net) > quantile(evcent(net), 0.9),"High","Medium")
                         , "Low")
 node_color = c("Low" = "grey", "Medium" = "darkgoldenrod1", "High"="brown1")
+
+# node 크기결정 (tf-idf 값으로 사용)
+dtm_tfidf_sum = colSums(dtmW_m)
+dtm_tfidf_sum = dtm_tfidf_sum[names(dtm_tfidf_sum) %in% rownames(cor_termW)]
+node_size = c("node.size" = round(dtm_tfidf_sum, digits = 1))
 
 # Network edge size 값 설정하기 (단어간 상관계수 값 * 2)
 set.edge.value(net, "edgeSize", cor_termW * 2)
@@ -65,12 +71,12 @@ ggnet2(net # 네트워크 객체
        ,label.size = 3 # 라벨 폰트 사이즈
        ,color = "mode" # 노드 색상 구준 기준
        ,palette = node_color # 노드 색상
-       ,size = "degree" # 노드의 크기를 degree cetrality값에 따라 다르게 하기
+       ,size = node_size # 노드의 크기를 tf_idf의 값으로 다르게 하기
        ,edge.size = "edgeSize" # 엣지의 굵기를 위에서 계산한 단어간 상관계수에 따라 다르게 하기
        ,mode = "fruchtermanreingold"
-       #,mode = "circle"
        ,family = "AppleGothic"
        ,layout.par = list(cell.pointcellrad=100000) # 네트워크 맵 레이아웃 조정하기
+       ,legend.size = 3
        )
 #"circle"
 #"kamadakawai"

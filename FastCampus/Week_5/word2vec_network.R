@@ -10,6 +10,7 @@ temp = cosineSimilarity(model, model)
 # Edge 개수 조절하기 (0~1 사이 값으로 세팅)
 temp[temp < 0.74] = 0
 
+# 각 컬럼별 sparsity 값 구하기
 sparseRatio = colSums(temp == 0) / nrow(temp)
 
 # sparse ratio 값 분포 확인

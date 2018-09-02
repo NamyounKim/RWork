@@ -25,7 +25,6 @@ synonymDic = read_csv("./dictionary/synonym.csv")
 # 2. 형태소 분석 및 전처리------------------------------------------------------------------------------------------------------------
 #형태소 분석기 실행하기
 parsedData = r_parser_r(textData$content, language = "ko", useEn = T, korDicPath = "./dictionary/user_dictionary.txt")
-saveRDS(parsedData, file = "./raw_data/parsedData.RDS")
 
 #명사 추출
 parsedData_noun = r_extract_noun(textData$content, language = "ko", useEn = T, korDicPath = "./dictionary/user_dictionary.txt")
@@ -38,6 +37,8 @@ for (i in 1:nrow(synonymDic)){
     parsedData[docNum] = gsub(synonymDic$originWord[i], synonymDic$changeWord[i], parsedData[docNum])
   }
 }
+
+saveRDS(parsedData, file = "./raw_data/parsed_data.RDS") # 나중 재사용을 위해 저장
 
 ## 단어간 스페이스 하나 더 추가하기 ##
 parsedData = gsub(" ","  ",parsedData)
@@ -60,6 +61,7 @@ corp = tm_map(corp, removeWords, stopWordDic$stopword)
 #텍스트문서 형식으로 변환
 corp = tm_map(corp, PlainTextDocument)
 
+saveRDS(corp, file = "./raw_data/corpus.RDS") # 나중 재사용을 위해 저장
 
 # 3. DTM 생성 및 Sparse Term 삭제 ----------------------------------------------------------------------------------------------------------
 #Document Term Matrix 생성 (단어 Length는 2로 세팅)

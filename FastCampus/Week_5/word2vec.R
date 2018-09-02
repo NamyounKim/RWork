@@ -9,12 +9,8 @@ library(wordVectors)
 library(tsne)
 library(readr)
 
-# 이전에 만들었던 corpus를 다시 리스트 형태로 변경
-targetData = NULL
-for(i in 1:length(corp)){
-  temp = corp[[i]]$content
-  targetData[i] = temp
-}
+# 이전에 만들었던 형태소분석 결과를 가져옴
+targetData = readRDS("./raw_data/parsedData.RDS")
 
 #word2vec Train용 TXT파일 만들기
 write.table(targetData, file = "./Week_5/trainTxt.txt", row.names = FALSE, col.names = FALSE, quote = F)
@@ -29,8 +25,6 @@ model = train_word2vec(train_file = "./Week_5/trainTxt.txt"
 
 #word2vector model 확인하기
 model
-
-wordVectors::
 
 #</s> 삭제하기
 model = model[rownames(model)!="</s>",]
@@ -57,13 +51,13 @@ plot(model)
 
 #Cosine 거리
 cosineDist(model[["세월호"]], model[["침몰"]])
-cosineDist(model[["청원"]], model[["국회의원"]])
+cosineDist(model[["세월호"]], model[["국회의원"]])
 
 #Cosine 유사도 (= 1 - Cosine거리)
 cosineSimilarity(model[["세월호"]], model[["침몰"]])
-cosineSimilarity(model[["청원"]], model[["국회의원"]])
+cosineSimilarity(model[["세월호"]], model[["국회의원"]])
 
 #Euclidean Distance
 dist(model[(row.names(model)=="세월호" | row.names(model)=="침몰"),])
-dist(model[(row.names(model)=="청원" | row.names(model)=="국회의원"),])
+dist(model[(row.names(model)=="세월호" | row.names(model)=="국회의원"),])
 

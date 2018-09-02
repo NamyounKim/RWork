@@ -16,7 +16,9 @@ dateTopic = textData %>% group_by(startDate, topicNo) %>% summarise(n = n()) %>%
 dateTopic$id = paste0(dateTopic$startDate,"_",dateTopic$topicNo)
 
 # 토픽번호별 문서가 없는 일자를 핸들링하기 위한 작업
-allDate = seq(min(dateTopic$startDate), max(dateTopic$startDate), by="day")
+allDate = seq(from = as.Date(min(dateTopic$startDate))
+              ,to =  as.Date(max(dateTopic$startDate))
+              , by="day")
 allDate = data.frame(startDate = allDate)
 topicNo = data.frame(topicNo = seq(1, max(textData$topicNo, na.rm = T), 1))
 allDate = merge(allDate, topicNo, all=T)
@@ -27,7 +29,8 @@ mergeData = merge(allDate, dateTopic, by = "id", all.x = T)
 mergeData[is.na(mergeData$n),"n"] = 0
 
 # 차트 그리기
-ggplot(mergeData, aes(x=startDate.x, y=n, fill=as.factor(topicNo.x))) + geom_area() + geom_line(position = "stack")
+ggplot(mergeData, aes(x=as.character(startDate.x), y=n, fill=as.factor(topicNo.x), group = as.factor(topicNo.x) )) + 
+  geom_area() + geom_line(position = "stack") + theme(axis.text.x=element_text(angle = 45, hjust = 1))
 
 #ggplot(dateTopic, aes(x=startDate, y=n, fill=as.factor(topicNo))) + geom_area() + geom_line(position = "stack")
 

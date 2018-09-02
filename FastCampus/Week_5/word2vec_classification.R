@@ -10,7 +10,7 @@ simMat = cosineSimilarity(model, model)
 # 속성별 가중치 행렬 만들기
 weightMat = simMat[row.names(simMat) %in% attKeyword,]
 
-# TDM 만들기 (TF-IDF기준)
+# TDM 만들기 (TF-IDF기준) - corp변수를 만들어야함
 tdmW = TermDocumentMatrix(corp, control=list(wordLengths=c(2,Inf)
                                              ,weighting = function(x) weightTfIdf(x, normalize = TRUE))) #Tf-Idf 가중치 주기
 
@@ -26,6 +26,9 @@ tdmW_mat = as.matrix(tdmW)
 
 # 가중치 행렬의 단어와 TDM 단어 맞추기
 weightMat = weightMat[,colnames(weightMat) %in% rownames(tdmW_mat)]
+tdmW_mat = tdmW_mat[rownames(tdmW_mat) %in% colnames(weightMat),]
+
+# 단어 순서 맞추기
 weightMat = weightMat[,sort(colnames(weightMat))]
 
 # 단어 순서가 맞는지 확인
@@ -38,14 +41,14 @@ attScore = as.data.frame(attScore)
 attScore = t(attScore)
 
 # 각 문서별 스코어 확인 하기
-attScore[800,]
-textData[800,"content"]
+attScore[597,]
+textData[597,"content"]
 
-attScore[1477,]
-textData[1477,"content"]
+attScore[8855,]
+textData[8855,"content"]
 
-attScore[2377,]
-textData[2377,"content"]
+attScore[2110,]
+textData[2110,"content"]
 
 # 각 문서별 속성 스코어 붙이기
 textData2 = cbind(textData, attScore)
@@ -61,9 +64,7 @@ textData2 = cbind(textData2, maxAttName, maxAttVal)
 
 # 전체 속성별 분류 개수 확인하기
 tapply(textData2$title, textData2$maxAttName, length)
-textData2 %>% filter(maxAttName == "성추행", maxAttVal > 0.4) %>% select(title, maxAttVal)
-
-read.binary.vectors("./Week_5/trainTxt.bin")
+filter_data = textData2 %>% filter(maxAttName == "취업", maxAttVal > 0.6) %>% select(title, maxAttVal)
 
 
 
