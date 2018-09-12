@@ -8,6 +8,7 @@ grepl("like", sentence)
 
 #매칭되는 Vector index값 구하기
 grep("like", sentence)
+grep(pattern = "like", x = sentence)
 sentence2 = c("I", "like", "an", "apple.")
 grep("like", sentence2)
 
@@ -46,12 +47,17 @@ data(Cars93)
 Cars93
 
 #특정 column 선택하기
+grep()
+
+select(.data = Cars93,  Manufacturer, Model, Type, Price)
+
 dSample = dplyr::select(Cars93, Manufacturer, Model, Type, Price)
 head(dSample, 5)
 
 #특정 row 선택하기
+filter(.data = dSample, Price > 30)
 filter(dSample, Price > 30)
-filter(dSample, Price > 30 & Manufacturer =="Audi")
+filter(dSample, Price > 30 & Manufacturer  =="Audi")
 filter(dSample, Type %in% c("Compact", "Van","Small","Midsize"))
 
 #Sorting 하기
@@ -61,7 +67,9 @@ arrange(dSample, -Price) #내림차순
 dSampleBy = dSample %>% group_by(Manufacturer, Type) %>% summarise(mean_price = mean(Price))
                                    
 #요약 column 2개만들기
-dSampleBy = dSample %>% group_by(Manufacturer, Type) %>% summarise(total_price = mean(Price), car_n = n())
+dSampleBy = dSample %>% group_by(Manufacturer, Type) %>% summarise(mean_price = mean(Price), car_n = n())
+
+dSample %>% group_by(Manufacturer) %>% summarise(count_n = n())
 
 #새로운 column 추가하기(mutate)
 dSampleMutate = dSample %>% group_by(Manufacturer) %>% summarise(total_price = sum(Price), car_n = n()) %>% mutate(mean_price = total_price / car_n)
@@ -76,12 +84,16 @@ install.packages("reshape2")
 library(reshape2)
 
 # 1. dcast 함수
-castTest = dcast(Cars93, Manufacturer ~ Type, mean, value.var = "MPG.city", fill=0, margins = FALSE)
+castTest = dcast(data = Cars93
+                 , formula = Model ~ Type
+                 , value.var = "Min.Price"
+                 , fill= 0
+                 , margins = FALSE)
 
 # 2. melt 함수
 meltTest = melt(data = Cars93, 
                  id.vars = "Type", 
-                 measure.vars = c("MPG.city", "MPG.highway"))
+                 measure.vars = c("Min.Price", "Max.Price"))
 
 
 #################################################################
@@ -95,7 +107,7 @@ if(length(a) > 1){
 }
 
 #2. else 문
-if(length(a) > 5){
+if(length(a) > 5){ 
   mean(a)
 } else {
   print("조건에 맞지 않습니다.")
@@ -120,14 +132,14 @@ while(i<=10){
 
 
 #6.Function 만들기
-myFunction = function(data, company,){
+myFunction = function(data, company){
   temp = subset(data, data$Manufacturer == company)
   sumPrice = sum(temp$Price)
   
   return(sumPrice)
 }
 
-aa = myFunction(Cars93, "Ford")
+aa = myFunction(Cars93, "Audi")
 aa
 
 

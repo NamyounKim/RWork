@@ -1,5 +1,6 @@
 #Vector 만들기
 a = c(1,2,4)
+c = c("aa","bb","cc")
 
 #List 만들기
 b = list("test", 5, a)
@@ -96,11 +97,12 @@ colnames(iris)
 #9.Group by
 tapply(iris$Sepal.Length, iris$Species, mean) # Species별로 Sepal.Length의 평균 구하기
 
+
 #10.Data Join
 df1 = data.frame(id = c(1,2,3,4,5,6), 
                  name= c("Jonh", "Jessica", "Tom","Rodrio","James","Alessia"))
-df2 = data.frame(id = c(2,4,6,8), 
-                 location=c("Seoul","LA", "Paris","Rome"))
+
+df2 = data.frame(id = c(2,4,6,8), location=c("Seoul","LA", "Paris","Rome"))
 
 #11-1.Inner Join
 merge(df1, df2, by="id")
