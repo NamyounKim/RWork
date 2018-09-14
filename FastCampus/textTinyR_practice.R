@@ -6,10 +6,14 @@ install.packages("/Users/kakao/Downloads/NLP4kec_1.2.0.tgz", repos = NULL, type 
 
 
 concat = readRDS("./raw_data/petitions_content_2018.RDS")
-concat = concat$content
+content = concat$content
 
-concat = r_parser_r(concat, useEn = T, language = "ko", korDicPath = "./dictionary/user_dictionary.txt")
+content = r_parser_r(content, useEn = T, language = "ko", korDicPath = "./dictionary/user_dictionary.txt")
 
+
+concat$pasred = content
+
+readr::write_csv(concat, "./petition.csv")
 clust_vec = textTinyR::tokenize_transform_vec_docs(object = concat, as_token = T,
                                                    to_lower = T, 
                                                    remove_punctuation_vector = F,
