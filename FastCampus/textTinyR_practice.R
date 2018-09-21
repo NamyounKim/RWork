@@ -55,6 +55,10 @@ textData$parsed_content = parsed_content
 readr::write_csv(textData, "./petitions_content_2018.csv")
 
 
+parsed_content_py = r_to_py(parsed_content)
+
+parsed_content_py
+
 clust_vec = textTinyR::tokenize_transform_vec_docs(object = concat, as_token = T,
                                                    to_lower = T, 
                                                    remove_punctuation_vector = F,
