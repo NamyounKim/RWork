@@ -1,3 +1,11 @@
+#install.packages("rvest")
+library(rvest)
+library(stringr)
+library(readr)
+library(xml2)
+library(tidyr)
+library(dplyr)
+library(data.table)
 
 # 동의수가 100이상인 청원글만 선별
 petitionList = petitionList_2018 %>% filter(agree_count >= 100)
