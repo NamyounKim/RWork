@@ -22,6 +22,7 @@ synonymDic = read_csv("./dictionary/synonym.csv")
 # 2. 형태소 분석 및 전처리------------------------------------------------------------------------------------------------------------
 #형태소 분석기 실행하기
 parsedData = r_parser_r(textData$content, language = "ko", useEn = T, korDicPath = "./dictionary/user_dictionary.txt")
+parsedData = readRDS("./raw_data/parsed_data.RDS")
 
 # 동의어 처리
 for (i in 1:nrow(synonymDic)){
@@ -54,6 +55,8 @@ corp = tm_map(corp, removeWords, stopWordDic$stopword)
 corp = tm_map(corp, PlainTextDocument)
 
 # 3. DTM 생성 및 Sparse Term 삭제 ----------------------------------------------------------------------------------------------------------
+corp = readRDS("./raw_data/corpus.RDS")
+
 #Document Term Matrix 생성 (단어 Length는 2로 세팅)
 dtm = DocumentTermMatrix(corp, control=list(wordLengths=c(2,Inf)))
 
@@ -154,7 +157,8 @@ freq_matrix = data.frame(ST = colnames(new_dtm_m),
 
 # 위에서 구한 값들을 파라메터 값으로 넘겨서 시각화를 하기 위한 데이터를 만들어 줍니다.
 source("./Week_6/createJsonForChart_v2.R")
-json_lda = createJson(phi = phi, theta = theta,
+json_lda = createJson(phi = phi
+                      , theta = theta,
                           vocab = vocab,
                           doc.length = doc_length,
                           term.frequency = freq_matrix$Freq,

@@ -26,9 +26,7 @@ target_val = read_csv("./raw_data/training_target_val.csv")
 stopWordDic = read_csv("./dictionary/stopword_ko.csv")
 synonymDic = read_csv("./dictionary/synonym.csv")
 
-###################################################################
-#---------------------- Text Pre-processing ----------------------#
-###################################################################
+# 1. Text Pre-processing ---------------------------------------------------------------------------------------
 
 # 동의어 처리
 for (i in 1:nrow(synonymDic)){
@@ -57,8 +55,6 @@ corp = tm_map(corp, removeWords, stopWordDic$stopword)
 #텍스트문서 형식으로 변환
 corp = tm_map(corp, PlainTextDocument)
 
-##################################################################
-
 #Document Term Matrix 생성 (단어 Length는 2로 세팅)
 dtm = DocumentTermMatrix(corp, control=list(wordLengths=c(2,Inf)))
 
@@ -75,6 +71,8 @@ dtmDf = as.data.frame(as.matrix(dtm_removed))
 #중복 Column 삭제
 dtmDf = dtmDf[,!duplicated(colnames(dtmDf))]
 
+
+# 2. 학습 데이터 준비하기 ---------------------------------------------------------------------------------------
 #dtm에 정답지 붙이기(타겟변수 붙이기)
 dtmDf$target = target_val$spam_yn
 
@@ -82,10 +80,11 @@ dtmDf$target = target_val$spam_yn
 trainingSet = dtmDf[1:8000,] #Training 데이터 8,000개
 testSet = dtmDf[8001:nrow(dtmDf),] #Test 데이터 2,012개
 
-#########################
-# Random Forest 모델링
-#########################
+# 타켓 변수 범주형타입으로 변경
 trainingSet$target = as.factor(trainingSet$target)
+
+
+# 3. Random forest 모델링 및 결과 확인 -----------------------------------------------------------------------------------
 cvtrain = trainControl(method="cv"
                        ,number=4
                        )
@@ -98,7 +97,7 @@ rfModel_caret = train(target ~ ., data=trainingSet, method="parRF"
                       ,metric="Accuracy"
                       ,preProc=c("center", "scale"))	
 
-rfModel_caret = readRDS("./Week_7/rfModel_caret.RDS") # 미리 저장해놓은 모델 불러오기
+rfModel_caret = readRDS("./Week_7/rfModel_caret_181017.RDS") # 미리 저장해놓은 모델 불러오기
 print(rfModel_caret)
 
 # 중요변수 확인하기
@@ -117,18 +116,12 @@ rf_pred_result = CrossTable(table(testSet$target, rfPred), prop.chisq=FALSE)
 #정확도 계산하기
 (rf_pred_result$t[1,1] + rf_pred_result$t[2,2]) / nrow(testSet)
 
-########################################################################################################
-# 정답지가 없는 새로운 문서를 분류할 경우             
-########################################################################################################
 
+# 4. 새로운 데이터(정답지가 없는) 분류 -----------------------------------------------------------------------------------
 # 새로운 문서 형태소 분석 실행하기
 newData = file_parser_r(path = "./raw_data/Blog_TestSet_Spam.xlsx"
                         ,language = "ko"
                         ,korDicPath = "./dictionary/user_dictionary.txt")
-
-#############################
-#Text Pre-processing
-#############################
 
 # 동의어 처리
 for (i in 1:nrow(synonymDic)){
@@ -153,8 +146,6 @@ corp = tm_map(corp, tolower)
 
 #특정 단어 삭제
 newCorp = tm_map(newCorp, removeWords, stopWordDic$stopword)
-
-#===============================================
 
 #텍스트문서 형식으로 변환
 newCorp = tm_map(newCorp, PlainTextDocument)

@@ -3,6 +3,8 @@ library(tm)
 #아래 코드를 수행하기 이전에 반드시 DTM을 생성해야 합니다.
 #text_handling.R 소스코드 참고 하세요.
 corp = readRDS("./raw_data/corpus.RDS")
+dtm = DocumentTermMatrix(corp, control=list(wordLengths=c(2,Inf)))
+dtm = removeSparseTerms(dtm, as.numeric(0.98))
 
 # 1. 연관 키워드 추출 및 TF-IDF 가중치 ----------------------------------------------------------------------------------------
 # "청원"의 연관 키워드 구하기
@@ -40,7 +42,7 @@ dtmW_m = as.matrix(dtmW)
 cor_termW = cor(dtmW_m) # 상관계수 매트릭스 초기화
 
 #Edge 개수 조절하기
-cor_termW[cor_termW < 0.15] = 0
+cor_termW[cor_termW < 0.1] = 0
 
 # 다른 노드와 연관성이 0인 노드 제거하기
 removeTarget = colSums(cor_termW) == 1
@@ -61,7 +63,7 @@ node_color = c("Low" = "grey", "Medium" = "darkgoldenrod1", "High"="brown1")
 # node 크기결정 (tf-idf 값으로 사용)
 dtm_tfidf_sum = colSums(dtmW_m)
 dtm_tfidf_sum = dtm_tfidf_sum[names(dtm_tfidf_sum) %in% rownames(cor_termW)]
-node_size = c("node.size" = round(dtm_tfidf_sum, digits = 1))
+node_size = c("node.size" = round(dtm_tfidf_sum, digits = 0))
 
 # Network edge size 값 설정하기 (단어간 상관계수 값 * 2)
 set.edge.value(net, "edgeSize", cor_termW * 2)
@@ -76,8 +78,8 @@ ggnet2(net # 네트워크 객체
        ,edge.size = "edgeSize" # 엣지의 굵기를 위에서 계산한 단어간 상관계수에 따라 다르게 하기
        ,mode = "fruchtermanreingold"
        ,family = "AppleGothic"
-       ,layout.par = list(cell.pointcellrad=100000) # 네트워크 맵 레이아웃 조정하기
-       ,legend.size = 3
+       #,layout.par = list(cell.pointcellrad=100000) # 네트워크 맵 레이아웃 조정하기
+       #,legend.size = 3
        )
 #"circle"
 #"kamadakawai"
@@ -92,7 +94,7 @@ word_network = data.frame(word = rownames(cor_termW),
                           )
 word_network %>% arrange(-betweenness)
 
-# 3. 특정 키워드만 석택한 네트워크 맵 -----------------------------------------------------------------------------------------
+# 3. 특정 키워드만 선택한 네트워크 맵 -----------------------------------------------------------------------------------------
 #keyword = c("박수진","특혜","삼성병원")
 keyword = c("대한항공","갑질","국민")
 

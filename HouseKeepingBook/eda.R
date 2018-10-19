@@ -81,8 +81,10 @@ filePreProcessing = function(expenditurFile, incomeFile){
   income = income %>% select(날짜, year, yearMonth, category1, category2, detail, 금액) %>% mutate(카드=NA, 카드분류=NA, total=금액)
   colnames(income) = c("날짜", "year", "yearMonth", "category1", "category2", "detail", "현금", "카드", "카드분류", "total")
   income$type = "income"
-
-  return(rbind(expenditure, save, income))
+  
+  binded_data = rbind(expenditure, save, income)
+  binded_data$category2 = paste(binded_data$category1, "_", binded_data$category2)
+  return(binded_data)
 }
 
 accountBook = filePreProcessing(expenditureFileList, incomeFileList)

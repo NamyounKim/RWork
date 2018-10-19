@@ -7,7 +7,7 @@ library(GGally)
 source("./tm_function.R") # sub_corpus로 DTM을 만드는 함수
 
 #추출하고 싶은 토픽 번호
-select_topic = c(11)
+select_topic = c(1)
 
 #선택한 토픽번호를 갖는 문서 추출
 sub_parsedData = id_topic %>% filter(doc_topic %in% select_topic) %>% filter(maxProb > 0.8) %>% dplyr::select(parsedData, doc_topic)
@@ -22,7 +22,7 @@ dtm_m = as.matrix(dtm)
 cor_term = cor(dtm_m)
 
 #Edge 개수 조절하기
-cor_term[cor_term < 0.5] = 0
+cor_term[cor_term < 0.6] = 0
 
 # 다른 노드와 연관성이 0인 노드 제거하기
 removeTarget = colSums(cor_term) == 1
@@ -57,7 +57,7 @@ ggnet2(net # 네트워크 객체
        ,edge.size = "edgeSize" # 엣지의 굵기를 위에서 계산한 단어간 상관계수에 따라 다르게 하기
        ,mode = "fruchtermanreingold"
        ,family = "AppleGothic"
-       ,layout.par = list(cell.pointpointrad=1000000)
+       
 )
 
 #shiny에 입력할 수 있는 csv형태의 파일로 떨구기

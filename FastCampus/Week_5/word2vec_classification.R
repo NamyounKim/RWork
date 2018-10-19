@@ -1,4 +1,5 @@
 library(wordVectors)
+library(dplyr)
 library(tm)
 
 # 속성명 정하기
@@ -11,6 +12,7 @@ simMat = cosineSimilarity(model, model)
 weightMat = simMat[row.names(simMat) %in% attKeyword,]
 
 # TDM 만들기 (TF-IDF기준) - corp변수를 만들어야함
+corp =  readRDS("./raw_data/corpus.RDS")
 tdmW = TermDocumentMatrix(corp, control=list(wordLengths=c(2,Inf)
                                              ,weighting = function(x) weightTfIdf(x, normalize = TRUE))) #Tf-Idf 가중치 주기
 
@@ -41,6 +43,7 @@ attScore = as.data.frame(attScore)
 attScore = t(attScore)
 
 # 각 문서별 스코어 확인 하기
+textData =  readRDS("./raw_data/petitions_content_2018.RDS")
 attScore[597,]
 textData[597,"content"]
 
@@ -64,6 +67,7 @@ textData2 = cbind(textData2, maxAttName, maxAttVal)
 
 # 전체 속성별 분류 개수 확인하기
 tapply(textData2$title, textData2$maxAttName, length)
+
 filter_data = textData2 %>% filter(maxAttName == "취업", maxAttVal > 0.6) %>% select(title, maxAttVal)
 
 

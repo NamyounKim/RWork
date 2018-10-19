@@ -1,8 +1,8 @@
 #======================================
 # word2vec로 연관 키워드 추출하기
 #======================================
-install.packages("/Users/kimnamyoun/GitHub/wordVectors_2.0_mac.tgz", repos = NULL, type = "source")
-install.packages("경로명/wordVectors_2.0_win.zip", repo = NULL, type = "source")
+install.packages("/Users/kimnamyoun/Downloads/wordVectors_2.0_mac.tgz", repos = NULL)
+install.packages("경로명/wordVectors_2.0.zip", repo = NULL)
 
 install.packages("tsne")
 library(wordVectors)
@@ -10,7 +10,7 @@ library(tsne)
 library(readr)
 
 # 이전에 만들었던 형태소분석 결과를 가져옴
-targetData = readRDS("./raw_data/parsedData.RDS")
+targetData = readRDS("./raw_data/parsed_data.RDS")
 
 #word2vec Train용 TXT파일 만들기
 write.table(targetData, file = "./Week_5/trainTxt.txt", row.names = FALSE, col.names = FALSE, quote = F)
@@ -60,4 +60,8 @@ cosineSimilarity(model[["세월호"]], model[["국회의원"]])
 #Euclidean Distance
 dist(model[(row.names(model)=="세월호" | row.names(model)=="침몰"),])
 dist(model[(row.names(model)=="세월호" | row.names(model)=="국회의원"),])
+
+
+
+
 

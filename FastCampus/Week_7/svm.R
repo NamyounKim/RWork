@@ -15,9 +15,6 @@ parsedData = file_parser_r(path = "./raw_data/Blog_TrainingSet_Spam.xlsx"
                            ,language = "ko"
                            ,korDicPath = "./dictionary/user_dictionary.txt")
 
-saveRDS(parsedData, "./raw_data/parsedData.RDS") #데이터셋 저장하기
-parsedData = readRDS("./raw_data/parsedData.RDS") #저장한 데이터셋 불러오기
-
 # 예측 변수값 가져오기
 target_val = read_csv("./raw_data/training_target_val.csv")
 
@@ -25,9 +22,7 @@ target_val = read_csv("./raw_data/training_target_val.csv")
 stopWordDic = read_csv("./dictionary/stopword_ko.csv")
 synonymDic = read_csv("./dictionary/synonym.csv")
 
-###################################################################
-#---------------------- Text Pre-processing ----------------------#
-###################################################################
+# 1. Text Pre-processing ---------------------------------------------------------------------------------------
 
 # 동의어 처리
 for (i in 1:nrow(synonymDic)){
@@ -56,8 +51,6 @@ corp = tm_map(corp, removeWords, stopWordDic$stopword)
 #텍스트문서 형식으로 변환
 corp = tm_map(corp, PlainTextDocument)
 
-##################################################################
-
 #텍스트문서 형식으로 변환
 corp = tm_map(corp, PlainTextDocument)
 
@@ -77,6 +70,8 @@ dtmDf = as.data.frame(as.matrix(dtm))
 #중복 Column 삭제
 dtmDf = dtmDf[,!duplicated(colnames(dtmDf))]
 
+
+# 2. 학습 데이터 준비하기 ---------------------------------------------------------------------------------------
 #DtmDf에 정답표 붙이기
 dtmDf$target = target_val$spam_yn
 
@@ -87,10 +82,11 @@ testSet = dtmDf[8001:nrow(dtmDf),] #Test 데이터 2,012개
 dtmDf$target
 tapply(dtmDf$target, dtmDf$target, length)
 
-#########################
-# SVM 모델링
-#########################
+# 타켓 변수 범주형타입으로 변경
 trainingSet$target = as.factor(trainingSet$target)
+
+
+# 3. SVM 모델링 및 결과 확인 -----------------------------------------------------------------------------------
 svmModel = svm(target ~ . 
                , data = trainingSet
                , type = "C-classification"
@@ -98,7 +94,7 @@ svmModel = svm(target ~ .
                , gamma=0.1
                , cost=1)
 
-svmModel = readRDS("./Week_7/svmModel.rds") # 미리 저장해놓은 모델 불러오기
+svmModel = readRDS("./Week_7/svm_model_181017.RDS") # 미리 저장해놓은 모델 불러오기
 
 #Spam 문서 예측하기
 svmPred =  predict(svmModel, newdata = testSet[,1:(ncol(testSet)-1)])
@@ -112,18 +108,13 @@ svm_pred_result = CrossTable(table(testSet$target, svmPred), prop.chisq=FALSE)
 #정확도 계산하기
 (svm_pred_result$t[1,1] + svm_pred_result$t[2,2]) / nrow(testSet)
 
-########################################################################################################
-# 정답지가 없는 새로운 문서를 분류할 경우            
-########################################################################################################
+
+# 4. 새로운 데이터(정답지가 없는) 분류 -----------------------------------------------------------------------------------
 
 # 새로운 문서 형태소 분석 실행하기
 newData = file_parser_r(path = "./raw_data/Blog_TestSet_Spam.xlsx"
                         ,language = "ko"
                         ,korDicPath = "./dictionary/user_dictionary.txt")
-
-#############################
-#Text Pre-processing
-#############################
 
 # 동의어 처리
 for (i in 1:nrow(synonymDic)){
