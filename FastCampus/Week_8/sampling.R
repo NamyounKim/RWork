@@ -3,7 +3,12 @@ library(caret)
 
 #### 층화 홀드아웃 샘플링 ####
 # trainSet 대상 row index 가져오기
-inTrain = createDataPartition(dtmDf$target, p=0.75, list = FALSE)
+saveRDS(dtmDf, "./dtmDf.RDS")
+dtmDf = readRDS("./dtmDf.RDS")
+
+inTrain = createDataPartition(dtmDf$target
+                              , p=0.75
+                              , list = FALSE)
 
 #추출한 row index로 trainSet 만들기
 trainSet = dtmDf[inTrain,]
@@ -20,10 +25,10 @@ folds = createFolds(dtmDf$target, k=5)
 trainSet1 = dtmDf[-folds$Fold1,]
 test1 = dtmDf[folds$Fold1,]
 
-trainSet2 = dtmDf[folds$Fold2,]
-trainSet3 = dtmDf[folds$Fold3,]
-trainSet4 = dtmDf[folds$Fold4,]
-trainSet5 = dtmDf[folds$Fold5,]
+trainSet2 = dtmDf[-folds$Fold2,]
+trainSet3 = dtmDf[-folds$Fold3,]
+trainSet4 = dtmDf[-folds$Fold4,]
+trainSet5 = dtmDf[-folds$Fold5,]
 
 #비율 확인하기
 tapply(trainSet1$target, trainSet1$target, function(y) length(y)/nrow(trainSet1))
@@ -43,3 +48,4 @@ trainSet5 = dtmDf[bootStrap$Resample5,]
 #비율 확인하기
 tapply(trainSet1$target, trainSet1$target, function(y) length(y)/nrow(trainSet1))
 tapply(trainSet4$target, trainSet4$target, function(y) length(y)/nrow(trainSet4))
+

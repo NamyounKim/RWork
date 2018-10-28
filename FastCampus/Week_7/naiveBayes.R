@@ -81,6 +81,9 @@ dtmDf$target = target_val$spam_yn
 trainingSet = dtmDf[1:8000,] #Training 데이터 8,000개
 testSet = dtmDf[8001:nrow(dtmDf),] #Test 데이터 2,012개
 
+saveRDS(testSet, "./testSet.RDS")
+saveRDS(trainingSet, "./trainingSet.RDS")
+
 # 타켓 변수 범주형타입으로 변경
 trainingSet$target = as.factor(trainingSet$target)
 

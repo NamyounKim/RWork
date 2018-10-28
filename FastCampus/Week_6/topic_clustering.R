@@ -92,6 +92,12 @@ k = 20 #클러스터 개수 세팅
 #LDA 실행
 lda_tm = LDA(new_dtm, control=list(seed=SEED), k)
 
+control_LDA_Gibbs <- list(alpha = 0.1, estimate.beta = TRUE, verbose = 0, prefix = tempfile(),
+                          save = 0, keep = 0, seed = SEED, nstart = 1,
+                          best = TRUE, delta = 0.1, iter = 5000, burnin = 0, thin = 2000)
+
+lda_tm_gibbs <-LDA(new_dtm, k, method = "Gibbs", control = control_LDA_Gibbs)
+
 #토픽별 핵심단어 저장하기
 term_topic = terms(lda_tm, 30)
 term_topic
@@ -172,3 +178,21 @@ serVis(json_lda, open.browser = T) # MAC인 경우
 
 # 예시 URL
 #localhost:8080/petition_LDA_15
+
+
+
+
+seqk <- seq(2, 40, 1)
+burnin <- 1000
+iter <- 1000
+keep <- 50
+
+
+fitted_many <- lapply(seqk, function(k) LDA(new_dtm, k=k, method="Gibbs", control=list(seed = 123
+                                                                                       ,burnin=burnin #number of omitted Gibbs iterations at beginning, by default equals 0.
+                                                                                       ,iter=iter #number of Gibbs iterations, by default equals 2000.
+                                                                                       ,keep=keep #if a positive integer, the log-likelihood is saved every keep iterations.
+                                                                                       )))
+logLiks_many <- lapply(fitted_many, function(L) L@logLiks[-c(1:(burnin/keep))])
+
+hm_many <- sapply(logLiks_many, function(h) harmonicMean(h))

@@ -1,7 +1,9 @@
 library(pROC)
 
 saveRDS(svmModel, "./파일경로/파일명.rds")
-svmModel = readRDS("./Week_7/svmModel.rds")
+svmModel = readRDS("./Week_7/svm_model_181017.RDS")
+
+testSet = readRDS("./testSet.RDS")
 
 ## SVM 모델로 TestSet 예측하기. 이때 decision.values 옵셥을 주어 예측 결정값을 계산하다.
 svmPred =  predict(svmModel, newdata = testSet[,1:(ncol(testSet)-1)]
@@ -51,6 +53,7 @@ plot(performance(svmPrediction, measure = "acc"))
 
 
 ##### Naive Bayes 모델 ROC커브로 비교해보기 #####
+trainingSet = readRDS("./trainingSet.RDS")
 nbModel = e1071::naiveBayes(target ~ ., data = trainingSet, fL=1)
 
 #Spam 문서 예측 확률값 가져오기
@@ -62,7 +65,6 @@ nbPrediction = prediction(nbProbs[,2], testSet$target)
 nbPerfomance = performance(nbPrediction, "tpr", "fpr")
 
 # ROC 커브 그리기
-plot(nbPerfomance, col="red")
 par(new=TRUE)
 plot(svmPerfomance)
 abline(a=0, b=1, lwd=2, lty=2) # a:절편, b:기울기, lwd:선두께, lty:선타입
@@ -78,7 +80,7 @@ plot(performance(nbPrediction, measure = "acc"))
 
 ##### Random Forest 모델 ROC커브로 비교해보기 #####
 #Spam 문서 예측 확률값 가져오기
-rfModel_caret = readRDS("./Week_7/rfModel_caret.RDS")
+rfModel_caret = readRDS("./Week_7/rfModel_caret_181017.RDS")
 rfPred =  predict(rfModel_caret, newdata = testSet[,1:(ncol(testSet)-1)]
                   ,type = "prob")
 

@@ -53,7 +53,7 @@ grid = data.frame(.mtry=c(32,33)) # 적정한 독립변수의 개수를 정한�
 rfModel_caret = train(target ~ ., data=dtmDf
                       ,method="parRF"
                       ,trControl=cvtrain
-                      ,ntree=100
+                      ,ntree=200
                       ,tuneGrid=grid
                       ,metric="ROC"
                       ,preProc=c("center", "scale"))
