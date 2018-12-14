@@ -11,7 +11,7 @@ library(slam)
 library(dplyr)
 library(NLP4kec)
 
-# 1. 원문 데이터 및 사전 불러오기 ----------------------------------------------------------------------------------------------------
+# 1. 원문 데이터 및 사전 불러오기 -------------------------------------------------------------------------------------------------------------------------------------------------------
 textData = readRDS("./raw_data/petitions_content_2018.RDS")
 
 #동의어 / 불용어 사전 불러오기
@@ -19,7 +19,7 @@ stopWordDic = read_csv("./dictionary/stopword_ko.csv")
 synonymDic = read_csv("./dictionary/synonym.csv")
 
 
-# 2. 형태소 분석 및 전처리------------------------------------------------------------------------------------------------------------
+# 2. 형태소 분석 및 전처리---------------------------------------------------------------------------------------------------------------------------------------------------------------
 #형태소 분석기 실행하기
 parsedData = r_parser_r(textData$content, language = "ko", useEn = T, korDicPath = "./dictionary/user_dictionary.txt")
 parsedData = readRDS("./raw_data/parsed_data.RDS")
@@ -54,7 +54,9 @@ corp = tm_map(corp, removeWords, stopWordDic$stopword)
 #텍스트문서 형식으로 변환
 corp = tm_map(corp, PlainTextDocument)
 
-# 3. DTM 생성 및 Sparse Term 삭제 ----------------------------------------------------------------------------------------------------------
+
+
+# 3. DTM 생성 및 Sparse Term 삭제 -------------------------------------------------------------------------------------------------------------------------------------------------------------
 corp = readRDS("./raw_data/corpus.RDS")
 
 #Document Term Matrix 생성 (단어 Length는 2로 세팅)
@@ -80,23 +82,22 @@ quantile(term_tfidf, seq(0, 1, 0.25))
 # Tf-Idf 값 기준으로 dtm 크기 줄여서 new_dtm 만들기
 new_dtm = dtm[,term_tfidf >= 0.1]
 new_dtm = new_dtm[row_sums(new_dtm) > 0,]
-new_dtm
 
 
-# 4. Running LDA ----------------------------------------------------------------------------------------------------------------
+
+# 4. LDA 모델링 -------------------------------------------------------------------------------------------------------------------------------------------------------------------
 #분석명, 랜덤 seed, 클러스트 개수 setup
 name = "petition"
 SEED = 100
 k = 20 #클러스터 개수 세팅
 
-#LDA 실행
-lda_tm = LDA(new_dtm, control=list(seed=SEED), k)
-
-control_LDA_Gibbs <- list(alpha = 0.1, estimate.beta = TRUE, verbose = 0, prefix = tempfile(),
+#LDA 옵션값 세팅
+control_LDA_Gibbs = list(alpha = 0.1, estimate.beta = TRUE, verbose = 0, prefix = tempfile(),
                           save = 0, keep = 0, seed = SEED, nstart = 1,
                           best = TRUE, delta = 0.1, iter = 5000, burnin = 0, thin = 2000)
 
-lda_tm_gibbs <-LDA(new_dtm, k, method = "Gibbs", control = control_LDA_Gibbs)
+#LDA 실행
+lda_tm = LDA(new_dtm, k, method = "Gibbs", control = control_LDA_Gibbs)
 
 #토픽별 핵심단어 저장하기
 term_topic = terms(lda_tm, 30)
@@ -137,7 +138,7 @@ filePathName = paste0("./LDA_output/",name,"_",k,"_DOC","_LDA_Result.csv",sep=""
 write.table(id_topic, filePathName, sep=",", row.names=FALSE)
 
 
-# 5. LDA결과 시각화 하기 --------------------------------------------------------------------------------
+# 5. LDA결과 시각화 하기 ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 # phi는 각 단어별 토픽에 포함될 확률값 입니다.
 phi = posterior(lda_tm)$terms %>% as.matrix
 
@@ -179,20 +180,3 @@ serVis(json_lda, open.browser = T) # MAC인 경우
 # 예시 URL
 #localhost:8080/petition_LDA_15
 
-
-
-
-seqk <- seq(2, 40, 1)
-burnin <- 1000
-iter <- 1000
-keep <- 50
-
-
-fitted_many <- lapply(seqk, function(k) LDA(new_dtm, k=k, method="Gibbs", control=list(seed = 123
-                                                                                       ,burnin=burnin #number of omitted Gibbs iterations at beginning, by default equals 0.
-                                                                                       ,iter=iter #number of Gibbs iterations, by default equals 2000.
-                                                                                       ,keep=keep #if a positive integer, the log-likelihood is saved every keep iterations.
-                                                                                       )))
-logLiks_many <- lapply(fitted_many, function(L) L@logLiks[-c(1:(burnin/keep))])
-
-hm_many <- sapply(logLiks_many, function(h) harmonicMean(h))
