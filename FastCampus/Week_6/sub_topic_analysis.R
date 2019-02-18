@@ -7,14 +7,14 @@ library(GGally)
 source("./tm_function.R") # sub_corpus로 DTM을 만드는 함수
 
 #추출하고 싶은 토픽 번호
-select_topic = c(1)
+select_topic = c(10)
 
 #선택한 토픽번호를 갖는 문서 추출
-sub_parsedData = id_topic %>% filter(doc_topic %in% select_topic) %>% filter(maxProb > 0.8) %>% dplyr::select(parsedData, doc_topic)
+sub_parsedData = id_topic %>% filter(doc_topic %in% select_topic) %>% filter(maxProb > 0.5) %>% dplyr::select(text, doc_topic)
 
 #------------------------------------------------------------------------------------
 # sub_corpus로 DTM을 만드는 함수
-dtm = makeDtm(parsedData = sub_parsedData$parsedData, sr = 0.98, type = "tf-idf")
+dtm = makeDtm(parsedData = sub_parsedData$text, sr = 0.94, type = "tf-idf")
 #------------------------------------------------------------------------------------
 
 #Network Map용 데이터 만들기 (단어 X 단어 상관계수 매트릭스 생성)
@@ -22,7 +22,7 @@ dtm_m = as.matrix(dtm)
 cor_term = cor(dtm_m)
 
 #Edge 개수 조절하기
-cor_term[cor_term < 0.6] = 0
+cor_term[cor_term < 0.75] = 0
 
 # 다른 노드와 연관성이 0인 노드 제거하기
 removeTarget = colSums(cor_term) == 1

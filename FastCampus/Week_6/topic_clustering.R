@@ -36,8 +36,12 @@ for (i in 1:nrow(synonymDic)){
 ## 단어간 스페이스 하나 더 추가하기 ##
 parsedData = gsub(" ","  ",parsedData)
 
+#Corpus에 doc_id를 추가하기 위한 데이터 프레임 만들기
+parsedData = data.frame(text = parsedData)
+parsedData$doc_id = textData$doc_id
+
 #Corpus 생성
-corp = VCorpus(VectorSource(parsedData))
+corp = VCorpus(DataframeSource(parsedData))
 
 #특수문자 제거
 corp = tm_map(corp, removePunctuation)
@@ -46,13 +50,13 @@ corp = tm_map(corp, removePunctuation)
 corp = tm_map(corp, removeNumbers)
 
 #소문자로 변경
-corp = tm_map(corp, tolower)
+#corp = tm_map(corp, tolower)
 
 #특정 단어 삭제
 corp = tm_map(corp, removeWords, stopWordDic$stopword)
 
 #텍스트문서 형식으로 변환
-corp = tm_map(corp, PlainTextDocument)
+#corp = tm_map(corp, PlainTextDocument)
 
 
 
@@ -68,7 +72,6 @@ dtm = dtm[,nchar(colnames(dtm)) > 1]
 
 #Sparse Terms 삭제
 dtm = removeSparseTerms(dtm, as.numeric(0.997))
-dtm
 
 ## LDA 할 때 DTM 크기 조절
 #단어별 Tf-Idf 값 구하기
@@ -81,6 +84,7 @@ quantile(term_tfidf, seq(0, 1, 0.25))
 
 # Tf-Idf 값 기준으로 dtm 크기 줄여서 new_dtm 만들기
 new_dtm = dtm[,term_tfidf >= 0.1]
+temp = new_dtm[row_sums(new_dtm) == 0,]
 new_dtm = new_dtm[row_sums(new_dtm) > 0,]
 
 
@@ -107,6 +111,8 @@ term_topic
 doc_topic = topics(lda_tm, 1)
 doc_topic_df = as.data.frame(doc_topic)
 doc_topic_df$rown = as.numeric(row.names(doc_topic_df)) # 조인키 만들기
+doc_topic_df$doc_id = new_dtm$dimnames[1]$Docs
+
 
 #문서별 토픽 확률값 계산하기
 doc_Prob = posterior(lda_tm)$topics
@@ -116,15 +122,15 @@ doc_Prob_df = as.data.frame(doc_Prob)
 doc_Prob_df$maxProb = apply(doc_Prob_df, 1, max) #--> 행기준으로 max값을 찾겠다.
 
 #문서별 토픽번호 및 확률값 추출하기
-doc_Prob_df$rown = doc_topic_df$rown
-parsedData = as.data.frame(parsedData)
-parsedData$rown = as.numeric(row.names(parsedData))
+doc_Prob_df$doc_id = rownames(doc_Prob_df)
 
-id_topic = merge(doc_topic_df, doc_Prob_df, by="rown")
-id_topic = merge(id_topic, parsedData, by="rown", all.y = TRUE)
 
-id_topic = id_topic %>% select(rown, parsedData, doc_topic, maxProb) #코드 변경됨
-id_topic$content = textData$content
+# 3가지 데이터셋 합치기 (원문, 토픽번호, 토픽확률)
+id_topic = merge(doc_topic_df, doc_Prob_df, by="doc_id")
+id_topic = merge(id_topic, parsedData, by="doc_id", all.y = TRUE)
+
+id_topic = id_topic %>% select(doc_id, text, doc_topic, maxProb) #코드 변경됨
+id_topic = merge(id_topic, textData %>% select(doc_id, content), by="doc_id")
 
 #단어별 토픽 확률값 출력하기
 posterior(lda_tm)$terms
@@ -152,9 +158,9 @@ vocab = colnames(phi)
 doc_length = vector()
 doc_topic_df=as.data.frame(doc_topic)
 
-for( i in as.numeric(row.names(doc_topic_df))){
-  temp = corp[[i]]$content
-  doc_length = c(doc_length, nchar(temp[1]))
+for( i in new_dtm$dimnames[[1]]){
+  temp = as.character(parsedData[parsedData$doc_id == i,]$text)
+  doc_length = c(doc_length, nchar(temp))
 }
 
 # 각 단어별 빈도수를 구합니다.
@@ -170,7 +176,7 @@ json_lda = createJson(phi = phi
                           doc.length = doc_length,
                           term.frequency = freq_matrix$Freq,
                           #mds.method = jsPCA #canberraPCA가 작동 안할 때 사용
-                          mds.method = canberraPCA
+                          mds.method = jsPCA
 )
 
 # 톰캣으로 보내기
