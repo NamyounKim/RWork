@@ -6,6 +6,7 @@ library(ggplot2)
 library(stringi)
 library(dplyr)
 library(readr)
+library(tm)
 
 stopWordDic = read_csv("./dictionary/stopword_ko.csv")
 

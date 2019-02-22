@@ -42,7 +42,7 @@ dtmW_m = as.matrix(dtmW)
 cor_termW = cor(dtmW_m) # 상관계수 매트릭스 초기화
 
 #Edge 개수 조절하기
-cor_termW[cor_termW < 0.1] = 0
+cor_termW[cor_termW < 0.05] = 0
 
 # 다른 노드와 연관성이 0인 노드 제거하기
 removeTarget = colSums(cor_termW) == 1
