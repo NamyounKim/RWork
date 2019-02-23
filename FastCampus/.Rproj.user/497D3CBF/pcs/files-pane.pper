@@ -1,8 +1,8 @@
 {
-    "path" : "~/GitHub/RWork/FastCampus/Week_9",
+    "path" : "~/GitHub/RWork/FastCampus/Week_4/shiny_code",
     "sortOrder" : [
         {
-            "ascending" : false,
+            "ascending" : true,
             "columnIndex" : 2
         },
         {

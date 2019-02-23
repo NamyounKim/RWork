@@ -61,4 +61,4 @@ ggnet2(net # 네트워크 객체
 )
 
 #shiny에 입력할 수 있는 csv형태의 파일로 떨구기
-write.table(sub_parsedData, "./LDA_output/sub_topic.csv", sep=",", row.names=FALSE)
+write_csv(sub_parsedData, "./LDA_output/sub_topic.csv")
