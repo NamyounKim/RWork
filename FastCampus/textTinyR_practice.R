@@ -16,8 +16,6 @@ synonymDic = read_csv("./dictionary/synonym.csv")
 #명사, 동사, 형용사만 추출
 parsedData = r_parser_r(textData$content, language = "ko", useEn = T, korDicPath = "./dictionary/user_dictionary.txt")
 
-#명사만 추출
-parsedData_noun = r_extract_noun(textData$content, language = "ko", useEn = T, korDicPath = "./dictionary/user_dictionary.txt")
 
 # 동의어 처리
 for (i in 1:nrow(synonymDic)){
