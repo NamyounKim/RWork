@@ -30,21 +30,19 @@ parsedData = r_parser_r(textData$content, language = "ko", useEn = T, korDicPath
 parsedData_noun = r_extract_noun(textData$content, language = "ko", useEn = T, korDicPath = "./dictionary/user_dictionary.txt")
 
 # 동의어 처리
-for (i in 1:nrow(synonymDic)){
-  targetDocIdx = which(ll <- grepl(synonymDic$originWord[i], parsedData))
-  for(j in 1:length(targetDocIdx)){
-    docNum = targetDocIdx[j]
-    parsedData[docNum] = gsub(synonymDic$originWord[i], synonymDic$changeWord[i], parsedData[docNum])
-  }
-}
-
-saveRDS(parsedData, file = "./raw_data/parsed_data.RDS") # 나중 재사용을 위해 저장
+parsedData = synonym_processing(parsedVector = parsedData, synonymDic = synonymDic)
 
 ## 단어간 스페이스 하나 더 추가하기 ##
 parsedData = gsub(" ","  ",parsedData)
 
+#Corpus에 doc_id를 추가하기 위한 데이터 프레임 만들기
+parsedData_df = data.frame(doc_id = textData$doc_id
+                           ,text = parsedData)
+
+saveRDS(parsedData_df, file = "./raw_data/parsed_petition_data.RDS") # 나중 재사용을 위해 저장
+
 #Corpus 생성
-corp = VCorpus(VectorSource(parsedData))
+corp = VCorpus(DataframeSource(parsedData_df))
 
 #특수문자 제거
 corp = tm_map(corp, removePunctuation)
@@ -52,16 +50,11 @@ corp = tm_map(corp, removePunctuation)
 #숫자 삭제
 corp = tm_map(corp, removeNumbers)
 
-#소문자로 변경
-corp = tm_map(corp, tolower)
-
 #특정 단어 삭제
 corp = tm_map(corp, removeWords, stopWordDic$stopword)
 
-#텍스트문서 형식으로 변환
-corp = tm_map(corp, PlainTextDocument)
 
-saveRDS(corp, file = "./raw_data/corpus.RDS") # 나중 재사용을 위해 저장
+saveRDS(corp, file = "./raw_data/corpus_petition.RDS") # 나중 재사용을 위해 저장
 
 # 3. DTM 생성 및 Sparse Term 삭제 --------------------------------------------------------------------------------------------------------------------------------------------------
 #Document Term Matrix 생성 (단어 Length는 2로 세팅)

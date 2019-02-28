@@ -12,7 +12,7 @@ simMat = cosineSimilarity(model, model)
 weightMat = simMat[row.names(simMat) %in% attKeyword,]
 
 # TDM 만들기 (TF-IDF기준) - corp변수를 만들어야함
-corp =  readRDS("./raw_data/corpus.RDS")
+corp =  readRDS("./raw_data/corpus_petition.RDS")
 tdmW = TermDocumentMatrix(corp, control=list(wordLengths=c(2,Inf)
                                              ,weighting = function(x) weightTfIdf(x, normalize = TRUE))) #Tf-Idf 가중치 주기
 

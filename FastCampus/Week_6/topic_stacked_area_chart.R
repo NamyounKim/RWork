@@ -1,10 +1,7 @@
 library(ggplot2)
 library(dplyr)
 
-# 아래링크에서 "샘플데이터" 폴더에서 textData.RDS 파일 다운받기
-# http://bit.ly/textminig_r
-
-textData = readRDS("./Week_6/textData.RDS")
+textData = readRDS("./raw_data/petitions_content_2018.RDS")
 
 # 원본 데이터에 토픽 번호 붙이기
 textData$topicNo = id_topic$doc_topic

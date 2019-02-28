@@ -18,30 +18,26 @@ textData = readRDS("./raw_data/petitions_content_2018.RDS")
 stopWordDic = read_csv("./dictionary/stopword_ko.csv")
 synonymDic = read_csv("./dictionary/synonym.csv")
 
+# 만약 3주차에 저장해놓은 데이터셋을 사용하고 싶다고 readRDS로 가져오기(형태소분석 및 전처리 필요없음)
+parsedData_df = readRDS("./raw_data/parsed_petition_data.RDS")
+corp = readRDS("./raw_data/corpus_petition.RDS")
 
 # 2. 형태소 분석 및 전처리---------------------------------------------------------------------------------------------------------------------------------------------------------------
 #형태소 분석기 실행하기
 parsedData = r_parser_r(textData$content, language = "ko", useEn = T, korDicPath = "./dictionary/user_dictionary.txt")
-parsedData = readRDS("./raw_data/parsed_data.RDS")
 
 # 동의어 처리
-for (i in 1:nrow(synonymDic)){
-  targetDocIdx = which(ll <- grepl(synonymDic$originWord[i], parsedData))
-  for(j in 1:length(targetDocIdx)){
-    docNum = targetDocIdx[j]
-    parsedData[docNum] = gsub(synonymDic$originWord[i], synonymDic$changeWord[i], parsedData[docNum])
-  }
-}
+parsedData = synonym_processing(parsedVector = parsedData, synonymDic = synonymDic)
 
 ## 단어간 스페이스 하나 더 추가하기 ##
 parsedData = gsub(" ","  ",parsedData)
 
 #Corpus에 doc_id를 추가하기 위한 데이터 프레임 만들기
-parsedData = data.frame(text = parsedData)
-parsedData$doc_id = textData$doc_id
+parsedData_df = data.frame(doc_id = textData$doc_id
+                           ,text = parsedData)
 
 #Corpus 생성
-corp = VCorpus(DataframeSource(parsedData))
+corp = VCorpus(DataframeSource(parsedData_df))
 
 #특수문자 제거
 corp = tm_map(corp, removePunctuation)
@@ -49,19 +45,11 @@ corp = tm_map(corp, removePunctuation)
 #숫자 삭제
 corp = tm_map(corp, removeNumbers)
 
-#소문자로 변경
-#corp = tm_map(corp, tolower)
-
 #특정 단어 삭제
 corp = tm_map(corp, removeWords, stopWordDic$stopword)
 
-#텍스트문서 형식으로 변환
-#corp = tm_map(corp, PlainTextDocument)
-
-
 
 # 3. DTM 생성 및 Sparse Term 삭제 -------------------------------------------------------------------------------------------------------------------------------------------------------------
-corp = readRDS("./raw_data/corpus.RDS")
 
 #Document Term Matrix 생성 (단어 Length는 2로 세팅)
 dtm = DocumentTermMatrix(corp, control=list(wordLengths=c(2,Inf)))

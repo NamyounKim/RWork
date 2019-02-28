@@ -1,19 +1,19 @@
 # word2vec 패키지 설치
 install.packages("/Users/kimnamyoun/Downloads/wordVectors_2.0_mac.tgz", repos = NULL)
 install.packages("경로명/wordVectors_2.0.zip", repo = NULL)
-
 install.packages("tsne")
+
 library(wordVectors)
 library(tsne)
 library(readr)
 
 # 이전에 만들었던 형태소분석 결과를 가져옴
-targetData = readRDS("./raw_data/parsed_data.RDS")
+parsedData_df = readRDS("./raw_data/parsed_petition_data.RDS")
 
 
 # 1. word2vec 모델링 -------------------------------------------------------------------------------------------------------------------------------------------------------------
 # word2vec Train용 TXT파일 만들기
-write.table(targetData, file = "./Week_5/trainTxt.txt", row.names = FALSE, col.names = FALSE, quote = F)
+write.table(parsedData_df$text, file = "./Week_5/trainTxt.txt", row.names = FALSE, col.names = FALSE, quote = F)
 
 #모델 Training
 model = train_word2vec(train_file = "./Week_5/trainTxt.txt"

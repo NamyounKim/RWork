@@ -8,10 +8,11 @@ library(dplyr)
 library(readr)
 library(tm)
 
+# 불용어 사전과 형태소분석 결과 데이터를 미리 가져온다.
 stopWordDic = read_csv("./dictionary/stopword_ko.csv")
+parsedData_df = readRDS("./raw_data/parsed_petition_data.RDS")
 
 # bigrams 기준 네트워크 맵 만들기 ---------------------------------------------------------------------------------------------------------------------
-parsed_data = readRDS("./raw_data/parsed_data.RDS")
 bigram = vector(length = length(parsed_data))
 
 # 전처리 

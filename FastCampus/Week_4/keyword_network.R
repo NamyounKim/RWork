@@ -2,7 +2,7 @@ library(tm)
 
 #아래 코드를 수행하기 이전에 반드시 DTM을 생성해야 합니다.
 #text_handling.R 소스코드 참고 하세요.
-corp = readRDS("./raw_data/corpus.RDS")
+corp = readRDS("./raw_data/corpus_petition.RDS")
 dtm = DocumentTermMatrix(corp, control=list(wordLengths=c(2,Inf)))
 dtm = removeSparseTerms(dtm, as.numeric(0.98))
 
