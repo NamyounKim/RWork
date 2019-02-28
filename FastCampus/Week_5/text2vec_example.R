@@ -2,10 +2,10 @@ library(text2vec)
 
 
 # 이전에 만들었던 형태소분석 결과를 가져옴
-targetData = readRDS("./raw_data/parsed_data.RDS")
+targetData = readRDS("./raw_data/parsed_petition_data.RDS")
 
 # Create iterator over tokens
-tokens = space_tokenizer(targetData)
+tokens = space_tokenizer(targetData$text)
 
 # Create vocabulary. Terms will be unigrams (simple words).
 it = itoken(tokens, progressbar = FALSE)
@@ -39,8 +39,8 @@ berlin = word_vectors["청원", , drop = FALSE] -
 cos_sim = sim2(x = word_vectors, y = berlin, method = "cosine", norm = "l2")
 head(sort(cos_sim[,1], decreasing = TRUE), 5)
 
-cos_sim2 = sim2(x = word_vectors, y = word_vectors["ais", , drop = FALSE], method = "cosine", norm = "l2")
-head(sort(cos_sim2[,1], decreasing = TRUE), 20)
+cos_sim2 = sim2(x = word_vectors, y = word_vectors["미러링", , drop = FALSE], method = "cosine", norm = "l2")
+head(sort(cos_sim2[,1], decreasing = TRUE), 30)
 nearest_to(model, model[["ais"]], 20)
 
 subVec = model[rownames(model)=="임금",] - model[rownames(model) == "근로",] + model[rownames(model) == "취업",]
