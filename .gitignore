@@ -46,3 +46,10 @@ FastCampus/.DS_Store
 *.csv
 *.pper
 *.pper
+
+!FastCampus/raw_data/petitions_content_2018.RDS
+!FastCampus/raw_data/petitions_category_name_2018.RDS
+!FastCampus/raw_data/Blog_TrainingSet_Spam.xlsx
+!FastCampus/raw_data/Blog_TestSet_Spam.xlsx
+!FastCampus/raw_data/test_target_val.csv
+!FastCampus/raw_data/training_target_val.csv
