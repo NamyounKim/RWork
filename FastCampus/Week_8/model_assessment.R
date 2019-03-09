@@ -1,9 +1,19 @@
 library(pROC)
+library(dplyr)
+library(stringi)
+library(tm)
+library(pROC)
+library(slam)
+library(gmodels)
+library(e1071)
+library(klaR)
+library(readr)
+install.packages("pROC")
 
 saveRDS(svmModel, "./파일경로/파일명.rds")
 svmModel = readRDS("./Week_7/svm_model_181017.RDS")
 
-testSet = readRDS("./testSet.RDS")
+testSet = readRDS("./testSet_copy.RDS")
 
 ## SVM 모델로 TestSet 예측하기. 이때 decision.values 옵셥을 주어 예측 결정값을 계산하다.
 svmPred =  predict(svmModel, newdata = testSet[,1:(ncol(testSet)-1)]
@@ -57,7 +67,7 @@ trainingSet = readRDS("./trainingSet.RDS")
 nbModel = e1071::naiveBayes(target ~ ., data = trainingSet, fL=1)
 
 #Spam 문서 예측 확률값 가져오기
-nbProbs =  predict(nbModel, newdata = testSet[,1:(ncol(testSet)-1)]
+nbProbs =  predict(nbModel, newdata = testSet2[,1:(ncol(testSet2)-1)]
                    ,type="raw")
 
 # ROC 값 구하기
@@ -66,7 +76,7 @@ nbPerfomance = performance(nbPrediction, "tpr", "fpr")
 
 # ROC 커브 그리기
 par(new=TRUE)
-plot(svmPerfomance)
+plot(nbPerfomance)
 abline(a=0, b=1, lwd=2, lty=2) # a:절편, b:기울기, lwd:선두께, lty:선타입
 
 

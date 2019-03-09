@@ -45,8 +45,11 @@ ggplot(temp, aes(x=yearMonth, y = totalExpenditure)) + geom_bar(stat = "identity
 
 
 # 년도별 수입 규모 ----------------------------------------------
-temp = accountBook %>% group_by(year) %>% summarise(totalIncome = sum(totalIncome)/12)
-ggplot(temp, aes(x=year, y = totalIncome, label = round(totalIncome, 1))) + geom_bar(stat = "identity")+ 
+temp = accountBook %>% group_by(year) %>% summarise(totalIncome = sum(totalIncome), totalMonthIncome = sum(totalIncome)/12)
+ggplot(temp, aes(x=year, y = totalMonthIncome, label = round(totalMonthIncome, 1))) + geom_bar(stat = "identity")+ 
          scale_y_continuous(labels = point, limits = c(0,12000000)) + geom_text()
+
+ggplot(temp, aes(x=year, y = totalIncome, label = round(totalIncome, 1))) + geom_bar(stat = "identity")+ 
+  scale_y_continuous(labels = point, limits = c(0,120000000)) + geom_text()
 
        

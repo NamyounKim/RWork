@@ -4,7 +4,7 @@ library(caret)
 #### 층화 홀드아웃 샘플링 ####
 # trainSet 대상 row index 가져오기
 saveRDS(dtmDf, "./dtmDf.RDS")
-dtmDf = readRDS("./dtmDf.RDS")
+dtmDf = readRDS("./trainingSet.RDS")
 
 inTrain = createDataPartition(dtmDf$target
                               , p=0.75
@@ -16,7 +16,6 @@ trainSet = dtmDf[inTrain,]
 #비율 확인하기
 tapply(dtmDf$target, dtmDf$target, function(y) length(y)/nrow(dtmDf))
 tapply(trainSet$target, trainSet$target, function(y) length(y)/nrow(trainSet))
-
 
 #### 교차 검증 ####
 folds = createFolds(dtmDf$target, k=5)
