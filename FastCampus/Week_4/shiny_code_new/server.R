@@ -8,7 +8,7 @@ library(ggplot2)
 library(GGally)
 library(ggraph)
 library(data.table)
-library(stringi)
+library(stringr)
 library(readr)
 
 options(shiny.maxRequestSize = 30 * 1024 ^ 2) 

@@ -18,7 +18,7 @@ shinyUI(
                  ),
                  
                  sliderInput("numberOfWord"
-                             , "보여질 단어개수"
+                             , "노출 단어개수"
                              , min = 5
                              , max = 20
                              , value = 10
@@ -39,10 +39,10 @@ shinyUI(
                            , value = NA
                  ),
                  sliderInput("numberOfAllWord2"
-                             , "보여질 단어개수"
-                             , min = 50
-                             , max = 500
-                             , value = 100
+                             , "노출 단어개수"
+                             , min = 20
+                             , max = 100
+                             , value = 30
                              , step=10
                  )
                ),
@@ -51,7 +51,7 @@ shinyUI(
       tabPanel("전체 연관 단어 네트워크", 
                sidebarPanel(
                  sliderInput("numberOfAllWord"
-                             , "보여질 단어개수"
+                             , "노출 단어개수"
                              , min = 50
                              , max = 500
                              , value = 100
