@@ -115,7 +115,7 @@ doc_Prob_df$doc_id = rownames(doc_Prob_df)
 
 # 3가지 데이터셋 합치기 (원문, 토픽번호, 토픽확률)
 id_topic = merge(doc_topic_df, doc_Prob_df, by="doc_id")
-id_topic = merge(id_topic, parsedData, by="doc_id", all.y = TRUE)
+id_topic = merge(id_topic, parsedData_df, by="doc_id", all.y = TRUE)
 
 id_topic = id_topic %>% select(doc_id, text, doc_topic, maxProb) #코드 변경됨
 id_topic = merge(id_topic, textData %>% select(doc_id, content), by="doc_id")
@@ -147,7 +147,7 @@ doc_length = vector()
 doc_topic_df=as.data.frame(doc_topic)
 
 for( i in new_dtm$dimnames[[1]]){
-  temp = as.character(parsedData[parsedData$doc_id == i,]$text)
+  temp = as.character(parsedData_df[parsedData_df$doc_id == i,]$text)
   doc_length = c(doc_length, nchar(temp))
 }
 

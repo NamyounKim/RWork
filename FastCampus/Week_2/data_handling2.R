@@ -1,9 +1,10 @@
+library(stringr)
 
 ## 7. 문자열 핸들링 ----------------------------------------------------------------------------------------------------------------------------------------------------------------
 sentence = c("I like an apple.")
 
 #매칭여부 확인하기
-grepl("like", sentence)
+str_detect(string = sentence, pattern = "like")
 
 #매칭되는 Vector index값 구하기
 grep("like", sentence)
@@ -12,26 +13,23 @@ sentence2 = c("I", "like", "an", "apple.")
 grep("like", sentence2)
 
 #매칭되는 문자열 바꾸기
-gsub("like", "hate", sentence)
+str_replace(sentence, pattern = "like", replacement = "hate")
 
 #문자열 붙이기
 paste(sentence, "And I have the apple.")
+paste0(sentence, "And I have the apple.")
 
 #특정 위치 문자열 가져오기
-substr(sentence, 4, 7)
-substr(x = sentence, start = 4, stop = 7)
-substr(sentence, 1, 6) = "I hate" # 1번째 문자에서 6문자 사이의 문자열 바꾸기
+str_sub(sentence, start = 4, end = 7)
 
-#문자열 내에 해당 패턴이 나오는 첫번째 위치 구하기
-regexpr("hate",sentence)
+#문자열 내에 해당 패턴이 나오는 첫번째와 마지막 위치 구하기
+str_locate(sentence, "like")
 
 #문자열 내에 해당 패턴이 나오는 모든 위치 구하기
-gregexpr("a", sentence)
+str_locate_all(sentence, "a")
 
 #문자열 구분자에 따라 나누기
-split = strsplit(sentence, " ")
-split = unlist(split) # Vector 형식으로 바꿔주기
-
+str_split_fixed(sentence, pattern = " ", n = Inf)
 
 
 ## 8. dplyr패키지로 데이터 핸들링하기 -----------------------------------------------------------------------------------------------------------------------------------------------------

@@ -9,7 +9,7 @@ library(readr)
 
 # 이전에 만들었던 형태소분석 결과를 가져옴
 parsedData_df = readRDS("./raw_data/parsed_petition_data.RDS")
-
+stopWordDic = read_csv("./dictionary/stopword_ko.csv")
 
 # 1. word2vec 모델링 -------------------------------------------------------------------------------------------------------------------------------------------------------------
 # word2vec Train용 TXT파일 만들기
@@ -33,17 +33,19 @@ model = model[rownames(model)!="</s>",]
 # 한글자 단어 삭제하기
 model = model[nchar(rownames(model))>1,]
 
-
+# 불용어 삭제하기
+model = model[!(rownames(model) %in% stopWordDic$stopword),]
+model
 
 # 3. word2vec에서 연관단어 추출 및 단어가 연산하기 -------------------------------------------------------------------------------------------------------------------------------------------------------------
 #연관 키워드 추출하기
-nearest_to(model, model[["청원"]], 20)
+nearest_to(model, model[["어린이집"]], 20)
 
 #2가지 이상 키워드에 대한 연관 키워드 추출하기
-nearest_to(model,model[[c("청원","청와대")]], 20)
+nearest_to(model,model[[c("어린이집","원장")]], 20)
 
 #단어간 연산하기
-subVec = model[rownames(model)=="청원",] - model[rownames(model) == "청와대",] + model[rownames(model) == "국회의원",]
+subVec = model[rownames(model)=="어린이집",] - model[rownames(model) == "원장",] + model[rownames(model) == "초등학교",]
 nearest_to(model, subVec, 20)
 
 
@@ -59,16 +61,16 @@ plot(model)
 
 # 5. 단어간 거리(유사도) 계산 -------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Cosine 거리
-cosineDist(model[["세월호"]], model[["침몰"]])
-cosineDist(model[["세월호"]], model[["국회의원"]])
+cosineDist(model[["어린이집"]], model[["초등학교"]])
+cosineDist(model[["어린이집"]], model[["원장"]])
 
 #Cosine 유사도 (= 1 - Cosine거리)
-cosineSimilarity(model[["세월호"]], model[["침몰"]])
-cosineSimilarity(model[["세월호"]], model[["국회의원"]])
+cosineSimilarity(model[["어린이집"]], model[["초등학교"]])
+cosineSimilarity(model[["어린이집"]], model[["원장"]])
 
 #Euclidean Distance
-dist(model[(row.names(model)=="세월호" | row.names(model)=="침몰"),])
-dist(model[(row.names(model)=="세월호" | row.names(model)=="국회의원"),])
+dist(model[(row.names(model)=="어린이집" | row.names(model)=="초등학교"),])
+dist(model[(row.names(model)=="어린이집" | row.names(model)=="원장"),])
 
 
 
