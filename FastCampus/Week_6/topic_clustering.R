@@ -84,9 +84,20 @@ SEED = 100
 k = 20 #클러스터 개수 세팅
 
 #LDA 옵션값 세팅
-control_LDA_Gibbs = list(alpha = 0.1, estimate.beta = TRUE, verbose = 0, prefix = tempfile(),
-                          save = 0, keep = 0, seed = SEED, nstart = 1,
-                          best = TRUE, delta = 0.1, iter = 5000, burnin = 0, thin = 2000)
+control_LDA_Gibbs = list(alpha = 0.1 # alpha 초기값
+                         ,estimate.beta = TRUE # 각 단어의 토픽별 분포 예측 여부
+                         ,delta = 0.1 # delta 초기값
+                         ,verbose = 0 # 0보다 큰 값일 경우 모델링 과정 출력
+                         ,prefix = tempfile() # 중간 결과물 저장 장소(임시파일)
+                         ,save = 0 # 0보다 큰 값일 경우 중간 결과물 저장
+                         ,keep = 0 # 0보다 큰 값일 경우 모든 iterations마다 log-likelihood 값 저장
+                         ,seed = SEED # 랜던수 발생을 위한 seed 숫자 (결과물 변경 방지를 위해 보통 고정)
+                         ,nstart = 1 # 랜덤  횟수
+                         ,best = TRUE # 가장 좋은 모델을 선택 (likelihood값이 최대가 되는 모델)
+                         ,iter = 5000 # 깁스 iteration 숫자 (반복 숫자)
+                         ,burnin = 0 # 생략해서 할 iteration 숫자
+                         ,thin = 2500 # 생략된 깁스 iteration 내에서 반복할 숫자
+                         )
 
 #LDA 실행
 lda_tm = LDA(new_dtm, k, method = "Gibbs", control = control_LDA_Gibbs)
@@ -98,19 +109,16 @@ term_topic
 #문서별 토픽 번호 저장하기
 doc_topic = topics(lda_tm, 1)
 doc_topic_df = as.data.frame(doc_topic)
-doc_topic_df$rown = as.numeric(row.names(doc_topic_df)) # 조인키 만들기
-doc_topic_df$doc_id = new_dtm$dimnames[1]$Docs
+doc_topic_df$doc_id = new_dtm$dimnames[1]$Docs # 조인키 만들기 (문서 번호 가져오기)
 
 
 #문서별 토픽 확률값 계산하기
 doc_Prob = posterior(lda_tm)$topics
 doc_Prob_df = as.data.frame(doc_Prob)
 
-#최대 확률값 찾기
-doc_Prob_df$maxProb = apply(doc_Prob_df, 1, max) #--> 행기준으로 max값을 찾겠다.
-
-#문서별 토픽번호 및 확률값 추출하기
-doc_Prob_df$doc_id = rownames(doc_Prob_df)
+#문서별 최대 확률값 찾기
+doc_Prob_df$maxProb = apply(doc_Prob_df, 1, max) # 행기준으로 max값 가져오기
+doc_Prob_df$doc_id = rownames(doc_Prob_df) # 조인키 만들기 (문서 번호 가져오기)
 
 
 # 3가지 데이터셋 합치기 (원문, 토픽번호, 토픽확률)

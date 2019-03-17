@@ -1,6 +1,10 @@
 {
-    "path" : "~/GitHub/RWork/FastCampus/Week_6",
+    "path" : "~/GitHub/RWork/FastCampus/Week_4/shiny_code_new",
     "sortOrder" : [
+        {
+            "ascending" : false,
+            "columnIndex" : 4
+        },
         {
             "ascending" : true,
             "columnIndex" : 2
@@ -8,10 +12,6 @@
         {
             "ascending" : true,
             "columnIndex" : 1
-        },
-        {
-            "ascending" : false,
-            "columnIndex" : 4
         }
     ]
 }

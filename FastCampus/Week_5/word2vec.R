@@ -21,10 +21,13 @@ model = train_word2vec(train_file = "./Week_5/trainTxt.txt"
                        , vectors=100
                        , force = T
                        , window = 6
-                       , output_file = "./Week_5/trainTxt.bin")
+                       , output_file = "./Week_5/word2vec_model.bin")
 
 #word2vector model 확인하기
 model
+
+# 파일로 저장된 word2vec모델 읽어오기
+model = wordVectors::read.binary.vectors("./Week_5/word2vec_model.bin")
 
 # 2. word2vec 결과 핸들링 -------------------------------------------------------------------------------------------------------------------------------------------------------------
 #</s> 삭제하기
