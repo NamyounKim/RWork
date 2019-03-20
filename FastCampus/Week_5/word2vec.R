@@ -61,6 +61,13 @@ par(family="AppleGothic")
 plot(model)
 
 
+# 텐서플로우용 데이터 추출
+write_delim(as.data.frame(rownames(model)), path = "./Week_5/tf_word_name.tsv", delim = "\t", col_names = F)
+write_delim(as.data.frame(model), path = "./Week_5/tf_word_vector.tsv", delim = "\t", col_names = F)
+
+# https://projector.tensorflow.org/ 이 사이트로 이동하여 추출된 데이터 업로드
+
+
 
 # 5. 단어간 거리(유사도) 계산 -------------------------------------------------------------------------------------------------------------------------------------------------------------
 #Cosine 거리
