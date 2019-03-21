@@ -8,8 +8,8 @@ library(dplyr)
 library(data.table)
 
 # List 가져오기
-petitionList_2018 = data.table(link=as.character(), category=as.character(), agree_count = as.numeric())
-for(i in 1:11000){
+petitionList_2019 = data.table(link=as.character(), category=as.character(), agree_count = as.numeric())
+for(i in 1:50000){
   Sys.sleep(runif(1,1,5))
   print(i)
   url = paste0("https://www1.president.go.kr/petitions?only=finished&page=",i)
@@ -27,11 +27,11 @@ for(i in 1:11000){
   agree_count = as.numeric(agree_count)
   
   rows = data.frame(link, category, agree_count, stringsAsFactors = F)
-  petitionList_2018 = rbind(petitionList_2018, rows)
+  petitionList_2019 = rbind(petitionList_2019, rows)
   
   if(i %% 5000 == 0){
-    saveRDS(petitionList_2018, paste0("./petitionList_",i,".rds"))
+    saveRDS(petitionList_2019, paste0("./petitionList_",i,".rds"))
   }
 }
 
-saveRDS(petitionList_2018, paste0("./petitionList_",i,".rds"))
+saveRDS(petitionList_2019, paste0("./petitionList_",i,".rds"))

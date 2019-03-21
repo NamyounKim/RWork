@@ -8,7 +8,7 @@ library(dplyr)
 library(data.table)
 
 # 동의수가 100이상인 청원글만 선별
-petitionList = petitionList_2018 %>% filter(agree_count >= 100)
+petitionList = petitionList_14058 %>% filter(agree_count >= 100)
 
 #문서ID
 petitionList$doc_id = str_extract(petitionList$link, pattern = "[0-9]{5,10}")
@@ -53,4 +53,4 @@ for(i in 1:nrow(petitionList)){
 
 petition_content_not_dup =petition_content[!duplicated(petition_content$doc_id),]
 petition_content_not_dup = merge(petitionList, petition_content_not_dup, by = "doc_id")
-saveRDS(petition_content_not_dup, "./petitions_content_2018.RDS")
+saveRDS(petition_content_not_dup, "./petitions_content_2019.RDS")
