@@ -16,45 +16,36 @@ parsedData = file_parser_r(path = "./raw_data/Blog_TrainingSet_Spam.xlsx"
                            ,language = "ko"
                            ,korDicPath = "./dictionary/user_dictionary.txt")
 
-# 타겟 변수값 가져오기(정답지)
+# 예측 변수값 가져오기
 target_val = read_csv("./raw_data/training_target_val.csv")
 
 #동의어 / 불용어 사전 불러오기
 stopWordDic = read_csv("./dictionary/stopword_ko.csv")
 synonymDic = read_csv("./dictionary/synonym.csv")
 
-
-# 1. Text Pre-processing ---------------------------------------------------------------------------------------
+# 1. Text Pre-processing -----------------------------------------------------------------------------------------------------------------
 
 # 동의어 처리
-for (i in 1:nrow(synonymDic)){
-  targetDocIdx = which(ll <- grepl(synonymDic$originWord[i], parsedData))
-  for(j in 1:length(targetDocIdx)){
-    docNum = targetDocIdx[j]
-    parsedData[docNum] = gsub(synonymDic$originWord[i], synonymDic$changeWord[i], parsedData[docNum])
-  }
-}
+parsedData = synonym_processing(parsedVector = parsedData, synonymDic = synonymDic)
 
-## 단어간 스페이스 하나 더 추가하기 ##
-parsedData = gsub(" ","  ",parsedData)
-
-saveRDS(parsedData, "./raw_data/parsed_spam_data.RDS") #데이터셋 저장하기
-parsedData = readRDS("./raw_data/parsed_spam_data.RDS") #저장한 데이터셋 불러오기
+#Corpus에 doc_id를 추가하기 위한 데이터 프레임 만들기
+parsedData_df = data.frame(doc_id = seq(1:length(parsedData))
+                           ,text = parsedData)
 
 #Corpus 생성
-corp = VCorpus(VectorSource(parsedData))
+corp = VCorpus(DataframeSource(parsedData_df))
 
 #특수문자 제거
 corp = tm_map(corp, removePunctuation)
 
-#소문자로 변경
-corp = tm_map(corp, tolower)
 
 #특정 단어 삭제
 corp = tm_map(corp, removeWords, stopWordDic$stopword)
 
-#텍스트문서 형식으로 변환
-corp = tm_map(corp, PlainTextDocument)
+
+#corpus 저장
+saveRDS(corp, "./raw_data/corpus_spam.RDS")
+
 
 #Document Term Matrix 생성 (단어 Length는 2로 세팅)
 dtm = DocumentTermMatrix(corp, control=list(wordLengths=c(2,Inf)))
@@ -64,31 +55,31 @@ colnames(dtm) = trimws(colnames(dtm))
 dtm = dtm[,nchar(colnames(dtm)) > 1]
 
 #Sparse Terms 삭제
-dtm_removed = removeSparseTerms(dtm, as.numeric(0.98))
+dtm = removeSparseTerms(dtm, as.numeric(0.98))
 
 #Covert to Dataframe
-dtmDf = as.data.frame(as.matrix(dtm_removed))
+dtmDf = as.data.frame(as.matrix(dtm))
 
 #중복 Column 삭제
 dtmDf = dtmDf[,!duplicated(colnames(dtmDf))]
 
 
-# 2. 학습 데이터 준비하기 ------------------------------------------------------------------------------------
-#dtm에 정답지 붙이기(타겟변수 붙이기)
+# 2. 학습 데이터 준비하기 -----------------------------------------------------------------------------------------------------------------------------
+#DtmDf에 정답표 붙이기
 dtmDf$target = target_val$spam_yn
 
 #Traing Set, Test Set 만들기
 trainingSet = dtmDf[1:8000,] #Training 데이터 8,000개
 testSet = dtmDf[8001:nrow(dtmDf),] #Test 데이터 2,012개
 
-saveRDS(testSet, "./testSet.RDS")
-saveRDS(trainingSet, "./trainingSet.RDS")
+dtmDf$target
+tapply(dtmDf$target, dtmDf$target, length)
 
 # 타켓 변수 범주형타입으로 변경
 trainingSet$target = as.factor(trainingSet$target)
 
 
-# 3. Naive bayes 모델링 및 결과 확인 -----------------------------------------------------------------------------------
+# 3. Naive bayes 모델링 및 결과 확인 ---------------------------------------------------------------------------------------------------------------------
 nbModel = e1071::naiveBayes(target ~ .
                             ,data = trainingSet
                             ,fL=1)
@@ -114,13 +105,7 @@ newData = file_parser_r(path = "./raw_data/Blog_TestSet_Spam.xlsx"
                         ,korDicPath = "./dictionary/user_dictionary.txt")
 
 # 동의어 처리
-for (i in 1:nrow(synonymDic)){
-  targetDocIdx = which(ll <- grepl(synonymDic$originWord[i], newData))
-  for(j in 1:length(targetDocIdx)){
-    docNum = targetDocIdx[j]
-    newData[docNum] = gsub(synonymDic$originWord[i], synonymDic$changeWord[i], newData[docNum])
-  }
-}
+newData = synonym_processing(parsedVector = newData, synonymDic = synonymDic)
 
 ## 단어간 스페이스 하나 더 추가하기 ##
 newData = gsub(" ","  ", newData)
@@ -131,17 +116,12 @@ newCorp = VCorpus(VectorSource(newData))
 #특수문자 제거
 newCorp = tm_map(newCorp, removePunctuation)
 
-#소문자로 변경
-corp = tm_map(corp, tolower)
-
 #특정 단어 삭제
 newCorp = tm_map(newCorp, removeWords, stopWordDic$stopword)
 
-#텍스트문서 형식으로 변환
-newCorp = tm_map(newCorp, PlainTextDocument)
-
 #Document Term Matrix 생성 (단어 Length는 2로 세팅)
 newDtm = DocumentTermMatrix(newCorp, control=list(removeNumbers=FALSE, wordLengths=c(2,Inf)))
+
 
 ## 한글자 단어 제외하기 ##
 colnames(newDtm) = trimws(colnames(newDtm))

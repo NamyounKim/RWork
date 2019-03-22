@@ -25,34 +25,22 @@ synonymDic = read_csv("./dictionary/synonym.csv")
 # 1. Text Pre-processing ---------------------------------------------------------------------------------------
 
 # 동의어 처리
-for (i in 1:nrow(synonymDic)){
-  targetDocIdx = which(ll <- grepl(synonymDic$originWord[i], parsedData))
-  for(j in 1:length(targetDocIdx)){
-    docNum = targetDocIdx[j]
-    parsedData[docNum] = gsub(synonymDic$originWord[i], synonymDic$changeWord[i], parsedData[docNum])
-  }
-}
+parsedData = synonym_processing(parsedVector = parsedData, synonymDic = synonymDic)
 
-## 단어간 스페이스 하나 더 추가하기 ##
-parsedData = gsub(" ","  ",parsedData)
+#Corpus에 doc_id를 추가하기 위한 데이터 프레임 만들기
+parsedData_df = data.frame(doc_id = seq(1:length(parsedData))
+                           ,text = parsedData)
 
 #Corpus 생성
-corp = VCorpus(VectorSource(parsedData))
+corp = VCorpus(DataframeSource(parsedData_df))
 
 #특수문자 제거
 corp = tm_map(corp, removePunctuation)
 
-#소문자로 변경
-corp = tm_map(corp, tolower)
 
 #특정 단어 삭제
 corp = tm_map(corp, removeWords, stopWordDic$stopword)
 
-#텍스트문서 형식으로 변환
-corp = tm_map(corp, PlainTextDocument)
-
-#텍스트문서 형식으로 변환
-corp = tm_map(corp, PlainTextDocument)
 
 #Document Term Matrix 생성 (단어 Length는 2로 세팅)
 dtm = DocumentTermMatrix(corp, control=list(wordLengths=c(2,Inf)))
@@ -71,7 +59,7 @@ dtmDf = as.data.frame(as.matrix(dtm))
 dtmDf = dtmDf[,!duplicated(colnames(dtmDf))]
 
 
-# 2. 학습 데이터 준비하기 ---------------------------------------------------------------------------------------
+# 2. 학습 데이터 준비하기 ------------------------------------------------------------------------------------------
 #DtmDf에 정답표 붙이기
 dtmDf$target = target_val$spam_yn
 
@@ -86,7 +74,7 @@ tapply(dtmDf$target, dtmDf$target, length)
 trainingSet$target = as.factor(trainingSet$target)
 
 
-# 3. SVM 모델링 및 결과 확인 -----------------------------------------------------------------------------------
+# 3. SVM 모델링 및 결과 확인 ----------------------------------------------------------------------------------------
 svmModel = svm(target ~ . 
                , data = trainingSet
                , type = "C-classification"
@@ -94,7 +82,7 @@ svmModel = svm(target ~ .
                , gamma=0.1
                , cost=1)
 
-svmModel = readRDS("./Week_7/svm_model_181017.RDS") # 미리 저장해놓은 모델 불러오기
+svmModel = readRDS("./Week_7/svm_model.RDS") # 미리 저장해놓은 모델 불러오기
 
 #Spam 문서 예측하기
 svmPred =  predict(svmModel, newdata = testSet[,1:(ncol(testSet)-1)])
@@ -117,13 +105,7 @@ newData = file_parser_r(path = "./raw_data/Blog_TestSet_Spam.xlsx"
                         ,korDicPath = "./dictionary/user_dictionary.txt")
 
 # 동의어 처리
-for (i in 1:nrow(synonymDic)){
-  targetDocIdx = which(ll <- grepl(synonymDic$originWord[i], newData))
-  for(j in 1:length(targetDocIdx)){
-    docNum = targetDocIdx[j]
-    newData[docNum] = gsub(synonymDic$originWord[i], synonymDic$changeWord[i], newData[docNum])
-  }
-}
+newData = synonym_processing(parsedVector = newData, synonymDic = synonymDic)
 
 ## 단어간 스페이스 하나 더 추가하기 ##
 newData = gsub(" ","  ", newData)
@@ -134,16 +116,8 @@ newCorp = VCorpus(VectorSource(newData))
 #특수문자 제거
 newCorp = tm_map(newCorp, removePunctuation)
 
-#소문자로 변경
-corp = tm_map(corp, tolower)
-
 #특정 단어 삭제
 newCorp = tm_map(newCorp, removeWords, stopWordDic$stopword)
-
-#===============================================
-
-#텍스트문서 형식으로 변환
-newCorp = tm_map(newCorp, PlainTextDocument)
 
 #Document Term Matrix 생성 (단어 Length는 2로 세팅)
 newDtm = DocumentTermMatrix(newCorp, control=list(removeNumbers=FALSE, wordLengths=c(2,Inf)))

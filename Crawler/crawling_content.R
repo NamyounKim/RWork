@@ -15,7 +15,7 @@ petitionList$doc_id = str_extract(petitionList$link, pattern = "[0-9]{5,10}")
 
 # content 가져오기
 petition_content = data.frame(doc_id=as.character(), title=as.character(), content=as.character(), startDate=as.character(), endDate=as.character(), agreeCount=as.numeric())
-for(i in 1:nrow(petitionList)){
+for(i in 6315:nrow(petitionList)){
   #for(i in 1:10){
   print(i)
   
@@ -40,6 +40,8 @@ for(i in 1:nrow(petitionList)){
   # 날짜 가져오기
   startDate = read_html_result %>% html_nodes(xpath = "//*[@id=\"cont_view\"]/div/div[1]/div/div[1]/div/div[2]/ul/li[2]/text()") %>% html_text()
   endDate = read_html_result %>% html_nodes(xpath = "//*[@id=\"cont_view\"]/div/div[1]/div/div[1]/div/div[2]/ul/li[3]/text()") %>% html_text()
+  
+  if(length(startDate) == 0){next}
   
   # 동의수
   agreeCount = read_html_result %>% html_node(xpath = "//*[@id=\"cont_view\"]/div/div[1]/div/div[1]/div/h2/span") %>% html_text()

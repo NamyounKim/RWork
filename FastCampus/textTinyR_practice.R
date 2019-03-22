@@ -32,9 +32,14 @@ for(i in 1:length(corp)){
   documents[i] = corp[[i]]$content
 }
 
-res = fastTextR::fasttext(input = "../FastCampus/Week_5/trainTxt.txt"
-                          ,method = "skipgram"
-                          ,control = ft.control(window_size = 6, word_vec_size = 100, nthreads = 6, min_count = 10, min_ngram = 2))
+res = fastTextR::fasttext(input = "./Week_5/trainTxt.txt", method = "skipgram"
+                          , control = ft.control(word_vec_size = 100
+                                                 ,window_size = 6
+                                                 ,min_ngram = 2))
+
+fastTextR::get_words(res)
+temp = fastTextR::get_word_vectors(res, get_words(res))
+dim(temp)
 
 textTinyR::
 

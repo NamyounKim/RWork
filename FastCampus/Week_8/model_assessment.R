@@ -10,10 +10,10 @@ library(klaR)
 library(readr)
 install.packages("pROC")
 
-saveRDS(svmModel, "./파일경로/파일명.rds")
-svmModel = readRDS("./Week_7/svm_model_181017.RDS")
 
-testSet = readRDS("./testSet_copy.RDS")
+svmModel = readRDS("./Week_7/svm_model.RDS")
+testSet = readRDS("./Week_7/testSet.RDS")
+
 
 ## SVM 모델로 TestSet 예측하기. 이때 decision.values 옵셥을 주어 예측 결정값을 계산하다.
 svmPred =  predict(svmModel, newdata = testSet[,1:(ncol(testSet)-1)]
@@ -39,7 +39,7 @@ svm_pred_result$t[1,1] / (svm_pred_result$t[1,1] + svm_pred_result$t[1,2])
 svm_pred_result$t[2,2] / (svm_pred_result$t[2,2] + svm_pred_result$t[1,2])
 
 
-#### SVM 예측 모델의 ROC 커브 그려보기 ####
+#### SVM 예측 모델의 ROC 커브 그려보기 ------------------------------------------------------------------------------------------------------------------------------------
 install.packages("ROCR")
 library(ROCR)
 
@@ -62,12 +62,11 @@ unlist(svmAuc@y.values)
 plot(performance(svmPrediction, measure = "acc"))
 
 
-##### Naive Bayes 모델 ROC커브로 비교해보기 #####
-trainingSet = readRDS("./trainingSet.RDS")
-nbModel = e1071::naiveBayes(target ~ ., data = trainingSet, fL=1)
+##### Naive Bayes 모델 ROC커브로 비교해보기 ------------------------------------------------------------------------------------------------------------------------------------
+nbModel = readRDS("./Week_7/nb_model.RDS")
 
 #Spam 문서 예측 확률값 가져오기
-nbProbs =  predict(nbModel, newdata = testSet2[,1:(ncol(testSet2)-1)]
+nbProbs =  predict(nbModel, newdata = testSet[,1:(ncol(testSet)-1)]
                    ,type="raw")
 
 # ROC 값 구하기
@@ -88,9 +87,9 @@ unlist(nbAuc@y.values)
 plot(performance(nbPrediction, measure = "acc"))
 
 
-##### Random Forest 모델 ROC커브로 비교해보기 #####
+##### Random Forest 모델 ROC커브로 비교해보기 ------------------------------------------------------------------------------------------------------------------------------------
 #Spam 문서 예측 확률값 가져오기
-rfModel_caret = readRDS("./Week_7/rfModel_caret_181017.RDS")
+rfModel_caret = readRDS("./Week_7/rfModel_caret.RDS")
 rfPred =  predict(rfModel_caret, newdata = testSet[,1:(ncol(testSet)-1)]
                   ,type = "prob")
 

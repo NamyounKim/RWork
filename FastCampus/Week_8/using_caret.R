@@ -30,7 +30,7 @@ nbModel_caret = readRDS("./Week_8/nbModel_caret.RDS")
 #########################
 #---------- SVM --------#
 #########################
-grid = data.frame(.C=c(1, 2, 3, 10, 200)) # 비교할 Cost값을 입력한다.
+grid = data.frame(.C=c(0.1, 0.5, 1)) # 비교할 Cost값을 입력한다.
 
 svmModel_caret = train(target ~ .
                        , data=dtmDf
@@ -48,12 +48,12 @@ svmModel_caret = readRDS("./Week_8/svmModel_caret.RDS")
 #########################
 #---- Random Forest ----#
 #########################
-grid = data.frame(.mtry=c(32,33)) # 적정한 독립변수의 개수를 정한다. (전체 변수개수의 제곱근)
+grid = data.frame(.mtry=c(23, 33)) # 적정한 독립변수의 개수를 정한다. (전체 변수개수의 제곱근 근처값으로)
 
 rfModel_caret = train(target ~ ., data=dtmDf
                       ,method="parRF"
                       ,trControl=cvtrain
-                      ,ntree=200
+                      ,ntree=150
                       ,tuneGrid=grid
                       ,metric="ROC"
                       ,preProc=c("center", "scale"))
