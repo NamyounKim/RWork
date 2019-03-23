@@ -52,10 +52,10 @@ library(rJava)
 Sys.getenv("JAVA_HOME")
 
 #JAVA_HOME 설정 (윈도우 경우)
-Sys.setenv(JAVA_HOME="C:/Program Files/Java/jre1.8.0_121/")
+Sys.setenv(JAVA_HOME="C:/Program Files/Java/jre1.8.0_201/")
 
 #JAVA_HOME 설정 (MAC 경우)
-dyn.load('/Library/Java/JavaVirtualMachines/jdk1.8.0_121.jdk/Contents/Home/jre/lib/server/libjvm.dylib')
+dyn.load('/Library/Java/JavaVirtualMachines/jdk1.8.0_201.jdk/Contents/Home/jre/lib/server/libjvm.dylib')
 
   
 # 3. 파일 import, export ------------------------------------------------------------------------------------------------
@@ -76,10 +76,10 @@ save.image("./totalData.RDATA")
 load("./totalData.RDATA")
 
 #특정 변수(데이터Set) 하나만 RDS 형식으로 저장하기
-saveRDS(데이터Set, "저장하고자 하는 위치와 파일명")
+saveRDS(date_set, "저장하고자 하는 위치와 파일명")
 
 #저장한 변수(데이터Set) 읽어오기
-svmModel = readRDS("읽어오고자 하는 파일명")
+data_set = readRDS("읽어오고자 하는 파일명")
 
 
 

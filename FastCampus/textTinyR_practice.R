@@ -4,31 +4,18 @@ library(fastTextR)
 library(NLP4kec)
 library(tm)
 library(reticulate)
-# 1. 원문 데이터 및 사전 불러오기 ----------------------------------------------------------------------------------------------------
-textData = readRDS("./raw_data/petitions_content_2018.RDS")
+
+
+parsedData_df = readRDS("./raw_data/parsed_petition_data.RDS")
 
 #동의어 / 불용어 사전 불러오기
 stopWordDic = read_csv("./dictionary/stopword_ko.csv")
 synonymDic = read_csv("./dictionary/synonym.csv")
 
-# 2. 형태소 분석 및 전처리------------------------------------------------------------------------------------------------------------
-#형태소 분석기 실행하기
-#명사, 동사, 형용사만 추출
-parsedData = r_parser_r(textData$content, language = "ko", useEn = T, korDicPath = "./dictionary/user_dictionary.txt")
-
-
-# 동의어 처리
-for (i in 1:nrow(synonymDic)){
-  targetDocIdx = which(ll <- grepl(synonymDic$originWord[i], parsedData))
-  for(j in 1:length(targetDocIdx)){
-    docNum = targetDocIdx[j]
-    parsedData[docNum] = gsub(synonymDic$originWord[i], synonymDic$changeWord[i], parsedData[docNum])
-  }
-}
-saveRDS(parsedData, file = "./raw_data/parsed_data.RDS") # 나중 재사용을 위해 저장
 
 #Corpus 생성
-corp = VCorpus(VectorSource(parsedData))
+corp = VCorpus(DataframeSource(parsedData_df))
+
 
 #특수문자 제거
 corp = tm_map(corp, removePunctuation)
@@ -36,28 +23,27 @@ corp = tm_map(corp, removePunctuation)
 #숫자 삭제
 corp = tm_map(corp, removeNumbers)
 
-#소문자로 변경
-corp = tm_map(corp, tolower)
-
 #특정 단어 삭제
 corp = tm_map(corp, removeWords, stopWordDic$stopword)
 
-#텍스트문서 형식으로 변환
-corp = tm_map(corp, PlainTextDocument)
 
-parsed_content = vector(length = length(corp), mode = "character")
+documents = vector(length = length(corp), mode = "character")
 for(i in 1:length(corp)){
-  parsed_content[i] = corp[[i]]$content
+  documents[i] = corp[[i]]$content
 }
-textData$parsed_content = parsed_content
-readr::write_csv(textData, "./petitions_content_2018.csv")
 
+res = fastTextR::fasttext(input = "./Week_5/trainTxt.txt", method = "skipgram"
+                          , control = ft.control(word_vec_size = 100
+                                                 ,window_size = 6
+                                                 ,min_ngram = 2))
 
-parsed_content_py = r_to_py(parsed_content)
+fastTextR::get_words(res)
+temp = fastTextR::get_word_vectors(res, get_words(res))
+dim(temp)
 
-parsed_content_py
+textTinyR::
 
-clust_vec = textTinyR::tokenize_transform_vec_docs(object = concat, as_token = T,
+clust_vec = textTinyR::tokenize_transform_vec_docs(object = documents, as_token = T,
                                                    to_lower = T, 
                                                    remove_punctuation_vector = F,
                                                    remove_numbers = F, 

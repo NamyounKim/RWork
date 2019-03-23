@@ -8,14 +8,14 @@ library(dplyr)
 library(data.table)
 
 # 동의수가 100이상인 청원글만 선별
-petitionList = petitionList_2018 %>% filter(agree_count >= 100)
+petitionList = petitionList_14058 %>% filter(agree_count >= 100)
 
 #문서ID
 petitionList$doc_id = str_extract(petitionList$link, pattern = "[0-9]{5,10}")
 
 # content 가져오기
 petition_content = data.frame(doc_id=as.character(), title=as.character(), content=as.character(), startDate=as.character(), endDate=as.character(), agreeCount=as.numeric())
-for(i in 1:nrow(petitionList)){
+for(i in 6315:nrow(petitionList)){
   #for(i in 1:10){
   print(i)
   
@@ -41,6 +41,8 @@ for(i in 1:nrow(petitionList)){
   startDate = read_html_result %>% html_nodes(xpath = "//*[@id=\"cont_view\"]/div/div[1]/div/div[1]/div/div[2]/ul/li[2]/text()") %>% html_text()
   endDate = read_html_result %>% html_nodes(xpath = "//*[@id=\"cont_view\"]/div/div[1]/div/div[1]/div/div[2]/ul/li[3]/text()") %>% html_text()
   
+  if(length(startDate) == 0){next}
+  
   # 동의수
   agreeCount = read_html_result %>% html_node(xpath = "//*[@id=\"cont_view\"]/div/div[1]/div/div[1]/div/h2/span") %>% html_text()
   agreeCount = str_replace_all(agreeCount, ",","")
@@ -53,4 +55,4 @@ for(i in 1:nrow(petitionList)){
 
 petition_content_not_dup =petition_content[!duplicated(petition_content$doc_id),]
 petition_content_not_dup = merge(petitionList, petition_content_not_dup, by = "doc_id")
-saveRDS(petition_content_not_dup, "./petitions_content_2018.RDS")
+saveRDS(petition_content_not_dup, "./petitions_content_2019.RDS")

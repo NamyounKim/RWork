@@ -19,6 +19,7 @@ corp = readRDS("./raw_data/corpus_petition.RDS")
 dtmW = DocumentTermMatrix(corp, control=list(wordLengths=c(2,Inf),
                                              weighting = function(x) weightTfIdf(x, normalize = TRUE))) #Tf-Idf 가중치 주기
 
+
 ## 단어 양옆 스페이스 제거 및 한글자 단어 제외하기
 colnames(dtmW) = trimws(colnames(dtmW))
 dtmW = dtmW[,nchar(colnames(dtmW)) > 1]
