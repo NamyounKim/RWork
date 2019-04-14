@@ -1,23 +1,28 @@
 
-install.packages("keras")
-
+#install.packages("keras")
+Sys.setenv(RETICULATE_PYTHON = "/Users/kimnamyoun/.virtualenvs/r-tensorflow/bin/python")
 library(keras)
 library(reticulate)
 library(purrr)
 
+#install_keras(conda = auto) # keras 설치
 
-use_python("/anaconda3/bin/python")
 py_config()
 py_discover_config()
 
-install_keras() # keras 설치
+
+#use_condaenv("r-tensorflow", required = TRUE)
+py_run_string("import numpy")
+
+
+
 reticulate::py_install(packages = "keras")
 reticulate::py_install(packages = "numpy")
 reticulate::py_numpy_available()
 
+is_keras_available()
 
-
-parsed_corp = readRDS("./raw_data/corpus_petition.RDS")
+parsed_corp = readRDS("./data/corpus_petition.RDS")
 
 parsed_text = NULL
 for(i in 1:length(parsed_corp$content)){
@@ -41,7 +46,8 @@ length(parsed_text)
 
 
 skipgrams_generator <- function(text, tokenizer, window_size, negative_samples) {
-  gen <- texts_to_sequences_generator(tokenizer, sample(text))
+  #gen <- texts_to_sequences_generator(tokenizer, sample(text))
+  gen <- texts_to_sequences_generator(tokenizer, sample(parsed_text))
   function() {
     skip <- generator_next(gen) %>%
       skipgrams(
@@ -124,7 +130,7 @@ find_similar_words <- function(word, embedding_matrix, n = 5) {
   
   similarities[,1] %>% sort(decreasing = TRUE) %>% head(n)
 }
-find_similar_words("지진", embedding_matrix, n = 100)
+find_similar_words("어린이집", embedding_matrix, n = 100)
 
 temp =  sim2(embedding_matrix['포항', ,drop =F], y = embedding_matrix['지진', ,drop =F] , method = "cosine", norm = "l2")
 dim(temp)

@@ -4,7 +4,7 @@ install.packages("dplyr")
 install.packages("readr") #파일을 읽어오기 위한 패키지
 
 # JAVA_HOME 경로 설정
-Sys.setenv(JAVA_HOME = "c:/Program Files/JAVA/jre1.8.0_161")
+# Sys.setenv(JAVA_HOME = "c:/Program Files/JAVA/jre1.8.0_161")
 library(tm)
 library(slam)
 library(dplyr)

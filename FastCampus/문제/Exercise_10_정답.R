@@ -1,4 +1,5 @@
-
+library(dplyr)
+library(ggplot2)
 # 원문 데이터 가져오기
 textData = readRDS(file = "./raw_data/petitions_content_2018.RDS")
 categoryData = readRDS(file = "./raw_data/petitions_category_name_2018.RDS")
@@ -23,7 +24,9 @@ temp = textData_join %>% group_by(start_date) %>% summarise(doc_n=n())
 ggplot(temp, aes(x=start_date, y=doc_n, group = 1)) + geom_line()
 
 #문제6) 카테고리별 문서개수 구하고, Bar차트로 그리기
-textData_join %>% group_by(category_name) %>% summarise(doc_n=n())
+temp = textData_join %>% group_by(category_name) %>% summarise(doc_n=n())
+ggplot(temp, aes(x=category_name, y=doc_n)) + geom_bar(stat = "identity")
+
 
 #문제7) 동의수가 높은순으로 10개 문서의 문서id, 제목, 동의수 컬럼만 가져오기
 textData_join %>% arrange(-agree_count) %>% select(doc_id, title, agree_count) %>% head(10)
