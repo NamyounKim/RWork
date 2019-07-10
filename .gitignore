@@ -57,3 +57,5 @@ HouseKeepingBook/.Rhistory
 FastCampus/Week_5/tf_word_name.tsv
 FastCampus/Week_5/tf_word_vector.tsv
 *.pper
+
+keras_pratice/data/*
