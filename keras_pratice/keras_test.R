@@ -1,6 +1,7 @@
 
 #install.packages("keras")
-Sys.setenv(RETICULATE_PYTHON = "/Users/kimnamyoun/.virtualenvs/r-tensorflow/bin/python")
+#Sys.setenv(RETICULATE_PYTHON = "/Users/kimnamyoun/.virtualenvs/r-tensorflow/bin/python")
+Sys.setenv(RETICULATE_PYTHON = "/Users/kakao/anaconda3/bin/python")
 library(keras)
 library(reticulate)
 library(purrr)

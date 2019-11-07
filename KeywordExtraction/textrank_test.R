@@ -22,8 +22,6 @@ keywords <- textrank_keywords(joboffer$lemma,
 subset(keywords$keywords, ngram > 1)
 
 
-
-
 #----------------------------------------------------------------------------------------------------------------------------
 doc_sample = read_file("./sample/doc3")
 
@@ -52,3 +50,9 @@ subset(keywords$keywords, ngram > 2)
 
 subset(keywords$keywords, ngram > 1)
 textrank::textrank_sentences()
+
+#--------------------------------------------
+textData = readRDS("/Users/kakao/Documents/GitHub/RWork/FastCampus/raw_data/petitions_content_2018.RDS")
+
+sentences = unlist(stri_split_lines(textData$content[1]))
+sentences
