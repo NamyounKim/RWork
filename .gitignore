@@ -59,4 +59,4 @@ FastCampus/Week_5/tf_word_vector.tsv
 *.pper
 
 keras_pratice/data/*
-KeywordExtraction/sample/180801.tsv
+KeywordExtraction/sample/*
