@@ -12,14 +12,16 @@ ggplot(monthly_exp_category, aes(x=category1, y=totalExpenditure, fill = categor
 
 
 # 동월 비교 ----------------------------------------------
-target_month = '10'
+target_month = '03'
 
 temp = accountBook %>% 
   filter(substr(accountBook$yearMonth, start = 6, stop = 7) == target_month) %>% 
   group_by(yearMonth) %>% 
   summarise(totalExpenditure = sum(totalExpenditure))
 
-ggplot(temp, aes(x=yearMonth, y = totalExpenditure)) + geom_bar(stat = "identity")+ scale_y_continuous(labels = point)
+ggplot(temp, aes(x=yearMonth, y = totalExpenditure)) + 
+  geom_bar(stat = "identity")+ 
+  scale_y_continuous(labels = point) + th
 
 
 # 각 월별로 Boxplot 및 라인 ----------------------------------------------
@@ -49,7 +51,9 @@ temp = accountBook %>% group_by(year) %>% summarise(totalIncome = sum(totalIncom
 ggplot(temp, aes(x=year, y = totalMonthIncome, label = round(totalMonthIncome, 1))) + geom_bar(stat = "identity")+ 
          scale_y_continuous(labels = point, limits = c(0,12000000)) + geom_text()
 
-ggplot(temp, aes(x=year, y = totalIncome, label = round(totalIncome, 1))) + geom_bar(stat = "identity")+ 
-  scale_y_continuous(labels = point, limits = c(0,120000000)) + geom_text()
+ggplot(temp, aes(x=year, y = totalIncome, label = point(round(totalIncome, 1)))) + 
+  geom_bar(stat = "identity") + 
+  geom_text(size = 3, vjust = -0.1) +
+  scale_y_continuous(labels = point, limits = c(0,120000000))
 
        
