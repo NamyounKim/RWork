@@ -60,3 +60,14 @@ FastCampus/Week_5/tf_word_vector.tsv
 
 keras_pratice/data/*
 KeywordExtraction/sample/*
+HDC_MaintenanceVOC/raw_data/*
+HDC_textmining_project/excel_data/AS관리 목록2010_발송용(완료).xlsx
+HDC_textmining_project/excel_data/AS관리 목록2011_발송용(완료).xlsx
+HDC_textmining_project/excel_data/AS관리 목록2012-상반기_발송용(완료).xlsx
+HDC_textmining_project/excel_data/AS관리 목록2012-하반기_발송용(완료).xlsx
+HDC_textmining_project/excel_data/AS관리 목록2013-상반기_발송용(완료).xlsx
+HDC_textmining_project/excel_data/AS관리 목록2013-하반기_발송용(완료).xlsx
+HDC_textmining_project/excel_data/AS관리 목록2014-상반기_발송용(완료).xlsx
+HDC_textmining_project/excel_data/AS관리 목록2014-하반기_발송용(완료).xlsx
+HDC_textmining_project/excel_data/AS관리 목록2015-상반기_발송용(완료).xlsx
+HDC_textmining_project/excel_data/AS관리 목록2015-하반기_발송용(완료).xlsx

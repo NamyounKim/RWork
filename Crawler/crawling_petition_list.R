@@ -16,13 +16,16 @@ petitionList_2019 = data.table(link=as.character(), category=as.character(), agr
 for(i in 1:list_n){
   Sys.sleep(runif(1,1,5))
   print(i)
-  url = paste0("https://www1.president.go.kr/petitions?only=finished&page=",i)
+  #url = paste0("https://www1.president.go.kr/petitions?only=finished&page=",i)
+  url = paste0("https://www1.president.go.kr/petitions?page=1&c=0&only=0&order=1")
   
   read_url_result = read_html(url)
   
-  temp  =read_url_result %>% html_nodes(xpath = "//*[@id=\"cont_view\"]/div[2]/div/div/div[2]/div[2]/div[4]/div/div[2]")
+  temp  =read_url_result %>% html_nodes(xpath = "/html/body")
   temp
   temp[[1]] %>% html_nodes("div") %>% html_nodes("div") %>% html_nodes("div.bl_subject")
+  /html/body/div[2]/div[2]/section[2]/div[2]/div/div/div[1]/div[3]/div/div[2]/div[2]/ul/li[1]/div/div[2]/a
+  //*[@id="cont_view"]/div[2]/div/div/div[1]/div[3]/div/div[2]/div[2]/ul/li[1]/div/div[2]/a
   
   //*[@id="cont_view"]/div[2]/div/div/div[2]/div[2]/div[4]/div/div[2]/div[2]/ul/li[1]
   
