@@ -9,8 +9,11 @@ require(dplyr)
 require(reshape)
 library(readxl)
 
-expenditureFileList = list.files("./dataFile/expenditure/")
-incomeFileList = list.files("./dataFile/income/")
+#expenditureFileList = list.files("./dataFile/expenditure/")
+#incomeFileList = list.files("./dataFile/income/")
+expenditureFileList = list.files("~/Library/Mobile Documents/com~apple~CloudDocs/개인용/dataFile/expenditure/")
+incomeFileList = list.files("~/Library/Mobile Documents/com~apple~CloudDocs/개인용/dataFile/income/")
+data_dir_path = "~/Library/Mobile Documents/com~apple~CloudDocs/개인용/dataFile"
 
 filePreProcessing = function(expenditurFile, incomeFile){
   
@@ -19,7 +22,7 @@ filePreProcessing = function(expenditurFile, incomeFile){
   income = NULL
   
   for(i in 1:length(expenditureFileList)){
-    expenditureTemp = read_xls(paste0("./dataFile/expenditure/",expenditureFileList[i]), sheet = 1)
+    expenditureTemp = read_xls(paste0(data_dir_path,"/expenditure/",expenditureFileList[i]), sheet = 1)
     headName = t(expenditureTemp[3,])
     headName = headName[,1]
     expenditureTemp = expenditureTemp[4:(nrow(expenditureTemp)-4),]
@@ -36,7 +39,7 @@ filePreProcessing = function(expenditurFile, incomeFile){
   }
   
   for(i in 1:length(incomeFileList)){
-    incomeTemp = read_xls(paste0("./dataFile/income/",incomeFileList[i]), sheet =  1)
+    incomeTemp = read_xls(paste0(data_dir_path,"/income/",incomeFileList[i]), sheet =  1)
     headName = t(incomeTemp[3,])
     headName = headName[,1]
     incomeTemp = incomeTemp[4:(nrow(incomeTemp)-1),]
