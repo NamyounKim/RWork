@@ -15,7 +15,7 @@ expenditureFileList = list.files("~/Library/Mobile Documents/com~apple~CloudDocs
 incomeFileList = list.files("~/Library/Mobile Documents/com~apple~CloudDocs/개인용/dataFile/income/")
 data_dir_path = "~/Library/Mobile Documents/com~apple~CloudDocs/개인용/dataFile"
 
-filePreProcessing = function(expenditurFile, incomeFile){
+filePreProcessing <- function(expenditurFile, incomeFile){
   
   expenditure = NULL
   save = NULL
@@ -58,6 +58,10 @@ filePreProcessing = function(expenditurFile, incomeFile){
   expenditure$category1 = stri_split_fixed(expenditure$분류,">",simplify = TRUE)[,1]
   expenditure$category2 = stri_split_fixed(expenditure$분류,">",simplify = TRUE)[,2]
   
+  credit_amount = expenditure %>% filter(category1 == "카드대금") 
+  credit_amount = credit_amount %>% select(날짜, year, yearMonth, category1, category2, detail, 현금, 카드, 카드분류, totalExpend)
+  colnames(credit_amount) = c("날짜", "year", "yearMonth", "category1", "category2", "detail", "현금", "카드", "카드분류", "total")
+  
   expenditure = expenditure %>% filter(category1 != "카드대금")
   expenditure = expenditure %>% select(날짜, year, yearMonth, category1, category2, detail, 현금, 카드, 카드분류, totalExpend)
   colnames(expenditure) = c("날짜", "year", "yearMonth", "category1", "category2", "detail", "현금", "카드", "카드분류", "total")
@@ -86,12 +90,15 @@ filePreProcessing = function(expenditurFile, incomeFile){
   income$type = "income"
   
   binded_data = rbind(expenditure, save, income)
-  binded_data$category2 = paste(binded_data$category1, "_", binded_data$category2)
-  return(binded_data)
+  binded_data$category2 = paste0(binded_data$category1, "_", binded_data$category2)
+  return(list(binded_data, credit_amount))
 }
 
-accountBook = filePreProcessing(expenditureFileList, incomeFileList)
-accountBook = dcast(accountBook, 날짜+year+yearMonth+category1+category2+detail+현금+카드+카드분류+total+type ~ type, fun.aggregate = sum, value.var = "total", fill = 0)
+processing_result = filePreProcessing(expenditureFileList, incomeFileList)
+accountBook = processing_result[[1]]
+credit_amount = processing_result[[2]]
+
+accountBook = reshape2::dcast(accountBook, 날짜+year+yearMonth+category1+category2+detail+현금+카드+카드분류+total+type ~ type, fun.aggregate = sum, value.var = "total", fill = 0)
 colnames(accountBook)[12:14] = c("totalExpenditure", "totalIncome","totalSave")
 
 write.csv(accountBook, "./accountBook.csv",row.names = F)
