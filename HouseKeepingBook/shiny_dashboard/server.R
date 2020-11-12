@@ -19,7 +19,10 @@ accountBook$month_id = substr(accountBook$yearMonth, 6,7)
 except_life_category = c("세금/이자_세금", "세금/이자_대출이자", "건강/문화_보장성보험","세금/이자_기타")
 all_month = c('01','02','03','04','05','06','07','08','09','10','11','12')
 
-#트렌드 차트 만들기
+c_year = as.numeric(substr(Sys.Date(), 1, 4))
+all_year = seq(2010, c_year, 1)
+
+#트렌드 차트 만들기 -----------------
 year_trend = accountBook %>% 
   group_by(yearMonth) %>% 
   summarise(t_income = sum(totalIncome)
@@ -45,17 +48,52 @@ year_trend_melt$year = substr(year_trend_melt$yearMonth, 1, 4)
 
 # 공통 함수 ------------------------------------------------------------------------------------------------------------------------------------------------------------
 get_input_ym <- function(year_val, month_val){
-  if(month_val == 'All'){
+  if(year_val == 'All' & month_val == 'All'){
+    input_ym = apply(expand.grid(all_year, all_month), 1, paste0, collapse = "-")
+  }else if(month_val == 'All'){
     input_ym = paste0(year_val, "-", all_month)
+  }else if(year_val == 'All'){
+    input_ym = paste0(all_year, "-", month_val)
   }else{
     input_ym = paste0(year_val, "-", month_val)
   }
+  
   return(input_ym)
 }
 
 
 # shiny server ---------------------------------------------------------------------------------------------------------------------------------------------------------------------
 shinyServer(function(input, output, session){
+  
+  #가공 테이블 결과 담는 객체
+  result_obj <- reactiveValues(monthly_exp_cat = NULL, monthly_income_cat = NULL)
+  
+  #가공 테이블 결과 업데이트 (년월 선택시)
+  get_etl_result <- observeEvent(c(input$year_id, input$month_id), {
+    input_ym = get_input_ym(input$year_id, input$month_id)
+    
+    #지출 카테고리2별 집계
+    monthly_exp_cat2 = accountBook[yearMonth %in% input_ym & type == 'expenditure'] %>% 
+      group_by(category2) %>% 
+      summarise(totalExpenditure = sum(totalExpenditure)) %>%
+      mutate(expenditure_ratio = totalExpenditure/sum(totalExpenditure)) %>%
+      arrange(-totalExpenditure) %>% as.data.table()
+    
+    
+    #수입 카테고리별 집계
+    monthly_income_cat = accountBook[yearMonth %in% input_ym & type == 'income'] %>% 
+      group_by(category2) %>% 
+      summarise(total_income = sum(totalIncome)) %>%
+      mutate(income_ratio = total_income/sum(total_income)) %>%
+      arrange(-total_income) %>% as.data.table()
+    
+    
+    # 객쳐에 담기 
+    result_obj$monthly_exp_cat = monthly_exp_cat2
+    result_obj$monthly_income_cat = monthly_income_cat
+    
+  })
+  
   output$value1 <- renderValueBox({
     
     input_ym = get_input_ym(input$year_id, input$month_id)
@@ -123,36 +161,45 @@ shinyServer(function(input, output, session){
     
   })
   
+  # 지출 카테고리별 금액 테이블 ---------------------------------------------------------------------------------------------------------------------------------
   output$table1 <- renderDataTable({
     
+    temp = result_obj$monthly_exp_cat
+    temp$expenditure_ratio = percent(temp$expenditure_ratio, accuracy = 0.1)
+    temp$totalExpenditure = formatC(temp$totalExpenditure, digits=0, format="f", big.mark=',')
+    
+    return(temp)
+    
+  }, selection = list(mode = 'single', selected = c(1)),
+    option=list(columnDefs=list(list(targets=2:3, class="dt-right")), searching = FALSE))
+  
+  
+  # 지출 상세 내역 테이블 ---------------------------------------------------------------------------------------------------------------------------------
+  output$detail_table <- renderDataTable({
+    
     input_ym = get_input_ym(input$year_id, input$month_id)
     
-    monthly_exp_cat2 = accountBook[yearMonth %in% input_ym & type == 'expenditure'] %>% 
-      group_by(category2) %>% 
-      summarise(totalExpenditure = sum(totalExpenditure)) %>%
-      mutate(expenditure_ratio = totalExpenditure/sum(totalExpenditure)) %>%
-      arrange(-totalExpenditure)
+    exp_dt = result_obj$monthly_exp_cat
+    select_cate = exp_dt[input$table1_rows_selected]$category2
+
+    detail_expenditure = accountBook[yearMonth %in% input_ym & type == 'expenditure' & category2 == select_cate]
     
-    monthly_exp_cat2$expenditure_ratio = percent(monthly_exp_cat2$expenditure_ratio, accuracy = 0.1)
-    monthly_exp_cat2$totalExpenditure = formatC(monthly_exp_cat2$totalExpenditure, digits=0, format="f", big.mark=',')
+    detail_expenditure = detail_expenditure[,.(날짜, category1, category2, detail, totalExpenditure)]
+    detail_expenditure$totalExpenditure = formatC(detail_expenditure$totalExpenditure, digits=0, format="f", big.mark=',')
     
-    return(monthly_exp_cat2)
+    return(detail_expenditure)
     
-  }, option=list(columnDefs=list(list(targets=2:3, class="dt-right")), searching = FALSE))
+  }, selection = list(mode = 'none'),
+  option=list(columnDefs=list(list(targets=5, class="dt-right")), searching = FALSE))
   
+  # 지출 카테고리별 막대바 ---------------------------------------------------------------------------------------------------------------------------------
   output$chart1 <- renderPlotly({
     
-    input_ym = get_input_ym(input$year_id, input$month_id)
-    
-    monthly_exp_cat2 = accountBook[yearMonth %in% input_ym & type == 'expenditure'] %>% 
-      group_by(category2) %>% 
-      summarise(totalExpenditure = sum(totalExpenditure)) %>%
-      mutate(expenditure_ratio = totalExpenditure/sum(totalExpenditure)) %>%
-      arrange(-totalExpenditure)
+    temp = result_obj$monthly_exp_cat
     
     p = 
-    ggplot(monthly_exp_cat2, aes(x = reorder(category2, totalExpenditure), y = totalExpenditure)) + 
-      geom_bar(stat = "identity", ) + coord_flip() +
+    ggplot(temp, aes(x = reorder(category2, totalExpenditure), y = totalExpenditure)) + 
+      geom_bar(stat = "identity") + coord_flip() +
       geom_text(aes(label = percent(expenditure_ratio, accuracy = 0.1)), hjust = 0.5) +
       scale_y_continuous(labels = point) +
       labs(x = "지출 카테고리", y = "지출액") +
@@ -170,32 +217,26 @@ shinyServer(function(input, output, session){
   
   output$table2 <- renderDataTable({
     
-    input_ym = get_input_ym(input$year_id, input$month_id)
-    
-    monthly_income_cat = accountBook[yearMonth %in% input_ym & type == 'income'] %>% 
-      group_by(category2) %>% 
-      summarise(total_income = sum(totalIncome)) %>%
-      mutate(income_ratio = total_income/sum(total_income)) %>%
-      arrange(-total_income)
-    
-    monthly_income_cat$income_ratio = percent(monthly_income_cat$income_ratio, accuracy = 0.1)
-    monthly_income_cat$total_income = formatC(monthly_income_cat$total_income, digits=0, format="f", big.mark=',')
-    
-    return(monthly_income_cat)
+    temp = result_obj$monthly_income_cat
+    temp$income_ratio = percent(temp$income_ratio, accuracy = 0.1)
+    temp$total_income = formatC(temp$total_income, digits=0, format="f", big.mark=',')
+
+    return(temp)
     
   }, option=list(columnDefs=list(list(targets=2:3, class="dt-right")), searching = FALSE))
   
   # Tab2. 트랜드 분석
   output$trend_chart1 <- renderPlotly({
     
-    print(year_trend_melt)
-    trend_dt = year_trend_melt[year %in% input$t2_year_id]
+    year_range = seq(input$year_slider[1], input$year_slider[2], 1)
+    
+    trend_dt = year_trend_melt[year %in% year_range]
     
     p = 
       ggplot(trend_dt[trend_type %in% c('t_income','my_income','t_exp','life_exp','t_save')], aes(x = yearMonth, y = trend_value, group = trend_type, color = trend_type)) + 
       geom_line() +
       geom_point() +
-      scale_y_continuous(labels = point, breaks = seq(0, 50000000, 1000000)) +
+      scale_y_continuous(labels = point, breaks = breaks_extended(n = 10)) +
       labs(x = "년월", y = "금액") +
       scale_color_startrek() +
       theme(axis.text.x=element_text(size = 11, face = "bold", angle = 45, hjust = 1)
@@ -203,6 +244,57 @@ shinyServer(function(input, output, session){
             , plot.title = element_text(hjust = 0.5, face = "bold")
             , title = element_text(hjust = 0.5, size = 12, face = "bold")
             , legend.position = "top"
+            , legend.text = element_text(size = 12, face = "bold")
+            , text = element_text(family = "Kakao Regular"))
+    
+    plotly::ggplotly(p)
+  })
+  
+  output$trend_chart2 <- renderPlotly({
+    year_range = seq(input$year_slider[1], input$year_slider[2], 1)
+    
+    trend_dt = year_trend_melt[year %in% year_range]
+    
+    p = 
+      ggplot(trend_dt[trend_type %in% c('t_cum_save')], aes(x = yearMonth, y = trend_value/100000000, group = trend_type, color = trend_type)) + 
+      geom_line() +
+      geom_point() +
+      scale_y_continuous(labels = point, breaks = seq(0, 10, 0.1)) +
+      labs(x = "년월", y = "금액 (억)") +
+      scale_color_startrek() +
+      theme(axis.text.x=element_text(size = 11, face = "bold", angle = 45, hjust = 1)
+            ,axis.text.y=element_text(size = 11, face = "bold")
+            , plot.title = element_text(hjust = 0.5, face = "bold")
+            , title = element_text(hjust = 0.5, size = 12, face = "bold")
+            , legend.position = "top"
+            , axis.ticks.x = element_blank()
+            , legend.text = element_text(size = 12, face = "bold")
+            , panel.grid.major.x = element_blank()
+            , text = element_text(family = "Kakao Regular"))
+    
+    plotly::ggplotly(p)
+  })
+  
+  output$trend_chart3 <- renderPlotly({
+    year_range = seq(input$year_slider[1], input$year_slider[2], 1)
+    
+    trend_dt = year_trend_melt[year %in% year_range]
+    
+    p = 
+      ggplot(trend_dt[trend_type %in% c('t_save_ratio', 'my_save_ratio')], aes(x = yearMonth, y = trend_value, group = trend_type, color = trend_type)) + 
+      geom_line() +
+      geom_point() +
+      scale_y_continuous(labels = percent, breaks = extended_breaks(10)) +
+      geom_hline(yintercept = 0.5, colour = "blue") +
+      geom_hline(yintercept = 0, colour = "black") +
+      labs(x = "년월", y = "sav") +
+      scale_color_startrek() +
+      theme(axis.text.x=element_text(size = 11, face = "bold", angle = 45, hjust = 1)
+            ,axis.text.y=element_text(size = 11, face = "bold")
+            , plot.title = element_text(hjust = 0.5, face = "bold")
+            , title = element_text(hjust = 0.5, size = 12, face = "bold")
+            , legend.position = "top"
+            , axis.ticks.x = element_blank()
             , legend.text = element_text(size = 12, face = "bold")
             , text = element_text(family = "Kakao Regular"))
     

@@ -105,14 +105,14 @@ monthly_income_cat
 
 
 #2. 년도별 수입, 지출 현황 ==============================================================================================
-input_year = seq(2020, 2020, 1)
+input_year = seq(2010, 2011, 1)
 
 year_trend = accountBook %>% 
   group_by(yearMonth) %>% 
   summarise(t_income = sum(totalIncome)
-            ,my_income = sum(ifelse(category2 %in% c('주수입_현아급여', '주수입_주원이') | detail == "퇴직금 찾음", 0, totalIncome))
+            ,my_income = sum(if_else(category2 %in% c("주수입_현아급여", "주수입_주원이") | detail == "퇴직금 찾음", 0, totalIncome))
             ,t_exp = sum(totalExpenditure)
-            ,life_exp = sum(ifelse(category2 %in% except_life_category, 0, totalExpenditure))
+            ,life_exp = sum(if_else(category2 %in% except_life_category, 0, totalExpenditure))
             ,t_save = sum(totalIncome) - sum(totalExpenditure)) %>% 
   mutate(my_save = my_income - life_exp) %>% #나의 세이브 = 나의 수입 - 생활비 지출
   arrange(yearMonth) %>%
