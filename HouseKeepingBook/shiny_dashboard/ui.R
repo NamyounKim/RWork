@@ -17,7 +17,9 @@ dashboardPage(
   dashboardSidebar(
     sidebarMenu(
       menuItem("월단위 지표", tabName = "t1"),
-      menuItem("트렌드 분석", tabName = "t2")
+      menuItem("월별 트렌드 분석", tabName = "t2"),
+      menuItem("연도별 트렌드 분석", tabName = "t3"),
+      menuItem("비교 분석", tabName = "t4")
     ),
     br(),br(),br()
   ),
@@ -46,20 +48,28 @@ dashboardPage(
               hr(),
               h3("이달의 지출 카테고리 순위"),
              fluidRow(
-               column(width = 6, dataTableOutput("table1", height = 600))
+               column(width = 6, dataTableOutput("table1"))
                ,column(width = 6, plotlyOutput("chart1", height = 600))
              ),
              h4("상세 지출 내역"),
              fluidRow(
-               column(width = 12, dataTableOutput("detail_table", height = 300))
+               column(width = 12, dataTableOutput("detail_table"))
+             ),
+             h4("올해 월 평균 생활비"),
+             fluidRow(
+               column(width = 12, verbatimTextOutput("value7"))
              ),
             hr(),
             h3("이달의 수입 항목"),
-             fluidRow(
-               column(width = 6, dataTableOutput("table2", height = 600))
+            fluidRow(
+              column(width = 6, dataTableOutput("table2"))
             #   ,column(width = 4, plotOutput("chart2", height = 600))
             #   ,column(width = 4, plotOutput("chart3", height = 600))
-             )
+            ),
+            h4("상세 수입 내역"),
+            fluidRow(
+              column(width = 12, dataTableOutput("detail_table2"))
+            ),
       ),
       tabItem(tabName = "t2",
               fluidRow(
@@ -77,6 +87,28 @@ dashboardPage(
               h3("Save 비율 추이"),
               fluidRow(
                 column(width = 12, plotlyOutput("trend_chart3"))
+              )
+      ),
+      tabItem(tabName = "t3",
+              # fluidRow(
+              #   column(width = 6, sliderInput("year_slider", "년도 범위 선택", min = 2010, max = current_year, value = c(current_year, current_year), step = 1, width = "100%", post = "년", sep = ""))
+              # ),
+              hr(),
+              h3("수입과 지출 추이"),
+              fluidRow(
+                column(width = 12, plotlyOutput("year_trend_chart1"))
+              ),
+              h3("월 평균 수입과 지출 추이"),
+              fluidRow(
+                column(width = 12, plotlyOutput("year_trend_chart1_avg"))
+              ),
+              h3("누적 Save 추이"),
+              fluidRow(
+                column(width = 12, plotlyOutput("year_trend_chart2"))
+              ),
+              h3("Save 비율 추이"),
+              fluidRow(
+                column(width = 12, plotlyOutput("year_trend_chart3"))
               )
       )
     )

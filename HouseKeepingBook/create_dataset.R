@@ -11,9 +11,9 @@ library(readxl)
 
 #expenditureFileList = list.files("./dataFile/expenditure/")
 #incomeFileList = list.files("./dataFile/income/")
-expenditureFileList = list.files("~/Library/Mobile Documents/com~apple~CloudDocs/개인용/dataFile/expenditure/")
-incomeFileList = list.files("~/Library/Mobile Documents/com~apple~CloudDocs/개인용/dataFile/income/")
-data_dir_path = "~/Library/Mobile Documents/com~apple~CloudDocs/개인용/dataFile"
+expenditureFileList = list.files("~/Library/Mobile Documents/com~apple~CloudDocs/개인용/dataFile/expenditure/")
+incomeFileList = list.files("~/Library/Mobile Documents/com~apple~CloudDocs/개인용/dataFile/income/")
+data_dir_path = "~/Library/Mobile Documents/com~apple~CloudDocs/개인용/dataFile"
 
 filePreProcessing <- function(expenditurFile, incomeFile){
   
@@ -31,8 +31,8 @@ filePreProcessing <- function(expenditurFile, incomeFile){
     expenditureTemp$카드 = as.numeric(expenditureTemp$카드)
     expenditureTemp$현금 = as.numeric(expenditureTemp$현금)
     
-    saveTemp = expenditureTemp %>% filter(grepl("저축/보험", 분류))
-    expenditureTemp = expenditureTemp %>% filter(!grepl("저축/보험", 분류))
+    saveTemp = expenditureTemp %>% dplyr::filter(grepl("저축/보험", 분류))
+    expenditureTemp = expenditureTemp %>% dplyr::filter(!grepl("저축/보험", 분류))
     
     expenditure = rbind(expenditure, expenditureTemp)
     save = rbind(save, saveTemp)
@@ -58,11 +58,11 @@ filePreProcessing <- function(expenditurFile, incomeFile){
   expenditure$category1 = stri_split_fixed(expenditure$분류,">",simplify = TRUE)[,1]
   expenditure$category2 = stri_split_fixed(expenditure$분류,">",simplify = TRUE)[,2]
   
-  credit_amount = expenditure %>% filter(category1 == "카드대금") 
+  credit_amount = expenditure %>% dplyr::filter(category1 == "카드대금") 
   credit_amount = credit_amount %>% select(날짜, year, yearMonth, category1, category2, detail, 현금, 카드, 카드분류, totalExpend)
   colnames(credit_amount) = c("날짜", "year", "yearMonth", "category1", "category2", "detail", "현금", "카드", "카드분류", "total")
   
-  expenditure = expenditure %>% filter(category1 != "카드대금")
+  expenditure = expenditure %>% dplyr::filter(category1 != "카드대금")
   expenditure = expenditure %>% select(날짜, year, yearMonth, category1, category2, detail, 현금, 카드, 카드분류, totalExpend)
   colnames(expenditure) = c("날짜", "year", "yearMonth", "category1", "category2", "detail", "현금", "카드", "카드분류", "total")
   expenditure$type = "expenditure"
@@ -84,7 +84,7 @@ filePreProcessing <- function(expenditurFile, incomeFile){
   income$year = stri_paste(substr(income$날짜,1,4))
   income$category1 = stri_split_fixed(income$분류, ">", simplify = TRUE)[,1]
   income$category2 = stri_split_fixed(income$분류, ">", simplify = TRUE)[,2]
-  income = income %>% filter(!(category1 %in% c("전월이월","저축/보험")))
+  income = income %>% dplyr::filter(!(category1 %in% c("전월이월","저축/보험")))
   income = income %>% select(날짜, year, yearMonth, category1, category2, detail, 금액) %>% mutate(카드=NA, 카드분류=NA, total=금액)
   colnames(income) = c("날짜", "year", "yearMonth", "category1", "category2", "detail", "현금", "카드", "카드분류", "total")
   income$type = "income"
