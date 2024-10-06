@@ -10,7 +10,7 @@ library(readr)
 library(scales)
 library(stringi)
 library(plotly)
-source("/Users/namyun/Documents/RWork/common_function.R")
+source("~/Documents/RWork/HouseKeepingBook/common_function.R")
 ggthemr('fresh')
 
 accountBook = data.table(accountBook)
@@ -30,7 +30,7 @@ year_trend = accountBook %>%
             ,t_exp = sum(totalExpenditure)
             ,life_exp = sum(ifelse(category2 %in% except_life_category, 0, totalExpenditure))
             ,t_save = sum(totalIncome) - sum(totalExpenditure)) %>% 
-  mutate(my_save = my_income - life_exp) %>% #나의 세이브 = 나의 수입 - 생활비 지출
+  mutate(my_save = my_income - t_exp) %>% #나의 세이브 = 나의 수입 - 전체 지출
   arrange(yearMonth) %>%
   mutate(t_cum_save = cumsum(t_save)) %>%
   data.table()
@@ -53,7 +53,7 @@ year_year_trend = accountBook %>%
             ,t_exp = sum(totalExpenditure)
             ,life_exp = sum(ifelse(category2 %in% except_life_category, 0, totalExpenditure))
             ,t_save = sum(totalIncome) - sum(totalExpenditure)) %>%  #Total 세이브 = 전체 수입 - 전체 지출
-  mutate(my_save = my_income - life_exp) %>% #나의 세이브 = 나의 수입 - 생활비 지출
+  mutate(my_save = my_income - t_exp) %>% #나의 세이브 = 나의 수입 - 전체지출
   mutate(avg_t_income = t_income / 12
          ,avg_my_income = my_income / 12
          ,avg_t_exp = t_exp / 12

@@ -1,9 +1,9 @@
 {
-    "path" : "~/GitHub/RWork/HouseKeepingBook/shiny_dashboard",
-    "sortOrder" : [
+    "path": "~/GitHub/RWork/HouseKeepingBook",
+    "sortOrder": [
         {
-            "ascending" : true,
-            "columnIndex" : 2
+            "columnIndex": 2,
+            "ascending": true
         }
     ]
 }
