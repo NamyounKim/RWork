@@ -1,0 +1,64 @@
+---
+title: "카테고리별 월단위 증감 비교"
+toc: true
+format:
+  html:
+    html-math-method: katex
+    code-tools: true
+    code-fold: true
+    self-contained: true
+execute:
+  warning: false
+---
+
+### L1 기준 카테고리별 증감
+
+```{r}
+#| cache: true
+source("/Users/namyun/Documents/RWork/common_function.R")
+accountBook = read_csv("./accountBook.csv")
+
+accountBook = data.table(accountBook)
+accountBook$month_id = substr(accountBook$yearMonth, 6,7)
+
+#월별 카테고리별 지출 비교
+before_ym = '2022-03'
+after_ym = '2023-03'
+
+  
+#지출 카테고리별 집계
+before_monthly_exp_cat = accountBook[yearMonth %in% before_ym & type == 'expenditure'] %>% 
+  group_by(category1) %>% 
+  summarise(totalExpenditure = sum(totalExpenditure)) %>%
+  mutate(expenditure_ratio = totalExpenditure/sum(totalExpenditure)) %>%
+  arrange(-totalExpenditure) %>% as.data.table()
+
+before_monthly_exp_cat$yearMonth = before_ym
+
+after_monthly_exp_cat = accountBook[yearMonth %in% after_ym & type == 'expenditure'] %>% 
+  group_by(category1) %>% 
+  summarise(totalExpenditure = sum(totalExpenditure)) %>%
+  mutate(expenditure_ratio = totalExpenditure/sum(totalExpenditure)) %>%
+  arrange(-totalExpenditure) %>% as.data.table()
+after_monthly_exp_cat$yearMonth = after_ym
+
+rbind_monthly_exp_cat = rbind(before_monthly_exp_cat, after_monthly_exp_cat)
+```
+
+plot
+
+```{r}
+p = 
+  ggplot(rbind_monthly_exp_cat, aes(x = category1, y = totalExpenditure, color = yearMonth, fill = yearMonth)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.5) + 
+  scale_y_continuous(labels = point, breaks = breaks_extended(n = 10)) +
+  theme(axis.text.x=element_text(size = 9, face = "bold")
+        ,axis.text.y=element_text(size = 9, face = "bold")
+        , plot.title = element_text(hjust = 0.5, face = "bold")
+        , title = element_text(hjust = 0.5, size = 12, face = "bold")
+        , legend.position = "top"
+        , legend.text = element_text(size = 12, face = "bold")
+        , text = element_text(family = "NanumBarunGothic"))
+
+plotly::ggplotly(p)
+```

@@ -101,4 +101,6 @@ credit_amount = processing_result[[2]]
 accountBook = reshape2::dcast(accountBook, 날짜+year+yearMonth+category1+category2+detail+현금+카드+카드분류+total+type ~ type, fun.aggregate = sum, value.var = "total", fill = 0)
 colnames(accountBook)[12:14] = c("totalExpenditure", "totalIncome","totalSave")
 
+accountBook$year = substr(accountBook$yearMonth, 1, 4)
+
 write.csv(accountBook, "./accountBook.csv",row.names = F)

@@ -122,6 +122,7 @@ shinyServer(function(input, output, session){
     
   })
   
+  # Tab1. 월단위 지표 대시보드 -------------------------------------------------------------------------------------------------------------------------------
   output$value1 <- renderValueBox({
     
     input_ym = get_input_ym(input$year_id, input$month_id)
@@ -200,20 +201,21 @@ shinyServer(function(input, output, session){
     formatC(this_year_avg_life_exp$mean[1], digits=0, format="f", big.mark=',')
   })
   
-  # 지출 카테고리별 금액 테이블 ---------------------------------------------------------------------------------------------------------------------------------
+  ### 지출 카테고리별 금액 테이블 ----
   output$table1 <- renderDataTable({
     
     temp = result_obj$monthly_exp_cat
-    temp$expenditure_ratio = percent(temp$expenditure_ratio, accuracy = 0.1)
-    temp$totalExpenditure = formatC(temp$totalExpenditure, digits=0, format="f", big.mark=',')
+    
+    temp = datatable(temp, options = list(pageLength = 10, searching = FALSE), selection = list(mode = 'single', selected = c(1))) %>% 
+      formatPercentage(columns = c('expenditure_ratio'), digits = 1) %>% 
+      formatRound(columns = c('totalExpenditure'), digits = 0)
     
     return(temp)
     
-  }, selection = list(mode = 'single', selected = c(1)),
-    option=list(columnDefs=list(list(targets=2:3, class="dt-right")), searching = FALSE))
+  })
   
   
-  # 지출 상세 내역 테이블 ---------------------------------------------------------------------------------------------------------------------------------
+  ### 지출 상세 내역 테이블 ----
   output$detail_table <- renderDataTable({
     
     input_ym = get_input_ym(input$year_id, input$month_id)
@@ -224,14 +226,15 @@ shinyServer(function(input, output, session){
     detail_expenditure = accountBook[yearMonth %in% input_ym & type == 'expenditure' & category2 == select_cate]
     
     detail_expenditure = detail_expenditure[,.(날짜, category1, category2, detail, totalExpenditure)]
-    detail_expenditure$totalExpenditure = formatC(detail_expenditure$totalExpenditure, digits=0, format="f", big.mark=',')
+    
+    detail_expenditure = datatable(detail_expenditure, options = list(pageLength = 10, searching = FALSE), selection = list(mode = 'none')) %>% 
+      formatRound(columns = c('totalExpenditure'), digits = 0)
     
     return(detail_expenditure)
     
-  }, selection = list(mode = 'none'),
-  option=list(columnDefs=list(list(targets=5, class="dt-right")), searching = FALSE))
+  })
   
-  ## 지출 카테고리별 막대바 ---------------------------------------------------------------------------------------------------------------------------------
+  ### 지출 카테고리별 막대바 ----
   output$chart1 <- renderPlotly({
     
     temp = result_obj$monthly_exp_cat
@@ -254,7 +257,7 @@ shinyServer(function(input, output, session){
     plotly::ggplotly(p)
   })
   
-  ## 수입 내역 ---------------------------------------------------------------------------------------------------------------------------------
+  ### 수입 내역 ----
   output$table2 <- renderDataTable({
     
     temp = result_obj$monthly_income_cat
@@ -266,7 +269,7 @@ shinyServer(function(input, output, session){
   }, selection = list(mode = 'single', selected = c(1)), 
   option=list(columnDefs=list(list(targets=2:3, class="dt-right")), searching = FALSE))
 
-  # 수입 상세 내역 테이블 ---------------------------------------------------------------------------------------------------------------------------------
+  ### 수입 상세 내역 테이블 ----
   output$detail_table2 <- renderDataTable({
     
     input_ym = get_input_ym(input$year_id, input$month_id)
@@ -286,6 +289,8 @@ shinyServer(function(input, output, session){
   
 
 # Tab2. 트랜드 분석 -------------------------------------------------------------------------------------------------------------------------------
+  
+  ### 수입과 지출 추이 -----
   output$trend_chart1 <- renderPlotly({
     
     year_range = seq(input$year_slider[1], input$year_slider[2], 1)
@@ -297,6 +302,8 @@ shinyServer(function(input, output, session){
       geom_line() +
       geom_point() +
       scale_y_continuous(labels = point, breaks = breaks_extended(n = 10)) +
+      geom_hline(yintercept = 3000000, colour = "blue") +
+      geom_hline(yintercept = 4000000, colour = "red") +
       labs(x = "년월", y = "금액") +
       scale_color_startrek() +
       theme(axis.text.x=element_text(size = 11, face = "bold", angle = 45, hjust = 1)
@@ -310,6 +317,7 @@ shinyServer(function(input, output, session){
     plotly::ggplotly(p)
   })
   
+  ### 누적 save 추이 ----
   output$trend_chart2 <- renderPlotly({
     year_range = seq(input$year_slider[1], input$year_slider[2], 1)
     
@@ -335,6 +343,7 @@ shinyServer(function(input, output, session){
     plotly::ggplotly(p)
   })
   
+  ### Save 비율 추이 ----
   output$trend_chart3 <- renderPlotly({
     year_range = seq(input$year_slider[1], input$year_slider[2], 1)
     
@@ -446,4 +455,186 @@ shinyServer(function(input, output, session){
     
     plotly::ggplotly(p)
   })
+  
+  # Tab4. 카테고리별 트렌드 분석 -------------------------------------------------------------------------------------------------------------------------------
+  
+  ### 지출 카테고리별 금액 테이블 만들기 ----
+  output$category_exp_table <- renderDataTable({
+    
+    year_range = seq(input$year_slider2[1], input$year_slider2[2], 1)
+    
+    #지출 카테고리별 집계
+    category_exp_df = accountBook[year %in% year_range & type == 'expenditure'] %>%
+      group_by(yearMonth, category2) %>% 
+      summarise(sumExp = sum(totalExpenditure)) %>%
+      group_by(category2) %>%
+      summarise(totalExpenditure = sum(sumExp)
+                ,avgExpenditure = mean(sumExp)) %>%
+      mutate(expenditure_ratio = totalExpenditure/sum(totalExpenditure)) %>%
+      arrange(-totalExpenditure) %>% as.data.table()
+    
+    category_exp_df = datatable(category_exp_df, options = list(pageLength = 10, searching = FALSE), selection = list(mode = 'single', selected = c(1))) %>% 
+      formatPercentage(columns = c('expenditure_ratio'), digits = 1) %>% 
+      formatRound(columns = c('totalExpenditure'), digits = 0) %>%
+      formatRound(columns = c('avgExpenditure'), digits = 0)
+    
+    return(category_exp_df)
+    
+  })
+  
+  ### 선택된 카테고리 월별 추이 ----
+  output$category_trend_chart <- renderPlotly({
+    
+    year_range = seq(input$year_slider2[1], input$year_slider2[2], 1)
+    
+    #지출 카테고리별 집계
+    category_exp_df = accountBook[year %in% year_range & type == 'expenditure'] %>%
+      group_by(category2) %>% 
+      summarise(totalExpenditure = sum(totalExpenditure)) %>%
+      mutate(expenditure_ratio = totalExpenditure/sum(totalExpenditure)) %>%
+      arrange(-totalExpenditure) %>% as.data.table()
+    
+    print(input$category_exp_table_rows_selected)
+    selected_cate = category_exp_df[input$category_exp_table_rows_selected]$category2
+    print(selected_cate)
+    
+    #지출 카테고리별 집계
+    selected_cate_trend_df = accountBook[year %in% year_range & type == 'expenditure' & category2 == selected_cate] %>%
+      group_by(yearMonth) %>% 
+      summarise(totalExpenditure = sum(totalExpenditure)) %>%
+      mutate(expenditure_ratio = totalExpenditure/sum(totalExpenditure)) %>%
+      arrange(-totalExpenditure) %>% as.data.table()
+  
+    
+    p = 
+      ggplot(selected_cate_trend_df, aes(x = yearMonth, y = totalExpenditure)) +
+      geom_bar(stat = "identity", position = "dodge", width = 0.5) + 
+      geom_text(aes(y=totalExpenditure, label = comma(totalExpenditure))) +
+      scale_y_continuous(labels = point, breaks = breaks_extended(n = 10)) +
+      theme(axis.text.x=element_text(size = 9, face = "bold", angle = 45)
+            ,axis.text.y=element_text(size = 9, face = "bold")
+            , plot.title = element_text(hjust = 0.5, face = "bold")
+            , title = element_text(hjust = 0.5, size = 12, face = "bold")
+            , legend.position = "top"
+            , legend.text = element_text(size = 12, face = "bold")
+            , text = element_text(family = "NanumBarunGothic"))
+    
+    plotly::ggplotly(p)
+    
+  })
+  
+  # Tab5. 다른 월과 비교 분석 -------------------------------------------------------------------------------------------------------------------------------
+  
+  output$value_past_exp <- renderValueBox({
+    
+    before_ym = paste0(input$past_year_id, "-", input$past_month_id)
+    
+    real_expenditure = sum(accountBook[yearMonth %in% before_ym & !(category2 %in% except_life_category)]$totalExpenditure)
+    
+    valueBox(formatC(real_expenditure, digits=0, format="f", big.mark=','), subtitle = before_ym, color = "red")
+    
+  })
+  
+  output$value_future_exp <- renderValueBox({
+    
+    after_ym = paste0(input$future_year_id, "-", input$future_month_id)
+    
+    real_expenditure = sum(accountBook[yearMonth %in% after_ym & !(category2 %in% except_life_category)]$totalExpenditure)
+    
+    valueBox(formatC(real_expenditure, digits=0, format="f", big.mark=','), subtitle = after_ym, color = "blue")
+    
+  })
+  
+  output$value_diff_exp <- renderValueBox({
+    
+    before_ym = paste0(input$past_year_id, "-", input$past_month_id)
+    after_ym = paste0(input$future_year_id, "-", input$future_month_id)
+    
+    diff_val = sum(accountBook[yearMonth %in% before_ym & !(category2 %in% except_life_category)]$totalExpenditure) - sum(accountBook[yearMonth %in% after_ym & !(category2 %in% except_life_category)]$totalExpenditure)
+    
+    valueBox(formatC(diff_val, digits=0, format="f", big.mark=','), subtitle = "차이금액", color = "yellow")
+    
+  })
+  
+  
+  output$compare_month_chart <- renderPlotly({
+    
+    before_ym = paste0(input$past_year_id, "-", input$past_month_id)
+    after_ym = paste0(input$future_year_id, "-", input$future_month_id)
+    
+    #지출 카테고리별 집계
+    before_monthly_exp_cat = accountBook[yearMonth %in% before_ym & type == 'expenditure'] %>% 
+      group_by(category1) %>% 
+      summarise(totalExpenditure = sum(totalExpenditure)) %>%
+      mutate(expenditure_ratio = totalExpenditure/sum(totalExpenditure)) %>%
+      arrange(-totalExpenditure) %>% as.data.table()
+    
+    before_monthly_exp_cat$yearMonth = before_ym
+    
+    after_monthly_exp_cat = accountBook[yearMonth %in% after_ym & type == 'expenditure'] %>% 
+      group_by(category1) %>% 
+      summarise(totalExpenditure = sum(totalExpenditure)) %>%
+      mutate(expenditure_ratio = totalExpenditure/sum(totalExpenditure)) %>%
+      arrange(-totalExpenditure) %>% as.data.table()
+    after_monthly_exp_cat$yearMonth = after_ym
+    
+    rbind_monthly_exp_cat = rbind(before_monthly_exp_cat, after_monthly_exp_cat)
+    
+    p = 
+      ggplot(rbind_monthly_exp_cat, aes(x = category1, y = totalExpenditure, color = yearMonth, fill = yearMonth)) +
+      geom_bar(stat = "identity", position = "dodge", width = 0.5) + 
+      geom_text(aes(y=totalExpenditure, label = comma(totalExpenditure))) +
+      scale_y_continuous(labels = point, breaks = breaks_extended(n = 10)) +
+      theme(axis.text.x=element_text(size = 9, face = "bold")
+            ,axis.text.y=element_text(size = 9, face = "bold")
+            , plot.title = element_text(hjust = 0.5, face = "bold")
+            , title = element_text(hjust = 0.5, size = 12, face = "bold")
+            , legend.position = "top"
+            , legend.text = element_text(size = 12, face = "bold")
+            , text = element_text(family = "NanumBarunGothic"))
+    
+    plotly::ggplotly(p)
+    
+  })
+  
+  output$compare_month_chart2 <- renderPlotly({
+    before_ym = paste0(input$past_year_id, "-", input$past_month_id)
+    after_ym = paste0(input$future_year_id, "-", input$future_month_id)
+    
+    #지출 카테고리별 집계
+    before_monthly_exp_cat = accountBook[yearMonth %in% before_ym & type == 'expenditure'] %>% 
+      group_by(category2) %>% 
+      summarise(totalExpenditure = sum(totalExpenditure)) %>%
+      mutate(expenditure_ratio = totalExpenditure/sum(totalExpenditure)) %>%
+      arrange(-totalExpenditure) %>% as.data.table()
+    
+    before_monthly_exp_cat$yearMonth = before_ym
+    
+    after_monthly_exp_cat = accountBook[yearMonth %in% after_ym & type == 'expenditure'] %>% 
+      group_by(category2) %>% 
+      summarise(totalExpenditure = sum(totalExpenditure)) %>%
+      mutate(expenditure_ratio = totalExpenditure/sum(totalExpenditure)) %>%
+      arrange(-totalExpenditure) %>% as.data.table()
+    after_monthly_exp_cat$yearMonth = after_ym
+    
+    rbind_monthly_exp_cat = rbind(before_monthly_exp_cat, after_monthly_exp_cat)
+    
+    p = 
+      ggplot(rbind_monthly_exp_cat, aes(x = category2, y = totalExpenditure, color = yearMonth, fill = yearMonth)) +
+      geom_bar(stat = "identity", position = "dodge", width = 0.5) + 
+      geom_text(aes(y=totalExpenditure, label = comma(totalExpenditure))) +
+      scale_y_continuous(labels = point, breaks = breaks_extended(n = 10)) +
+      theme(axis.text.x=element_text(size = 9, face = "bold", angle = 90)
+            ,axis.text.y=element_text(size = 9, face = "bold")
+            , plot.title = element_text(hjust = 0.5, face = "bold")
+            , title = element_text(hjust = 0.5, size = 12, face = "bold")
+            , legend.position = "top"
+            , legend.text = element_text(size = 12, face = "bold")
+            , text = element_text(family = "NanumBarunGothic"))
+    
+    plotly::ggplotly(p)
+    
+  })
+  
 })
+
