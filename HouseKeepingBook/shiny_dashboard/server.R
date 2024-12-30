@@ -261,8 +261,10 @@ shinyServer(function(input, output, session){
   output$table2 <- renderDataTable({
     
     temp = result_obj$monthly_income_cat
-    temp$income_ratio = percent(temp$income_ratio, accuracy = 0.1)
-    temp$total_income = formatC(temp$total_income, digits=0, format="f", big.mark=',')
+    
+    temp = datatable(temp, options = list(pageLength = 10, searching = FALSE), selection = list(mode = 'single', selected = c(1))) %>% 
+      formatPercentage(columns = c('income_ratio'), digits = 1) %>% 
+      formatRound(columns = c('total_income'), digits = 0)
 
     return(temp)
     
@@ -280,7 +282,10 @@ shinyServer(function(input, output, session){
     detail_income = accountBook[yearMonth %in% input_ym & type == 'income' & category2 == select_cate]
     
     detail_income = detail_income[,.(날짜, category1, category2, detail, totalIncome)]
-    detail_income$totalIncome = formatC(detail_income$totalIncome, digits=0, format="f", big.mark=',')
+    
+    detail_income = datatable(detail_income, options = list(pageLength = 10, searching = FALSE), selection = list(mode = 'none')) %>% 
+      formatRound(columns = c('totalIncome'), digits = 0)
+    
     print(detail_income)
     return(detail_income)
     
